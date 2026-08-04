@@ -1,0 +1,1295 @@
+<!DOCTYPE html>
+<html lang="pl">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Algo Analyzer // Social Media Algorithm Intelligence (ApliHub)</title>
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&family=Orbitron:wght@600;800;900&display=swap" rel="stylesheet">
+    
+    <!-- Main Style -->
+    <link rel="stylesheet" href="css/style.css">
+</head>
+
+<body>
+    <!-- Atmospheric Cyber Background Glows (Yellow Cyberpunk Theme) -->
+    <div class="glow-bg"></div>
+    <div class="glow-bg-secondary"></div>
+
+    <div class="app-container">
+        <!-- Top Navigation Header -->
+        <header class="top-header">
+            <div class="top-header-left">
+                <!-- Left area clean without badges -->
+            </div>
+
+            <div class="top-header-right">
+                <!-- User Avatar Profile Menu Container -->
+                <div class="user-profile-wrapper" id="user-profile-wrapper">
+                    <div class="user-avatar-btn" id="user-avatar-btn" title="Konto użytkownika">
+                        <div class="avatar-frame" id="top-user-avatar-frame">
+                            <span>O</span>
+                        </div>
+                        <div class="avatar-info">
+                            <span class="avatar-name" id="top-user-avatar-name">Oskar_Algo</span>
+                        </div>
+                        <svg class="dropdown-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <polyline points="6 9 12 15 18 9"></polyline>
+                        </svg>
+                    </div>
+
+                    <!-- Dropdown Panel (Profil, Konto, Połączone konta, Wyloguj) -->
+                    <div class="user-dropdown-menu" id="user-dropdown-menu">
+                        <div class="dropdown-header">
+                            <div style="font-weight: 600; font-size: 13px;" id="dropdown-user-name">Oskar_Algo</div>
+                            <div class="user-email">oskar@aplihub.pl</div>
+                        </div>
+
+                        <button class="dropdown-item" data-action="profil">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                                <circle cx="12" cy="7" r="4"></circle>
+                            </svg>
+                            <span data-i18n="profile_title">Profil</span>
+                        </button>
+
+                        <button class="dropdown-item" data-action="konto">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+                                <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+                            </svg>
+                            <span data-i18n="account_settings">Konto</span>
+                        </button>
+
+                        <button class="dropdown-item" data-action="polaczone">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path>
+                                <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path>
+                            </svg>
+                            <span data-i18n="connected_accounts">Połączone konta</span>
+                        </button>
+
+                        <div style="height: 1px; background: rgba(255,255,255,0.06); margin: 4px 0;"></div>
+
+                        <button class="dropdown-item danger" data-action="wyloguj">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+                                <polyline points="16 17 21 12 16 7"></polyline>
+                                <line x1="21" y1="12" x2="9" y2="12"></line>
+                            </svg>
+                            <span data-i18n="logout">Wyloguj</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <!-- Main Application Body -->
+        <div class="app-layout">
+            <!-- Sidebar Navigation -->
+            <aside class="sidebar">
+                <div class="sidebar-header">
+                    <div class="logo">
+                        <div class="logo-icon">
+                            <svg viewBox="0 0 24 24">
+                                <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"></path>
+                            </svg>
+                        </div>
+                        <div class="logo-text">
+                            <span class="logo-title">ALGO ANALYZER</span>
+                            <span class="logo-subtitle">ApliHub Suite</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Sidebar Tabs: YouTube, TikTok, Instagram, Facebook, Twitch, Analiza -->
+                <nav class="sidebar-tabs">
+                    <button class="tab-btn" data-target="tab-youtube">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M22.54 6.42a2.78 2.78 0 0 0-1.94-2C18.88 4 12 4 12 4s-6.88 0-8.6.46a2.78 2.78 0 0 0-1.94 2A29 29 0 0 0 1 11.75a29 29 0 0 0 .46 5.33A2.78 2.78 0 0 0 3.4 19c1.72.46 8.6.46 8.6.46s6.88 0 8.6-.46a2.78 2.78 0 0 0 1.94-2 29 29 0 0 0 .46-5.25 29 29 0 0 0-.46-5.33z"></path>
+                            <polygon points="9.75 15.02 15.5 11.75 9.75 8.48 9.75 15.02"></polygon>
+                        </svg>
+                        <span>YouTube</span>
+                    </button>
+
+                    <button class="tab-btn" data-target="tab-tiktok">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M9 12a4 4 0 1 0 4 4V4a5 5 0 0 0 5 5"></path>
+                        </svg>
+                        <span>TikTok</span>
+                    </button>
+
+                    <button class="tab-btn" data-target="tab-instagram">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect>
+                            <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path>
+                            <line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line>
+                        </svg>
+                        <span>Instagram</span>
+                    </button>
+
+                    <button class="tab-btn" data-target="tab-facebook">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"></path>
+                        </svg>
+                        <span>Facebook</span>
+                    </button>
+
+                    <button class="tab-btn" data-target="tab-twitch">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M21 2H3v16h5v4l4-4h5l4-4V2zm-10 9V7m5 4V7"></path>
+                        </svg>
+                        <span>Twitch</span>
+                    </button>
+
+                    <button class="tab-btn active" data-target="tab-analiza">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <line x1="18" y1="20" x2="18" y2="10"></line>
+                            <line x1="12" y1="20" x2="12" y2="4"></line>
+                            <line x1="6" y1="20" x2="6" y2="14"></line>
+                        </svg>
+                        <span data-i18n="nav_analiza">Analiza</span>
+                    </button>
+                </nav>
+            </aside>
+
+            <!-- Main Content Area -->
+            <main class="main-content">
+
+                <!-- TAB: YouTube -->
+                <section class="view-section" id="tab-youtube">
+                    <div class="page-header">
+                        <h1 class="page-title">
+                            <span class="page-title-accent">YouTube — Poradnik Zasięgów & Trendy</span>
+                        </h1>
+                        <p class="page-description">Proste i przejrzyste wskazówki, jak wybić swoje filmy na YouTube.</p>
+                    </div>
+
+                    <div style="margin-bottom: 30px;">
+                        <h3 style="font-family: var(--font-tech); color: var(--color-yellow-main); font-size: 18px; margin-bottom: 15px; display: flex; align-items: center; gap: 10px;">
+                            <span>🔥</span> Co się teraz wybija i ma najsilniejsze zasięgi
+                        </h3>
+                        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px;">
+                            <div class="glass-card" style="padding: 20px;">
+                                <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 12px;">
+                                    <h4 style="font-size: 15px; font-weight: 700; color: var(--color-text-primary); line-height: 1.3;">Shorts 15-30 sekund z prostym wstępem</h4>
+                                    <span style="font-size: 10px; font-family: var(--font-mono); background: rgba(245,158,11,0.15); color: var(--color-yellow-main); padding: 3px 8px; border-radius: 6px; border: 1px solid rgba(245,158,11,0.3); white-space: nowrap;">Wirusowość 98%</span>
+                                </div>
+                                <p style="font-size: 13px; color: var(--color-text-muted); line-height: 1.5;">Krótkie filmy z wyraźnymi dużymi napisami i dynamicznym wstępem przyciągają najwięcej widzów.</p>
+                            </div>
+                            <div class="glass-card" style="padding: 20px;">
+                                <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 12px;">
+                                    <h4 style="font-size: 15px; font-weight: 700; color: var(--color-text-primary); line-height: 1.3;">Filmy Długie (10-15 minut)</h4>
+                                    <span style="font-size: 10px; font-family: var(--font-mono); background: rgba(245,158,11,0.15); color: var(--color-yellow-main); padding: 3px 8px; border-radius: 6px; border: 1px solid rgba(245,158,11,0.3); white-space: nowrap;">Utrzymanie Uwagi</span>
+                                </div>
+                                <p style="font-size: 13px; color: var(--color-text-muted); line-height: 1.5;">Przejrzyste materiały, które ciekawie tłumaczą jeden konkretny temat.</p>
+                            </div>
+                            <div class="glass-card" style="padding: 20px;">
+                                <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 12px;">
+                                    <h4 style="font-size: 15px; font-weight: 700; color: var(--color-text-primary); line-height: 1.3;">Miniatury z 2-3 słowami</h4>
+                                    <span style="font-size: 10px; font-family: var(--font-mono); background: rgba(245,158,11,0.15); color: var(--color-yellow-main); padding: 3px 8px; border-radius: 6px; border: 1px solid rgba(245,158,11,0.3); white-space: nowrap;">Klikalność (CTR)</span>
+                                </div>
+                                <p style="font-size: 13px; color: var(--color-text-muted); line-height: 1.5;">Czytelna miniatura z jasnym obiektem i maksymalnie 3 słowami działa najlepiej.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div style="margin-bottom: 30px;">
+                        <h3 style="font-family: var(--font-tech); color: var(--color-yellow-main); font-size: 18px; margin-bottom: 15px; display: flex; align-items: center; gap: 10px;">
+                            <span>⚡</span> Jak prosto wbić się w algorytm — 3 Szybkie Kroki
+                        </h3>
+                        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px;">
+                            <div class="glass-card" style="padding: 20px;">
+                                <div style="font-size: 13px; color: var(--color-text-muted); font-weight: 600; margin-bottom: 6px;">Miniatura i Tytuł (CTR)</div>
+                                <div style="font-family: var(--font-mono); font-size: 15px; font-weight: 700; color: var(--color-yellow-main); margin-bottom: 8px;">Krok 1: Zadbaj o prosty nagłówek</div>
+                                <div style="font-size: 12px; color: var(--color-text-dim); line-height: 1.4;">Stwórz miniaturę z 2-3 słowami, która budzi ciekawość.</div>
+                            </div>
+                            <div class="glass-card" style="padding: 20px;">
+                                <div style="font-size: 13px; color: var(--color-text-muted); font-weight: 600; margin-bottom: 6px;">Pierwsze 30 sekund</div>
+                                <div style="font-family: var(--font-mono); font-size: 15px; font-weight: 700; color: var(--color-yellow-main); margin-bottom: 8px;">Krok 2: Od razu przejdź do rzeczy</div>
+                                <div style="font-size: 12px; color: var(--color-text-dim); line-height: 1.4;">Unikaj długich wstępów. Powiedz widzom wprost, co zyskają.</div>
+                            </div>
+                            <div class="glass-card" style="padding: 20px;">
+                                <div style="font-size: 13px; color: var(--color-text-muted); font-weight: 600; margin-bottom: 6px;">Komentarze i Opinie</div>
+                                <div style="font-family: var(--font-mono); font-size: 15px; font-weight: 700; color: var(--color-yellow-main); margin-bottom: 8px;">Krok 3: Zadaj jedno pytanie</div>
+                                <div style="font-size: 12px; color: var(--color-text-dim); line-height: 1.4;">Poproś w filmie o odpowiedź w komentarzu – to podbija pozycję.</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="glass-card" style="margin-bottom: 30px; padding: 25px;">
+                        <h3 style="font-family: var(--font-tech); color: var(--color-yellow-main); font-size: 18px; margin-bottom: 18px; display: flex; align-items: center; gap: 10px;">
+                            <span>⏰</span> Najlepszy Czas i Częstotliwość Publikacji
+                        </h3>
+                        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 20px;">
+                            <div style="background: rgba(0,0,0,0.3); padding: 16px; border-radius: 10px; border: 1px solid rgba(255,255,255,0.05);">
+                                <div style="font-size: 11px; color: var(--color-text-muted); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 6px;">NAJLEPSZE DNI TYGODNIA</div>
+                                <div style="font-size: 14px; font-weight: 600; color: var(--color-text-primary);">Wtorek, Czwartek, Sobota, Niedziela</div>
+                            </div>
+                            <div style="background: rgba(0,0,0,0.3); padding: 16px; border-radius: 10px; border: 1px solid rgba(255,255,255,0.05);">
+                                <div style="font-size: 11px; color: var(--color-text-muted); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 6px;">GODZINY SZCZYTU (PL)</div>
+                                <div style="font-size: 14px; font-weight: 600; color: var(--color-yellow-main); font-family: var(--font-mono);">16:00 - 18:30 oraz 20:00 (szczyt oglądalności)</div>
+                            </div>
+                            <div style="background: rgba(0,0,0,0.3); padding: 16px; border-radius: 10px; border: 1px solid rgba(255,255,255,0.05);">
+                                <div style="font-size: 11px; color: var(--color-text-muted); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 6px;">CZĘSTOTLIWOŚĆ</div>
+                                <div style="font-size: 14px; font-weight: 600; color: var(--color-text-primary);">Shorts: 1x dziennie | Filmy Długie: 2-3x w tygodniu</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="cheat-sheet-section" style="margin-top: 30px; padding: 25px; background: var(--color-card-bg); border: 1px solid var(--color-card-border); border-radius: var(--border-radius); backdrop-filter: blur(16px);">
+                        <h3 style="font-family: var(--font-tech); color: var(--color-yellow-main); font-size: 17px; margin-bottom: 16px; display: flex; align-items: center; gap: 10px;">
+                            <span>💡</span> Ściągawka ze Skrótów w Panelach
+                        </h3>
+                        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 16px;">
+                            <div style="background: rgba(0,0,0,0.3); padding: 14px 18px; border-radius: 10px; border: 1px solid rgba(255,255,255,0.05);">
+                                <div style="font-family: var(--font-mono); color: var(--color-yellow-main); font-weight: 700; font-size: 14px; margin-bottom: 4px;">CTR (Click-Through Rate)</div>
+                                <div style="font-size: 12px; color: var(--color-text-muted); line-height: 1.5;">Procent osób, które kliknęły w Twój film po zobaczeniu jego miniatury.</div>
+                            </div>
+                            <div style="background: rgba(0,0,0,0.3); padding: 14px 18px; border-radius: 10px; border: 1px solid rgba(255,255,255,0.05);">
+                                <div style="font-family: var(--font-mono); color: var(--color-yellow-main); font-weight: 700; font-size: 14px; margin-bottom: 4px;">AVD (Average View Duration)</div>
+                                <div style="font-size: 12px; color: var(--color-text-muted); line-height: 1.5;">Średni czas oglądania wideo przez widzów.</div>
+                            </div>
+                            <div style="background: rgba(0,0,0,0.3); padding: 14px 18px; border-radius: 10px; border: 1px solid rgba(255,255,255,0.05);">
+                                <div style="font-family: var(--font-mono); color: var(--color-yellow-main); font-weight: 700; font-size: 14px; margin-bottom: 4px;">FYP (For You Page)</div>
+                                <div style="font-size: 12px; color: var(--color-text-muted); line-height: 1.5;">Główny strumień rekomendacji na TikToku.</div>
+                            </div>
+                            <div style="background: rgba(0,0,0,0.3); padding: 14px 18px; border-radius: 10px; border: 1px solid rgba(255,255,255,0.05);">
+                                <div style="font-family: var(--font-mono); color: var(--color-yellow-main); font-weight: 700; font-size: 14px; margin-bottom: 4px;">Hook Rate (Retencja 3s)</div>
+                                <div style="font-size: 12px; color: var(--color-text-muted); line-height: 1.5;">Procent widzów zatrzymanych w pierwszych 3 sekundach.</div>
+                            </div>
+                            <div style="background: rgba(0,0,0,0.3); padding: 14px 18px; border-radius: 10px; border: 1px solid rgba(255,255,255,0.05);">
+                                <div style="font-family: var(--font-mono); color: var(--color-yellow-main); font-weight: 700; font-size: 14px; margin-bottom: 4px;">Saves Rate (Zapisania)</div>
+                                <div style="font-size: 12px; color: var(--color-text-muted); line-height: 1.5;">Wskaźnik określający, jak często widzowie zapisują post na później.</div>
+                            </div>
+                            <div style="background: rgba(0,0,0,0.3); padding: 14px 18px; border-radius: 10px; border: 1px solid rgba(255,255,255,0.05);">
+                                <div style="font-family: var(--font-mono); color: var(--color-yellow-main); font-weight: 700; font-size: 14px; margin-bottom: 4px;">Score (Algorytm)</div>
+                                <div style="font-size: 12px; color: var(--color-text-muted); line-height: 1.5;">Ogólna ocena procentowa dopasowania materiału do algorytmu.</div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- TAB: TikTok -->
+                <section class="view-section" id="tab-tiktok">
+                    <div class="page-header">
+                        <h1 class="page-title">
+                            <span class="page-title-accent">TikTok — Jak Wybić się na Stronie Dla Ciebie (FYP)</span>
+                        </h1>
+                        <p class="page-description">Sprawdzone sposoby na zdobywanie wyświetleń bez zbędnego utrudniania sobie życia.</p>
+                    </div>
+
+                    <div style="margin-bottom: 30px;">
+                        <h3 style="font-family: var(--font-tech); color: var(--color-yellow-main); font-size: 18px; margin-bottom: 15px; display: flex; align-items: center; gap: 10px;">
+                            <span>🔥</span> Co się teraz wybija i ma najsilniejsze zasięgi
+                        </h3>
+                        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px;">
+                            <div class="glass-card" style="padding: 20px;">
+                                <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 12px;">
+                                    <h4 style="font-size: 15px; font-weight: 700; color: var(--color-text-primary); line-height: 1.3;">Format POV & Tekst na Ekranie</h4>
+                                    <span style="font-size: 10px; font-family: var(--font-mono); background: rgba(245,158,11,0.15); color: var(--color-yellow-main); padding: 3px 8px; border-radius: 6px; border: 1px solid rgba(245,158,11,0.3); white-space: nowrap;">Szybka Pętla</span>
+                                </div>
+                                <p style="font-size: 13px; color: var(--color-text-muted); line-height: 1.5;">Krótkie nagranie z wciągającym napisem i muzyką w tle.</p>
+                            </div>
+                            <div class="glass-card" style="padding: 20px;">
+                                <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 12px;">
+                                    <h4 style="font-size: 15px; font-weight: 700; color: var(--color-text-primary); line-height: 1.3;">Popularne Dźwięki (Trending Audio)</h4>
+                                    <span style="font-size: 10px; font-family: var(--font-mono); background: rgba(245,158,11,0.15); color: var(--color-yellow-main); padding: 3px 8px; border-radius: 6px; border: 1px solid rgba(245,158,11,0.3); white-space: nowrap;">Podkład Dźwiękowy</span>
+                                </div>
+                                <p style="font-size: 13px; color: var(--color-text-muted); line-height: 1.5;">Używaj dźwięków z rosnącą strzałką, aby algorytm częściej wyświetlał film.</p>
+                            </div>
+                            <div class="glass-card" style="padding: 20px;">
+                                <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 12px;">
+                                    <h4 style="font-size: 15px; font-weight: 700; color: var(--color-text-primary); line-height: 1.3;">Format: Problem → Proste Rozwiązanie</h4>
+                                    <span style="font-size: 10px; font-family: var(--font-mono); background: rgba(245,158,11,0.15); color: var(--color-yellow-main); padding: 3px 8px; border-radius: 6px; border: 1px solid rgba(245,158,11,0.3); white-space: nowrap;">Wciągająca Treść</span>
+                                </div>
+                                <p style="font-size: 13px; color: var(--color-text-muted); line-height: 1.5;">Pokaż na samym początku ciekawy efekt lub odpowiedź.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div style="margin-bottom: 30px;">
+                        <h3 style="font-family: var(--font-tech); color: var(--color-yellow-main); font-size: 18px; margin-bottom: 15px; display: flex; align-items: center; gap: 10px;">
+                            <span>⚡</span> Jak prosto wbić się w algorytm — 3 Szybkie Kroki
+                        </h3>
+                        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px;">
+                            <div class="glass-card" style="padding: 20px;">
+                                <div style="font-size: 13px; color: var(--color-text-muted); font-weight: 600; margin-bottom: 6px;">Zaczepka w 3 sekundy</div>
+                                <div style="font-family: var(--font-mono); font-size: 15px; font-weight: 700; color: var(--color-yellow-main); margin-bottom: 8px;">Krok 1: Zaskocz na początku</div>
+                                <div style="font-size: 12px; color: var(--color-text-dim); line-height: 1.4;">Pokaż efekt końcowy lub zadaj intrygujące pytanie.</div>
+                            </div>
+                            <div class="glass-card" style="padding: 20px;">
+                                <div style="font-size: 13px; color: var(--color-text-muted); font-weight: 600; margin-bottom: 6px;">Długość Wideo (7-15s)</div>
+                                <div style="font-family: var(--font-mono); font-size: 15px; font-weight: 700; color: var(--color-yellow-main); margin-bottom: 8px;">Krok 2: Rób krótkie wideo</div>
+                                <div style="font-size: 12px; color: var(--color-text-dim); line-height: 1.4;">Wycinaj ciszę i niepotrzebne pauzy, aby utrzymać tempo.</div>
+                            </div>
+                            <div class="glass-card" style="padding: 20px;">
+                                <div style="font-size: 13px; color: var(--color-text-muted); font-weight: 600; margin-bottom: 6px;">Przesyłanie Znajomym</div>
+                                <div style="font-family: var(--font-mono); font-size: 15px; font-weight: 700; color: var(--color-yellow-main); margin-bottom: 8px;">Krok 3: Treści życiowe</div>
+                                <div style="font-size: 12px; color: var(--color-text-dim); line-height: 1.4;">Twórz materiały w stylu "Wyślij to znajomemu".</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="glass-card" style="margin-bottom: 30px; padding: 25px;">
+                        <h3 style="font-family: var(--font-tech); color: var(--color-yellow-main); font-size: 18px; margin-bottom: 18px; display: flex; align-items: center; gap: 10px;">
+                            <span>⏰</span> Najlepszy Czas i Częstotliwość Publikacji
+                        </h3>
+                        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 20px;">
+                            <div style="background: rgba(0,0,0,0.3); padding: 16px; border-radius: 10px; border: 1px solid rgba(255,255,255,0.05);">
+                                <div style="font-size: 11px; color: var(--color-text-muted); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 6px;">NAJLEPSZE DNI TYGODNIA</div>
+                                <div style="font-size: 14px; font-weight: 600; color: var(--color-text-primary);">Poniedziałek - Niedziela (Codziennie)</div>
+                            </div>
+                            <div style="background: rgba(0,0,0,0.3); padding: 16px; border-radius: 10px; border: 1px solid rgba(255,255,255,0.05);">
+                                <div style="font-size: 11px; color: var(--color-text-muted); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 6px;">GODZINY SZCZYTU (PL)</div>
+                                <div style="font-size: 14px; font-weight: 600; color: var(--color-yellow-main); font-family: var(--font-mono);">15:00, 19:00, 21:30 oraz okno 22:30 - 00:00</div>
+                            </div>
+                            <div style="background: rgba(0,0,0,0.3); padding: 16px; border-radius: 10px; border: 1px solid rgba(255,255,255,0.05);">
+                                <div style="font-size: 11px; color: var(--color-text-muted); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 6px;">CZĘSTOTLIWOŚĆ</div>
+                                <div style="font-size: 14px; font-weight: 600; color: var(--color-text-primary);">2 do 3 TikToki dziennie dla najlepszych efektów</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="cheat-sheet-section" style="margin-top: 30px; padding: 25px; background: var(--color-card-bg); border: 1px solid var(--color-card-border); border-radius: var(--border-radius); backdrop-filter: blur(16px);">
+                        <h3 style="font-family: var(--font-tech); color: var(--color-yellow-main); font-size: 17px; margin-bottom: 16px; display: flex; align-items: center; gap: 10px;">
+                            <span>💡</span> Ściągawka ze Skrótów w Panelach
+                        </h3>
+                        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 16px;">
+                            <div style="background: rgba(0,0,0,0.3); padding: 14px 18px; border-radius: 10px; border: 1px solid rgba(255,255,255,0.05);">
+                                <div style="font-family: var(--font-mono); color: var(--color-yellow-main); font-weight: 700; font-size: 14px; margin-bottom: 4px;">CTR (Click-Through Rate)</div>
+                                <div style="font-size: 12px; color: var(--color-text-muted); line-height: 1.5;">Procent osób, które kliknęły w Twój film po zobaczeniu jego miniatury.</div>
+                            </div>
+                            <div style="background: rgba(0,0,0,0.3); padding: 14px 18px; border-radius: 10px; border: 1px solid rgba(255,255,255,0.05);">
+                                <div style="font-family: var(--font-mono); color: var(--color-yellow-main); font-weight: 700; font-size: 14px; margin-bottom: 4px;">AVD (Average View Duration)</div>
+                                <div style="font-size: 12px; color: var(--color-text-muted); line-height: 1.5;">Średni czas oglądania wideo przez widzów.</div>
+                            </div>
+                            <div style="background: rgba(0,0,0,0.3); padding: 14px 18px; border-radius: 10px; border: 1px solid rgba(255,255,255,0.05);">
+                                <div style="font-family: var(--font-mono); color: var(--color-yellow-main); font-weight: 700; font-size: 14px; margin-bottom: 4px;">FYP (For You Page)</div>
+                                <div style="font-size: 12px; color: var(--color-text-muted); line-height: 1.5;">Główny strumień rekomendacji na TikToku.</div>
+                            </div>
+                            <div style="background: rgba(0,0,0,0.3); padding: 14px 18px; border-radius: 10px; border: 1px solid rgba(255,255,255,0.05);">
+                                <div style="font-family: var(--font-mono); color: var(--color-yellow-main); font-weight: 700; font-size: 14px; margin-bottom: 4px;">Hook Rate (Retencja 3s)</div>
+                                <div style="font-size: 12px; color: var(--color-text-muted); line-height: 1.5;">Procent widzów zatrzymanych w pierwszych 3 sekundach.</div>
+                            </div>
+                            <div style="background: rgba(0,0,0,0.3); padding: 14px 18px; border-radius: 10px; border: 1px solid rgba(255,255,255,0.05);">
+                                <div style="font-family: var(--font-mono); color: var(--color-yellow-main); font-weight: 700; font-size: 14px; margin-bottom: 4px;">Saves Rate (Zapisania)</div>
+                                <div style="font-size: 12px; color: var(--color-text-muted); line-height: 1.5;">Wskaźnik określający, jak często widzowie zapisują post na później.</div>
+                            </div>
+                            <div style="background: rgba(0,0,0,0.3); padding: 14px 18px; border-radius: 10px; border: 1px solid rgba(255,255,255,0.05);">
+                                <div style="font-family: var(--font-mono); color: var(--color-yellow-main); font-weight: 700; font-size: 14px; margin-bottom: 4px;">Score (Algorytm)</div>
+                                <div style="font-size: 12px; color: var(--color-text-muted); line-height: 1.5;">Ogólna ocena procentowa dopasowania materiału do algorytmu.</div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- TAB: Instagram -->
+                <section class="view-section" id="tab-instagram">
+                    <div class="page-header">
+                        <h1 class="page-title">
+                            <span class="page-title-accent">Instagram — Zasięgi Rolki (Reels) i Postów</span>
+                        </h1>
+                        <p class="page-description">Jak budować estetyczny profil i docierać do nowych obserwujących.</p>
+                    </div>
+
+                    <div style="margin-bottom: 30px;">
+                        <h3 style="font-family: var(--font-tech); color: var(--color-yellow-main); font-size: 18px; margin-bottom: 15px; display: flex; align-items: center; gap: 10px;">
+                            <span>🔥</span> Co się teraz wybija i ma najsilniejsze zasięgi
+                        </h3>
+                        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px;">
+                            <div class="glass-card" style="padding: 20px;">
+                                <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 12px;">
+                                    <h4 style="font-size: 15px; font-weight: 700; color: var(--color-text-primary); line-height: 1.3;">Reels 7-15 sekund</h4>
+                                    <span style="font-size: 10px; font-family: var(--font-mono); background: rgba(245,158,11,0.15); color: var(--color-yellow-main); padding: 3px 8px; border-radius: 6px; border: 1px solid rgba(245,158,11,0.3); white-space: nowrap;">Karta Eksploruj</span>
+                                </div>
+                                <p style="font-size: 13px; color: var(--color-text-muted); line-height: 1.5;">Estetyczne krótkie rolki z płynnym montażem i wskazówką.</p>
+                            </div>
+                            <div class="glass-card" style="padding: 20px;">
+                                <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 12px;">
+                                    <h4 style="font-size: 15px; font-weight: 700; color: var(--color-text-primary); line-height: 1.3;">Karuzele (Kilka slajdów)</h4>
+                                    <span style="font-size: 10px; font-family: var(--font-mono); background: rgba(245,158,11,0.15); color: var(--color-yellow-main); padding: 3px 8px; border-radius: 6px; border: 1px solid rgba(245,158,11,0.3); white-space: nowrap;">Wysokie Zaangażowanie</span>
+                                </div>
+                                <p style="font-size: 13px; color: var(--color-text-muted); line-height: 1.5;">Slajdy z krokami i wiedzą – widzowie chętnie je przewijają i zapisują.</p>
+                            </div>
+                            <div class="glass-card" style="padding: 20px;">
+                                <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 12px;">
+                                    <h4 style="font-size: 15px; font-weight: 700; color: var(--color-text-primary); line-height: 1.3;">Interakcje na Relacjach (Stories)</h4>
+                                    <span style="font-size: 10px; font-family: var(--font-mono); background: rgba(245,158,11,0.15); color: var(--color-yellow-main); padding: 3px 8px; border-radius: 6px; border: 1px solid rgba(245,158,11,0.3); white-space: nowrap;">Stała Społeczność</span>
+                                </div>
+                                <p style="font-size: 13px; color: var(--color-text-muted); line-height: 1.5;">Stosuj ankiety i naklejki z pytaniami, by utrzymać bliski kontakt.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div style="margin-bottom: 30px;">
+                        <h3 style="font-family: var(--font-tech); color: var(--color-yellow-main); font-size: 18px; margin-bottom: 15px; display: flex; align-items: center; gap: 10px;">
+                            <span>⚡</span> Jak prosto wbić się w algorytm — 3 Szybkie Kroki
+                        </h3>
+                        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px;">
+                            <div class="glass-card" style="padding: 20px;">
+                                <div style="font-size: 13px; color: var(--color-text-muted); font-weight: 600; margin-bottom: 6px;">Zapisywanie Postów</div>
+                                <div style="font-family: var(--font-mono); font-size: 15px; font-weight: 700; color: var(--color-yellow-main); margin-bottom: 8px;">Krok 1: Daj przydatną ściągę</div>
+                                <div style="font-size: 12px; color: var(--color-text-dim); line-height: 1.4;">Daj wiedzę, którą warto zachować na później.</div>
+                            </div>
+                            <div class="glass-card" style="padding: 20px;">
+                                <div style="font-size: 13px; color: var(--color-text-muted); font-weight: 600; margin-bottom: 6px;">Przesyłanie na Chat (DM)</div>
+                                <div style="font-family: var(--font-mono); font-size: 15px; font-weight: 700; color: var(--color-yellow-main); margin-bottom: 8px;">Krok 2: Rób zabawne Reels</div>
+                                <div style="font-size: 12px; color: var(--color-text-dim); line-height: 1.4;">Przesłanie rolki w wiadomości prywatnej to najsilniejszy sygnał.</div>
+                            </div>
+                            <div class="glass-card" style="padding: 20px;">
+                                <div style="font-size: 13px; color: var(--color-text-muted); font-weight: 600; margin-bottom: 6px;">Relacje (Stories)</div>
+                                <div style="font-family: var(--font-mono); font-size: 15px; font-weight: 700; color: var(--color-yellow-main); margin-bottom: 8px;">Krok 3: Dodawaj ankiety</div>
+                                <div style="font-size: 12px; color: var(--color-text-dim); line-height: 1.4;">Każda nakładka z pytaniem zwiększa liczbę wyświetleń.</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="glass-card" style="margin-bottom: 30px; padding: 25px;">
+                        <h3 style="font-family: var(--font-tech); color: var(--color-yellow-main); font-size: 18px; margin-bottom: 18px; display: flex; align-items: center; gap: 10px;">
+                            <span>⏰</span> Najlepszy Czas i Częstotliwość Publikacji
+                        </h3>
+                        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 20px;">
+                            <div style="background: rgba(0,0,0,0.3); padding: 16px; border-radius: 10px; border: 1px solid rgba(255,255,255,0.05);">
+                                <div style="font-size: 11px; color: var(--color-text-muted); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 6px;">NAJLEPSZE DNI TYGODNIA</div>
+                                <div style="font-size: 14px; font-weight: 600; color: var(--color-text-primary);">Środa, Piątek, Niedziela</div>
+                            </div>
+                            <div style="background: rgba(0,0,0,0.3); padding: 16px; border-radius: 10px; border: 1px solid rgba(255,255,255,0.05);">
+                                <div style="font-size: 11px; color: var(--color-text-muted); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 6px;">GODZINY SZCZYTU (PL)</div>
+                                <div style="font-size: 14px; font-weight: 600; color: var(--color-yellow-main); font-family: var(--font-mono);">07:30 - 09:00, 12:30, 18:30, 20:30</div>
+                            </div>
+                            <div style="background: rgba(0,0,0,0.3); padding: 16px; border-radius: 10px; border: 1px solid rgba(255,255,255,0.05);">
+                                <div style="font-size: 11px; color: var(--color-text-muted); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 6px;">CZĘSTOTLIWOŚĆ</div>
+                                <div style="font-size: 14px; font-weight: 600; color: var(--color-text-primary);">Reels: 1x dziennie | Stories: 4-5x / dzień</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="cheat-sheet-section" style="margin-top: 30px; padding: 25px; background: var(--color-card-bg); border: 1px solid var(--color-card-border); border-radius: var(--border-radius); backdrop-filter: blur(16px);">
+                        <h3 style="font-family: var(--font-tech); color: var(--color-yellow-main); font-size: 17px; margin-bottom: 16px; display: flex; align-items: center; gap: 10px;">
+                            <span>💡</span> Ściągawka ze Skrótów w Panelach
+                        </h3>
+                        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 16px;">
+                            <div style="background: rgba(0,0,0,0.3); padding: 14px 18px; border-radius: 10px; border: 1px solid rgba(255,255,255,0.05);">
+                                <div style="font-family: var(--font-mono); color: var(--color-yellow-main); font-weight: 700; font-size: 14px; margin-bottom: 4px;">CTR (Click-Through Rate)</div>
+                                <div style="font-size: 12px; color: var(--color-text-muted); line-height: 1.5;">Procent osób, które kliknęły w Twój film po zobaczeniu jego miniatury.</div>
+                            </div>
+                            <div style="background: rgba(0,0,0,0.3); padding: 14px 18px; border-radius: 10px; border: 1px solid rgba(255,255,255,0.05);">
+                                <div style="font-family: var(--font-mono); color: var(--color-yellow-main); font-weight: 700; font-size: 14px; margin-bottom: 4px;">AVD (Average View Duration)</div>
+                                <div style="font-size: 12px; color: var(--color-text-muted); line-height: 1.5;">Średni czas oglądania wideo przez widzów.</div>
+                            </div>
+                            <div style="background: rgba(0,0,0,0.3); padding: 14px 18px; border-radius: 10px; border: 1px solid rgba(255,255,255,0.05);">
+                                <div style="font-family: var(--font-mono); color: var(--color-yellow-main); font-weight: 700; font-size: 14px; margin-bottom: 4px;">FYP (For You Page)</div>
+                                <div style="font-size: 12px; color: var(--color-text-muted); line-height: 1.5;">Główny strumień rekomendacji na TikToku.</div>
+                            </div>
+                            <div style="background: rgba(0,0,0,0.3); padding: 14px 18px; border-radius: 10px; border: 1px solid rgba(255,255,255,0.05);">
+                                <div style="font-family: var(--font-mono); color: var(--color-yellow-main); font-weight: 700; font-size: 14px; margin-bottom: 4px;">Hook Rate (Retencja 3s)</div>
+                                <div style="font-size: 12px; color: var(--color-text-muted); line-height: 1.5;">Procent widzów zatrzymanych w pierwszych 3 sekundach.</div>
+                            </div>
+                            <div style="background: rgba(0,0,0,0.3); padding: 14px 18px; border-radius: 10px; border: 1px solid rgba(255,255,255,0.05);">
+                                <div style="font-family: var(--font-mono); color: var(--color-yellow-main); font-weight: 700; font-size: 14px; margin-bottom: 4px;">Saves Rate (Zapisania)</div>
+                                <div style="font-size: 12px; color: var(--color-text-muted); line-height: 1.5;">Wskaźnik określający, jak często widzowie zapisują post na później.</div>
+                            </div>
+                            <div style="background: rgba(0,0,0,0.3); padding: 14px 18px; border-radius: 10px; border: 1px solid rgba(255,255,255,0.05);">
+                                <div style="font-family: var(--font-mono); color: var(--color-yellow-main); font-weight: 700; font-size: 14px; margin-bottom: 4px;">Score (Algorytm)</div>
+                                <div style="font-size: 12px; color: var(--color-text-muted); line-height: 1.5;">Ogólna ocena procentowa dopasowania materiału do algorytmu.</div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- TAB: Facebook -->
+                <section class="view-section" id="tab-facebook">
+                    <div class="page-header">
+                        <h1 class="page-title">
+                            <span class="page-title-accent">Facebook — Budowanie Społeczności & Zasięgi</span>
+                        </h1>
+                        <p class="page-description">Prosty przewodnik jak tworzyć treści angażujące odbiorców.</p>
+                    </div>
+
+                    <div style="margin-bottom: 30px;">
+                        <h3 style="font-family: var(--font-tech); color: var(--color-yellow-main); font-size: 18px; margin-bottom: 15px; display: flex; align-items: center; gap: 10px;">
+                            <span>🔥</span> Co się teraz wybija i ma najsilniejsze zasięgi
+                        </h3>
+                        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px;">
+                            <div class="glass-card" style="padding: 20px;">
+                                <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 12px;">
+                                    <h4 style="font-size: 15px; font-weight: 700; color: var(--color-text-primary); line-height: 1.3;">Posty z Pytaniem Otwartym</h4>
+                                    <span style="font-size: 10px; font-family: var(--font-mono); background: rgba(245,158,11,0.15); color: var(--color-yellow-main); padding: 3px 8px; border-radius: 6px; border: 1px solid rgba(245,158,11,0.3); white-space: nowrap;">Dyskusja w Komentarzach</span>
+                                </div>
+                                <p style="font-size: 13px; color: var(--color-text-muted); line-height: 1.5;">Pytania zachęcające do wyrażenia opinii błyskawicznie podnoszą zasięg.</p>
+                            </div>
+                            <div class="glass-card" style="padding: 20px;">
+                                <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 12px;">
+                                    <h4 style="font-size: 15px; font-weight: 700; color: var(--color-text-primary); line-height: 1.3;">FB Reels z autentycznym nagraniem</h4>
+                                    <span style="font-size: 10px; font-family: var(--font-mono); background: rgba(245,158,11,0.15); color: var(--color-yellow-main); padding: 3px 8px; border-radius: 6px; border: 1px solid rgba(245,158,11,0.3); white-space: nowrap;">Zasięg Organiczny</span>
+                                </div>
+                                <p style="font-size: 13px; color: var(--color-text-muted); line-height: 1.5;">Krótkie rolki bez sztucznych efektów docierają do szerokiego grona.</p>
+                            </div>
+                            <div class="glass-card" style="padding: 20px;">
+                                <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 12px;">
+                                    <h4 style="font-size: 15px; font-weight: 700; color: var(--color-text-primary); line-height: 1.3;">Prawdziwe Zdjęcia (Autentyczność)</h4>
+                                    <span style="font-size: 10px; font-family: var(--font-mono); background: rgba(245,158,11,0.15); color: var(--color-yellow-main); padding: 3px 8px; border-radius: 6px; border: 1px solid rgba(245,158,11,0.3); white-space: nowrap;">Zaufanie Widzów</span>
+                                </div>
+                                <p style="font-size: 13px; color: var(--color-text-muted); line-height: 1.5;">Zdjęcia z życia codziennego mają znacznie wyższą widoczność.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div style="margin-bottom: 30px;">
+                        <h3 style="font-family: var(--font-tech); color: var(--color-yellow-main); font-size: 18px; margin-bottom: 15px; display: flex; align-items: center; gap: 10px;">
+                            <span>⚡</span> Jak prosto wbić się w algorytm — 3 Szybkie Kroki
+                        </h3>
+                        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px;">
+                            <div class="glass-card" style="padding: 20px;">
+                                <div style="font-size: 13px; color: var(--color-text-muted); font-weight: 600; margin-bottom: 6px;">Komentarze</div>
+                                <div style="font-family: var(--font-mono); font-size: 15px; font-weight: 700; color: var(--color-yellow-main); margin-bottom: 8px;">Krok 1: Zadaj proste pytanie</div>
+                                <div style="font-size: 12px; color: var(--color-text-dim); line-height: 1.4;">Zapytaj społeczność o zdanie – komentarze napędzają widoczność.</div>
+                            </div>
+                            <div class="glass-card" style="padding: 20px;">
+                                <div style="font-size: 13px; color: var(--color-text-muted); font-weight: 600; margin-bottom: 6px;">Grupy Tematyczne</div>
+                                <div style="font-family: var(--font-mono); font-size: 15px; font-weight: 700; color: var(--color-yellow-main); margin-bottom: 8px;">Krok 2: Dziel się w grupach</div>
+                                <div style="font-size: 12px; color: var(--color-text-dim); line-height: 1.4;">Dotrzyj do pasjonatów tematu bez wydawania budżetu.</div>
+                            </div>
+                            <div class="glass-card" style="padding: 20px;">
+                                <div style="font-size: 13px; color: var(--color-text-muted); font-weight: 600; margin-bottom: 6px;">Odnośniki i Linki</div>
+                                <div style="font-family: var(--font-mono); font-size: 15px; font-weight: 700; color: var(--color-yellow-main); margin-bottom: 8px;">Krok 3: Link w 1. komentarzu</div>
+                                <div style="font-size: 12px; color: var(--color-text-dim); line-height: 1.4;">Wklejaj linki pod postem, by nie ucinać zasięgów w treści głównej.</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="glass-card" style="margin-bottom: 30px; padding: 25px;">
+                        <h3 style="font-family: var(--font-tech); color: var(--color-yellow-main); font-size: 18px; margin-bottom: 18px; display: flex; align-items: center; gap: 10px;">
+                            <span>⏰</span> Najlepszy Czas i Częstotliwość Publikacji
+                        </h3>
+                        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 20px;">
+                            <div style="background: rgba(0,0,0,0.3); padding: 16px; border-radius: 10px; border: 1px solid rgba(255,255,255,0.05);">
+                                <div style="font-size: 11px; color: var(--color-text-muted); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 6px;">NAJLEPSZE DNI TYGODNIA</div>
+                                <div style="font-size: 14px; font-weight: 600; color: var(--color-text-primary);">Poniedziałek, Środa, Sobota</div>
+                            </div>
+                            <div style="background: rgba(0,0,0,0.3); padding: 16px; border-radius: 10px; border: 1px solid rgba(255,255,255,0.05);">
+                                <div style="font-size: 11px; color: var(--color-text-muted); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 6px;">GODZINY SZCZYTU (PL)</div>
+                                <div style="font-size: 14px; font-weight: 600; color: var(--color-yellow-main); font-family: var(--font-mono);">08:30, 13:00, 19:30</div>
+                            </div>
+                            <div style="background: rgba(0,0,0,0.3); padding: 16px; border-radius: 10px; border: 1px solid rgba(255,255,255,0.05);">
+                                <div style="font-size: 11px; color: var(--color-text-muted); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 6px;">CZĘSTOTLIWOŚĆ</div>
+                                <div style="font-size: 14px; font-weight: 600; color: var(--color-text-primary);">1-2 posty dziennie | FB Reels: 1 dziennie</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="cheat-sheet-section" style="margin-top: 30px; padding: 25px; background: var(--color-card-bg); border: 1px solid var(--color-card-border); border-radius: var(--border-radius); backdrop-filter: blur(16px);">
+                        <h3 style="font-family: var(--font-tech); color: var(--color-yellow-main); font-size: 17px; margin-bottom: 16px; display: flex; align-items: center; gap: 10px;">
+                            <span>💡</span> Ściągawka ze Skrótów w Panelach
+                        </h3>
+                        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 16px;">
+                            <div style="background: rgba(0,0,0,0.3); padding: 14px 18px; border-radius: 10px; border: 1px solid rgba(255,255,255,0.05);">
+                                <div style="font-family: var(--font-mono); color: var(--color-yellow-main); font-weight: 700; font-size: 14px; margin-bottom: 4px;">CTR (Click-Through Rate)</div>
+                                <div style="font-size: 12px; color: var(--color-text-muted); line-height: 1.5;">Procent osób, które kliknęły w Twój film po zobaczeniu jego miniatury.</div>
+                            </div>
+                            <div style="background: rgba(0,0,0,0.3); padding: 14px 18px; border-radius: 10px; border: 1px solid rgba(255,255,255,0.05);">
+                                <div style="font-family: var(--font-mono); color: var(--color-yellow-main); font-weight: 700; font-size: 14px; margin-bottom: 4px;">AVD (Average View Duration)</div>
+                                <div style="font-size: 12px; color: var(--color-text-muted); line-height: 1.5;">Średni czas oglądania wideo przez widzów.</div>
+                            </div>
+                            <div style="background: rgba(0,0,0,0.3); padding: 14px 18px; border-radius: 10px; border: 1px solid rgba(255,255,255,0.05);">
+                                <div style="font-family: var(--font-mono); color: var(--color-yellow-main); font-weight: 700; font-size: 14px; margin-bottom: 4px;">FYP (For You Page)</div>
+                                <div style="font-size: 12px; color: var(--color-text-muted); line-height: 1.5;">Główny strumień rekomendacji na TikToku.</div>
+                            </div>
+                            <div style="background: rgba(0,0,0,0.3); padding: 14px 18px; border-radius: 10px; border: 1px solid rgba(255,255,255,0.05);">
+                                <div style="font-family: var(--font-mono); color: var(--color-yellow-main); font-weight: 700; font-size: 14px; margin-bottom: 4px;">Hook Rate (Retencja 3s)</div>
+                                <div style="font-size: 12px; color: var(--color-text-muted); line-height: 1.5;">Procent widzów zatrzymanych w pierwszych 3 sekundach.</div>
+                            </div>
+                            <div style="background: rgba(0,0,0,0.3); padding: 14px 18px; border-radius: 10px; border: 1px solid rgba(255,255,255,0.05);">
+                                <div style="font-family: var(--font-mono); color: var(--color-yellow-main); font-weight: 700; font-size: 14px; margin-bottom: 4px;">Saves Rate (Zapisania)</div>
+                                <div style="font-size: 12px; color: var(--color-text-muted); line-height: 1.5;">Wskaźnik określający, jak często widzowie zapisują post na później.</div>
+                            </div>
+                            <div style="background: rgba(0,0,0,0.3); padding: 14px 18px; border-radius: 10px; border: 1px solid rgba(255,255,255,0.05);">
+                                <div style="font-family: var(--font-mono); color: var(--color-yellow-main); font-weight: 700; font-size: 14px; margin-bottom: 4px;">Score (Algorytm)</div>
+                                <div style="font-size: 12px; color: var(--color-text-muted); line-height: 1.5;">Ogólna ocena procentowa dopasowania materiału do algorytmu.</div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- TAB: Twitch -->
+                <section class="view-section" id="tab-twitch">
+                    <div class="page-header">
+                        <h1 class="page-title">
+                            <span class="page-title-accent">Twitch — Transmisje na Żywo & Społeczność</span>
+                        </h1>
+                        <p class="page-description">Najważniejsze wytyczne budowania stałej widowni na żywo i rajdy (Raids).</p>
+                    </div>
+
+                    <div style="margin-bottom: 30px;">
+                        <h3 style="font-family: var(--font-tech); color: var(--color-yellow-main); font-size: 18px; margin-bottom: 15px; display: flex; align-items: center; gap: 10px;">
+                            <span>🔥</span> Co się teraz wybija i ma najsilniejsze zasięgi
+                        </h3>
+                        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px;">
+                            <div class="glass-card" style="padding: 20px;">
+                                <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 12px;">
+                                    <h4 style="font-size: 15px; font-weight: 700; color: var(--color-text-primary); line-height: 1.3;">Transmisje w Stałych Godzinach</h4>
+                                    <span style="font-size: 10px; font-family: var(--font-mono); background: rgba(245,158,11,0.15); color: var(--color-yellow-main); padding: 3px 8px; border-radius: 6px; border: 1px solid rgba(245,158,11,0.3); white-space: nowrap;">Lojalność Widzów</span>
+                                </div>
+                                <p style="font-size: 13px; color: var(--color-text-muted); line-height: 1.5;">Przewidywalne godziny rozpoczęcia live budują przyzwyczajenie u stałych widzów.</p>
+                            </div>
+                            <div class="glass-card" style="padding: 20px;">
+                                <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 12px;">
+                                    <h4 style="font-size: 15px; font-weight: 700; color: var(--color-text-primary); line-height: 1.3;">Klipy (Twitch Clips) z Akcji</h4>
+                                    <span style="font-size: 10px; font-family: var(--font-mono); background: rgba(245,158,11,0.15); color: var(--color-yellow-main); padding: 3px 8px; border-radius: 6px; border: 1px solid rgba(245,158,11,0.3); white-space: nowrap;">Wirusowy Zasięg</span>
+                                </div>
+                                <p style="font-size: 13px; color: var(--color-text-muted); line-height: 1.5;">Wycinanie 30-sekundowych śmiesznych momentów z transmisji daje darmową promocję.</p>
+                            </div>
+                            <div class="glass-card" style="padding: 20px;">
+                                <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 12px;">
+                                    <h4 style="font-size: 15px; font-weight: 700; color: var(--color-text-primary); line-height: 1.3;">Gry z Małą/Średnią Konkurencją</h4>
+                                    <span style="font-size: 10px; font-family: var(--font-mono); background: rgba(245,158,11,0.15); color: var(--color-yellow-main); padding: 3px 8px; border-radius: 6px; border: 1px solid rgba(245,158,11,0.3); white-space: nowrap;">Wyższa Pozycja</span>
+                                </div>
+                                <p style="font-size: 13px; color: var(--color-text-muted); line-height: 1.5;">Streamowanie gier z 1-3k widzów pozwala szybciej trafić na pierwszą stronę kategorii.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div style="margin-bottom: 30px;">
+                        <h3 style="font-family: var(--font-tech); color: var(--color-yellow-main); font-size: 18px; margin-bottom: 15px; display: flex; align-items: center; gap: 10px;">
+                            <span>⚡</span> Jak prosto wbić się w algorytm — 3 Szybkie Kroki
+                        </h3>
+                        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px;">
+                            <div class="glass-card" style="padding: 20px;">
+                                <div style="font-size: 13px; color: var(--color-text-muted); font-weight: 600; margin-bottom: 6px;">Częstotliwość Chatu</div>
+                                <div style="font-family: var(--font-mono); font-size: 15px; font-weight: 700; color: var(--color-yellow-main); margin-bottom: 8px;">Krok 1: Odpowiadaj na wiadomości</div>
+                                <div style="font-size: 12px; color: var(--color-text-dim); line-height: 1.4;">Angażuj widzów pytaniami – szybki chat wywołuje wyższą pozycję.</div>
+                            </div>
+                            <div class="glass-card" style="padding: 20px;">
+                                <div style="font-size: 13px; color: var(--color-text-muted); font-weight: 600; margin-bottom: 6px;">Czas Trwania Live (2-4h)</div>
+                                <div style="font-family: var(--font-mono); font-size: 15px; font-weight: 700; color: var(--color-yellow-main); margin-bottom: 8px;">Krok 2: Utrzymuj długi stream</div>
+                                <div style="font-size: 12px; color: var(--color-text-dim); line-height: 1.4;">Transmisje trwające min. 2 godziny dają czas widzom na dołączenie.</div>
+                            </div>
+                            <div class="glass-card" style="padding: 20px;">
+                                <div style="font-size: 13px; color: var(--color-text-muted); font-weight: 600; margin-bottom: 6px;">Rajdy i Współpraca</div>
+                                <div style="font-family: var(--font-mono); font-size: 15px; font-weight: 700; color: var(--color-yellow-main); margin-bottom: 8px;">Krok 3: Rób Raidy po live</div>
+                                <div style="font-size: 12px; color: var(--color-text-dim); line-height: 1.4;">Wysyłaj widzów do innych streamerów – zbudujesz sieć kontaktów.</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="glass-card" style="margin-bottom: 30px; padding: 25px;">
+                        <h3 style="font-family: var(--font-tech); color: var(--color-yellow-main); font-size: 18px; margin-bottom: 18px; display: flex; align-items: center; gap: 10px;">
+                            <span>⏰</span> Najlepszy Czas i Częstotliwość Publikacji
+                        </h3>
+                        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 20px;">
+                            <div style="background: rgba(0,0,0,0.3); padding: 16px; border-radius: 10px; border: 1px solid rgba(255,255,255,0.05);">
+                                <div style="font-size: 11px; color: var(--color-text-muted); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 6px;">NAJLEPSZE DNI TYGODNIA</div>
+                                <div style="font-size: 14px; font-weight: 600; color: var(--color-text-primary);">Wtorek, Czwartek, Piątek, Niedziela</div>
+                            </div>
+                            <div style="background: rgba(0,0,0,0.3); padding: 16px; border-radius: 10px; border: 1px solid rgba(255,255,255,0.05);">
+                                <div style="font-size: 11px; color: var(--color-text-muted); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 6px;">GODZINY SZCZYTU (PL)</div>
+                                <div style="font-size: 14px; font-weight: 600; color: var(--color-yellow-main); font-family: var(--font-mono);">18:00 - 23:00 (wieczorne transmisje)</div>
+                            </div>
+                            <div style="background: rgba(0,0,0,0.3); padding: 16px; border-radius: 10px; border: 1px solid rgba(255,255,255,0.05);">
+                                <div style="font-size: 11px; color: var(--color-text-muted); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 6px;">CZĘSTOTLIWOŚĆ</div>
+                                <div style="font-size: 14px; font-weight: 600; color: var(--color-text-primary);">Live: 3-4 razy w tygodniu (po 2-4 godziny)</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="cheat-sheet-section" style="margin-top: 30px; padding: 25px; background: var(--color-card-bg); border: 1px solid var(--color-card-border); border-radius: var(--border-radius); backdrop-filter: blur(16px);">
+                        <h3 style="font-family: var(--font-tech); color: var(--color-yellow-main); font-size: 17px; margin-bottom: 16px; display: flex; align-items: center; gap: 10px;">
+                            <span>💡</span> Ściągawka ze Skrótów w Panelach
+                        </h3>
+                        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 16px;">
+                            <div style="background: rgba(0,0,0,0.3); padding: 14px 18px; border-radius: 10px; border: 1px solid rgba(255,255,255,0.05);">
+                                <div style="font-family: var(--font-mono); color: var(--color-yellow-main); font-weight: 700; font-size: 14px; margin-bottom: 4px;">CTR (Click-Through Rate)</div>
+                                <div style="font-size: 12px; color: var(--color-text-muted); line-height: 1.5;">Procent osób, które kliknęły w Twój film po zobaczeniu jego miniatury.</div>
+                            </div>
+                            <div style="background: rgba(0,0,0,0.3); padding: 14px 18px; border-radius: 10px; border: 1px solid rgba(255,255,255,0.05);">
+                                <div style="font-family: var(--font-mono); color: var(--color-yellow-main); font-weight: 700; font-size: 14px; margin-bottom: 4px;">AVD (Average View Duration)</div>
+                                <div style="font-size: 12px; color: var(--color-text-muted); line-height: 1.5;">Średni czas oglądania wideo przez widzów.</div>
+                            </div>
+                            <div style="background: rgba(0,0,0,0.3); padding: 14px 18px; border-radius: 10px; border: 1px solid rgba(255,255,255,0.05);">
+                                <div style="font-family: var(--font-mono); color: var(--color-yellow-main); font-weight: 700; font-size: 14px; margin-bottom: 4px;">FYP (For You Page)</div>
+                                <div style="font-size: 12px; color: var(--color-text-muted); line-height: 1.5;">Główny strumień rekomendacji na TikToku.</div>
+                            </div>
+                            <div style="background: rgba(0,0,0,0.3); padding: 14px 18px; border-radius: 10px; border: 1px solid rgba(255,255,255,0.05);">
+                                <div style="font-family: var(--font-mono); color: var(--color-yellow-main); font-weight: 700; font-size: 14px; margin-bottom: 4px;">Hook Rate (Retencja 3s)</div>
+                                <div style="font-size: 12px; color: var(--color-text-muted); line-height: 1.5;">Procent widzów zatrzymanych w pierwszych 3 sekundach.</div>
+                            </div>
+                            <div style="background: rgba(0,0,0,0.3); padding: 14px 18px; border-radius: 10px; border: 1px solid rgba(255,255,255,0.05);">
+                                <div style="font-family: var(--font-mono); color: var(--color-yellow-main); font-weight: 700; font-size: 14px; margin-bottom: 4px;">Saves Rate (Zapisania)</div>
+                                <div style="font-size: 12px; color: var(--color-text-muted); line-height: 1.5;">Wskaźnik określający, jak często widzowie zapisują post na później.</div>
+                            </div>
+                            <div style="background: rgba(0,0,0,0.3); padding: 14px 18px; border-radius: 10px; border: 1px solid rgba(255,255,255,0.05);">
+                                <div style="font-family: var(--font-mono); color: var(--color-yellow-main); font-weight: 700; font-size: 14px; margin-bottom: 4px;">Score (Algorytm)</div>
+                                <div style="font-size: 12px; color: var(--color-text-muted); line-height: 1.5;">Ogólna ocena procentowa dopasowania materiału do algorytmu.</div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- TAB: Analiza (DEFAULT ACTIVE) -->
+                <section class="view-section active" id="tab-analiza">
+                    
+                    <!-- Overview Analysis Container -->
+                    <div id="overview-analysis-view">
+                        <div class="page-header">
+                            <h1 class="page-title">
+                                Analiza Algorytmu <span class="page-title-accent">Social Media</span>
+                            </h1>
+                            <p class="page-description">
+                                Wybierz platformę społecznościową, aby przeanalizować jej wskaźniki zasięgu, algorytm rekomendacji oraz wygenerować zaawansowane statystyki.
+                            </p>
+                        </div>
+
+                        <!-- 5 Side-by-Side Panels Grid -->
+                        <div class="analysis-grid">
+                            
+                            <!-- Panel 1: YouTube -->
+                            <div class="glass-card" data-platform="youtube">
+                                <div>
+                                    <div class="card-header">
+                                        <div class="platform-info">
+                                            <div class="platform-icon-wrapper" style="border-color: rgba(255, 0, 0, 0.4);">
+                                                <svg viewBox="0 0 24 24" fill="#ff0000" width="24" height="24">
+                                                    <path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/>
+                                                </svg>
+                                            </div>
+                                            <div>
+                                                <div class="platform-title">YouTube</div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="card-description">
+                                        Przeanalizuj zasięgi twoich materiałów na YouTube
+                                    </div>
+                                    <div class="card-metrics-preview">
+                                        <div class="preview-stat">
+                                            <span class="preview-label">Zasięg</span>
+                                            <span class="preview-value">1.48M</span>
+                                        </div>
+                                        <div class="preview-stat">
+                                            <span class="preview-label">Score</span>
+                                            <span class="preview-value">94%</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <button class="btn-yellow btn-check-platform" data-platform="youtube">
+                                    <span data-i18n="check">Sprawdź</span>
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <polyline points="9 18 15 12 9 6"></polyline>
+                                    </svg>
+                                </button>
+                            </div>
+
+                            <!-- Panel 2: TikTok -->
+                            <div class="glass-card" data-platform="tiktok">
+                                <div>
+                                    <div class="card-header">
+                                        <div class="platform-info">
+                                            <div class="platform-icon-wrapper" style="border-color: rgba(0, 242, 254, 0.4);">
+                                                <svg viewBox="0 0 24 24" fill="#00f2fe" width="24" height="24">
+                                                    <path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-5.2 1.74 2.89 2.89 0 0 1 2.31-4.64c.29 0 .56.04.83.12V9.3a6.33 6.33 0 0 0-1-.08 6.34 6.34 0 1 0 6.34 6.34V9.05a8.3 8.3 0 0 0 5-1.63V6.69z"/>
+                                                </svg>
+                                            </div>
+                                            <div>
+                                                <div class="platform-title">TikTok</div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="card-description">
+                                        Przeanalizuj zasięgi twoich materiałów na TikTok
+                                    </div>
+                                    <div class="card-metrics-preview">
+                                        <div class="preview-stat">
+                                            <span class="preview-label">Zasięg</span>
+                                            <span class="preview-value">4.92M</span>
+                                        </div>
+                                        <div class="preview-stat">
+                                            <span class="preview-label">Score</span>
+                                            <span class="preview-value">91%</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <button class="btn-yellow btn-check-platform" data-platform="tiktok">
+                                    <span data-i18n="check">Sprawdź</span>
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <polyline points="9 18 15 12 9 6"></polyline>
+                                    </svg>
+                                </button>
+                            </div>
+
+                            <!-- Panel 3: Instagram -->
+                            <div class="glass-card" data-platform="instagram">
+                                <div>
+                                    <div class="card-header">
+                                        <div class="platform-info">
+                                            <div class="platform-icon-wrapper" style="border-color: rgba(225, 48, 108, 0.4);">
+                                                <svg viewBox="0 0 24 24" fill="#e1306c" width="24" height="24">
+                                                    <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/>
+                                                </svg>
+                                            </div>
+                                            <div>
+                                                <div class="platform-title">Instagram</div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="card-description">
+                                        Przeanalizuj zasięgi twoich materiałów na Instagramie
+                                    </div>
+                                    <div class="card-metrics-preview">
+                                        <div class="preview-stat">
+                                            <span class="preview-label">Zasięg</span>
+                                            <span class="preview-value">895.4K</span>
+                                        </div>
+                                        <div class="preview-stat">
+                                            <span class="preview-label">Score</span>
+                                            <span class="preview-value">83%</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <button class="btn-yellow btn-check-platform" data-platform="instagram">
+                                    <span data-i18n="check">Sprawdź</span>
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <polyline points="9 18 15 12 9 6"></polyline>
+                                    </svg>
+                                </button>
+                            </div>
+
+                            <!-- Panel 4: Facebook -->
+                            <div class="glass-card" data-platform="facebook">
+                                <div>
+                                    <div class="card-header">
+                                        <div class="platform-info">
+                                            <div class="platform-icon-wrapper" style="border-color: rgba(24, 119, 242, 0.4);">
+                                                <svg viewBox="0 0 24 24" fill="#1877f2" width="24" height="24">
+                                                    <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
+                                                </svg>
+                                            </div>
+                                            <div>
+                                                <div class="platform-title">Facebook</div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="card-description">
+                                        Przeanalizuj zasięgi twoich materiałów na Facebooku
+                                    </div>
+                                    <div class="card-metrics-preview">
+                                        <div class="preview-stat">
+                                            <span class="preview-label">Zasięg</span>
+                                            <span class="preview-value">412.8K</span>
+                                        </div>
+                                        <div class="preview-stat">
+                                            <span class="preview-label">Score</span>
+                                            <span class="preview-value">78%</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <button class="btn-yellow btn-check-platform" data-platform="facebook">
+                                    <span data-i18n="check">Sprawdź</span>
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <polyline points="9 18 15 12 9 6"></polyline>
+                                    </svg>
+                                </button>
+                            </div>
+
+                            <!-- Panel 5: Twitch -->
+                            <div class="glass-card" data-platform="twitch">
+                                <div>
+                                    <div class="card-header">
+                                        <div class="platform-info">
+                                            <div class="platform-icon-wrapper" style="border-color: rgba(145, 70, 255, 0.4);">
+                                                <svg viewBox="0 0 24 24" fill="#9146ff" width="24" height="24">
+                                                    <path d="M21 2H3v16h5v4l4-4h5l4-4V2zm-10 9V7m5 4V7"/>
+                                                </svg>
+                                            </div>
+                                            <div>
+                                                <div class="platform-title">Twitch</div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="card-description">
+                                        Przeanalizuj zasięgi transmisji i transmisję na Twitchu
+                                    </div>
+                                    <div class="card-metrics-preview">
+                                        <div class="preview-stat">
+                                            <span class="preview-label">Zasięg</span>
+                                            <span class="preview-value">278.5K</span>
+                                        </div>
+                                        <div class="preview-stat">
+                                            <span class="preview-label">Score</span>
+                                            <span class="preview-value">88%</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <button class="btn-yellow btn-check-platform" data-platform="twitch">
+                                    <span data-i18n="check">Sprawdź</span>
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <polyline points="9 18 15 12 9 6"></polyline>
+                                    </svg>
+                                </button>
+                            </div>
+
+                        </div>
+                    </div>
+
+                    <!-- Detailed Analysis View (Opened after clicking "Sprawdź") -->
+                    <div class="detailed-analysis-container" id="detailed-analysis-view">
+                        
+                        <div class="detail-header" style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 16px;">
+                            <button class="btn-back" id="btn-back-to-overview">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <line x1="19" y1="12" x2="5" y2="12"></line>
+                                    <polyline points="12 19 5 12 12 5"></polyline>
+                                </svg>
+                                <span data-i18n="back_to_overview">Powrót do analizy ogólnej</span>
+                            </button>
+
+                            <div class="detail-title-group">
+                                <div class="detail-platform-icon" id="detailed-platform-icon">
+                                    <!-- Dynamic SVG -->
+                                </div>
+                                <div>
+                                    <h2 id="detailed-platform-title" style="font-family: var(--font-tech); font-size: 20px;">--</h2>
+                                </div>
+                            </div>
+
+                            <!-- WYGLĄD TOGGLE (WIDOK SZCZEGÓŁOWY) -->
+                            <div style="background: rgba(15, 23, 42, 0.7); border: 1px solid rgba(245, 158, 11, 0.25); border-radius: 12px; padding: 6px 12px; display: flex; align-items: center; gap: 10px;">
+                                <span style="font-size: 0.85rem; font-weight: 600; color: var(--color-text-muted);" data-i18n="view_mode_label">Wygląd:</span>
+                                <div style="display: flex; gap: 4px; background: rgba(0,0,0,0.4); padding: 4px; border-radius: 8px;">
+                                    <button class="view-mode-btn active" id="btn-mode-simplified" data-mode="simplified" style="padding: 6px 14px; border: none; border-radius: 6px; font-size: 0.8rem; font-weight: 700; cursor: pointer; transition: all 0.2s; background: var(--color-yellow-main); color: #000;" data-i18n="mode_simplified">⚡ Uproszczony</button>
+                                    <button class="view-mode-btn" id="btn-mode-advanced" data-mode="advanced" style="padding: 6px 14px; border: none; border-radius: 6px; font-size: 0.8rem; font-weight: 700; cursor: pointer; transition: all 0.2s; background: transparent; color: var(--color-text-muted);" data-i18n="mode_advanced">📊 Zaawansowany</button>
+                                </div>
+                            </div>
+
+                            <div class="period-selector">
+                                <button class="period-btn">7 dni</button>
+                                <button class="period-btn active">30 dni</button>
+                                <button class="period-btn">90 dni</button>
+                            </div>
+                        </div>
+
+                        <!-- KPI Stat Cards (Wyświetlenia, Nowi subskrybenci, Stali widzowie, Liczba polubień) -->
+                        <div class="kpi-row">
+                            <!-- KPI 1: Wyświetlenia -->
+                            <div class="kpi-card">
+                                <div class="kpi-top">
+                                    <span class="kpi-label">Liczba wyświetleń</span>
+                                    <div class="kpi-icon">
+                                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                            <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                                            <circle cx="12" cy="12" r="3"></circle>
+                                        </svg>
+                                    </div>
+                                </div>
+                                <div class="kpi-value" id="kpi-views-value">--</div>
+                                <div class="kpi-bottom">
+                                    <span class="kpi-trend positive" id="kpi-views-trend">--</span>
+                                    <span class="kpi-subtext" id="kpi-views-subtext">--</span>
+                                </div>
+                            </div>
+
+                            <!-- KPI 2: Nowi subskrybenci -->
+                            <div class="kpi-card">
+                                <div class="kpi-top">
+                                    <span class="kpi-label">Liczba nowych subskrybentów</span>
+                                    <div class="kpi-icon">
+                                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                            <path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                                            <circle cx="8.5" cy="7" r="4"></circle>
+                                            <line x1="20" y1="8" x2="20" y2="14"></line>
+                                            <line x1="23" y1="11" x2="17" y2="11"></line>
+                                        </svg>
+                                    </div>
+                                </div>
+                                <div class="kpi-value" id="kpi-subs-value">--</div>
+                                <div class="kpi-bottom">
+                                    <span class="kpi-trend positive" id="kpi-subs-trend">--</span>
+                                    <span class="kpi-subtext" id="kpi-subs-subtext">--</span>
+                                </div>
+                            </div>
+
+                            <!-- KPI 3: Stali widzowie -->
+                            <div class="kpi-card">
+                                <div class="kpi-top">
+                                    <span class="kpi-label">Liczba stałych widzów</span>
+                                    <div class="kpi-icon">
+                                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                            <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                                            <circle cx="9" cy="7" r="4"></circle>
+                                            <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+                                            <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+                                        </svg>
+                                    </div>
+                                </div>
+                                <div class="kpi-value" id="kpi-returning-value">--</div>
+                                <div class="kpi-bottom">
+                                    <span class="kpi-trend positive" id="kpi-returning-trend">--</span>
+                                    <span class="kpi-subtext" id="kpi-returning-subtext">--</span>
+                                </div>
+                            </div>
+
+                            <!-- KPI 4: Liczba polubień -->
+                            <div class="kpi-card">
+                                <div class="kpi-top">
+                                    <span class="kpi-label">Liczba polubień</span>
+                                    <div class="kpi-icon">
+                                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                            <path d="M14 9V5a3 3 0 0 0-3-3l-4 9v11h11.28a2 2 0 0 0 2-1.7l1.38-9a2 2 0 0 0-2-2.3zM7 22H4a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h3"></path>
+                                        </svg>
+                                    </div>
+                                </div>
+                                <div class="kpi-value" id="kpi-likes-value">--</div>
+                                <div class="kpi-bottom">
+                                    <span class="kpi-trend positive" id="kpi-likes-trend">--</span>
+                                    <span class="kpi-subtext" id="kpi-likes-subtext">--</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Interactive Charts Section -->
+                        <div class="charts-grid">
+                            <!-- Main Line Chart -->
+                            <div class="chart-card">
+                                <div class="chart-header">
+                                    <div class="chart-title">Wykres Dynamiki Wyświetleń i Zaangażowania</div>
+                                    <div class="chart-legend">
+                                        <div class="legend-item">
+                                            <span class="legend-dot" style="background: var(--color-yellow-main);"></span>
+                                            <span>Wyświetlenia (Views)</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="canvas-wrapper">
+                                    <canvas id="analytics-main-chart"></canvas>
+                                </div>
+                            </div>
+
+                            <!-- Algorithm Fit Meter Card -->
+                            <div class="chart-card algo-score-card">
+                                <div class="chart-title" style="margin-bottom: 15px;">Wskaźnik Trafienia w Algorytm</div>
+                                <div class="algo-gauge-container">
+                                    <canvas id="algo-gauge-canvas"></canvas>
+                                    <div class="algo-score-value">
+                                        <span class="algo-score-number" id="algo-score-num">94%</span>
+                                        <span class="algo-score-label" id="algo-score-status">Wybitny Fit</span>
+                                    </div>
+                                </div>
+                                <div class="algo-tips-list" id="algo-tips-container">
+                                    <!-- Dynamic Tips -->
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- ADVANCED ANALYTICS SUITE (VISIBLE ONLY IN ADVANCED MODE) -->
+                        <div class="advanced-analytics-suite" id="advanced-suite-container" style="margin-top: 30px; display: none;">
+                            <div style="grid-column: 1 / -1; display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; padding-bottom: 12px; border-bottom: 1px dashed rgba(245, 158, 11, 0.3);">
+                                <h3 style="font-family: var(--font-tech); color: var(--color-yellow-main); font-size: 18px; display: flex; align-items: center; gap: 10px;">
+                                    <span>📊</span> ZAAWANSOWANA TELEMETRIA & RETENCJA WIDZÓW (PRO SUITE)
+                                </h3>
+                                <span style="font-family: var(--font-mono); font-size: 11px; color: #000; background: var(--color-yellow-main); font-weight: 800; padding: 4px 10px; border-radius: 6px;">TRYB BARDZO ZAAWANSOWANY</span>
+                            </div>
+
+                            <!-- WIDGET 1: Audience Retention Drop-Off Chart -->
+                            <div class="chart-card" style="background: var(--color-card-bg); border: 1px solid rgba(245,158,11,0.25); border-radius: 14px; padding: 22px;">
+                                <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 14px;">
+                                    <div>
+                                        <div style="font-family: var(--font-tech); font-size: 16px; color: var(--color-yellow-main); font-weight: 700;">Retencja Widzów (Krzywa Zrezygnowania)</div>
+                                        <div style="font-size: 12px; color: var(--color-text-muted); margin-top: 2px;">Analiza spadku uwagi z punktem zaczepki (Hook Rate: 84.2%)</div>
+                                    </div>
+                                    <span style="font-family: var(--font-mono); font-size: 11px; color: #10b981; background: rgba(16, 185, 129, 0.15); border: 1px solid rgba(16, 185, 129, 0.3); padding: 4px 8px; border-radius: 6px;">+12.4% Powyżej Średniej</span>
+                                </div>
+                                <div class="canvas-wrapper" style="height: 220px; position: relative;">
+                                    <canvas id="analytics-retention-chart"></canvas>
+                                </div>
+                            </div>
+
+                            <!-- WIDGET 2: Format Comparison Velocity (Shorts vs Long-form) -->
+                            <div class="chart-card" style="background: var(--color-card-bg); border: 1px solid rgba(245,158,11,0.25); border-radius: 14px; padding: 22px;">
+                                <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 14px;">
+                                    <div>
+                                        <div style="font-family: var(--font-tech); font-size: 16px; color: var(--color-yellow-main); font-weight: 700;">Porównanie Formatów (Shorts vs Filmy Długie)</div>
+                                        <div style="font-size: 12px; color: var(--color-text-muted); margin-top: 2px;">Prędkość przyrostu subskrypcji na 1,000 wyświetleń</div>
+                                    </div>
+                                    <span style="font-family: var(--font-mono); font-size: 11px; color: #00f2fe; background: rgba(0, 242, 254, 0.15); border: 1px solid rgba(0, 242, 254, 0.3); padding: 4px 8px; border-radius: 6px;">Velocimeter v3.1</span>
+                                </div>
+                                <div class="canvas-wrapper" style="height: 220px; position: relative;">
+                                    <canvas id="analytics-format-chart"></canvas>
+                                </div>
+                            </div>
+
+                            <!-- WIDGET 3: Geographic & Demographic Breakdown -->
+                            <div class="chart-card" style="background: var(--color-card-bg); border: 1px solid rgba(245,158,11,0.25); border-radius: 14px; padding: 22px;">
+                                <div style="font-family: var(--font-tech); font-size: 16px; color: var(--color-yellow-main); font-weight: 700; margin-bottom: 14px;">Demografia Widzów & Kraje (Lokalizacja PL / UE)</div>
+                                <div style="display: flex; flex-direction: column; gap: 12px;">
+                                    <div>
+                                        <div style="display: flex; justify-content: space-between; font-size: 12px; margin-bottom: 4px; color: var(--color-text-primary);">
+                                            <span>Polska (PL)</span>
+                                            <span style="font-weight: 700; color: var(--color-yellow-main);">68.4%</span>
+                                        </div>
+                                        <div style="width: 100%; height: 8px; background: rgba(255,255,255,0.08); border-radius: 4px; overflow: hidden;">
+                                            <div style="width: 68.4%; height: 100%; background: linear-gradient(90deg, #f59e0b, #fbbf24);"></div>
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <div style="display: flex; justify-content: space-between; font-size: 12px; margin-bottom: 4px; color: var(--color-text-primary);">
+                                            <span>Niemcy / Wielka Brytania (DE/UK)</span>
+                                            <span style="font-weight: 700; color: #00f2fe;">18.2%</span>
+                                        </div>
+                                        <div style="width: 100%; height: 8px; background: rgba(255,255,255,0.08); border-radius: 4px; overflow: hidden;">
+                                            <div style="width: 18.2%; height: 100%; background: linear-gradient(90deg, #00f2fe, #38bdf8);"></div>
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <div style="display: flex; justify-content: space-between; font-size: 12px; margin-bottom: 4px; color: var(--color-text-primary);">
+                                            <span>Stany Zjednoczone (USA)</span>
+                                            <span style="font-weight: 700; color: #a855f7;">8.5%</span>
+                                        </div>
+                                        <div style="width: 100%; height: 8px; background: rgba(255,255,255,0.08); border-radius: 4px; overflow: hidden;">
+                                            <div style="width: 8.5%; height: 100%; background: linear-gradient(90deg, #a855f7, #c084fc);"></div>
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <div style="display: flex; justify-content: space-between; font-size: 12px; margin-bottom: 4px; color: var(--color-text-primary);">
+                                            <span>Grupa Wiekowa: 18-24 lata</span>
+                                            <span style="font-weight: 700; color: #10b981;">54.0% widowni</span>
+                                        </div>
+                                        <div style="width: 100%; height: 8px; background: rgba(255,255,255,0.08); border-radius: 4px; overflow: hidden;">
+                                            <div style="width: 54.0%; height: 100%; background: linear-gradient(90deg, #10b981, #34d399);"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- WIDGET 4: Hourly Heatmap Matrix -->
+                            <div class="chart-card" style="background: var(--color-card-bg); border: 1px solid rgba(245,158,11,0.25); border-radius: 14px; padding: 22px;">
+                                <div style="font-family: var(--font-tech); font-size: 16px; color: var(--color-yellow-main); font-weight: 700; margin-bottom: 14px;">Heatmapa Aktywności Widzów w Ciągu Doby</div>
+                                <div style="display: grid; grid-template-columns: repeat(12, 1fr); gap: 4px; margin-bottom: 12px;">
+                                    <div style="background: rgba(255,255,255,0.06); height: 26px; border-radius: 4px; display: flex; align-items: center; justify-content: center; font-size: 8px; font-weight: 700; color: #888;">00h</div>
+                                    <div style="background: rgba(255,255,255,0.06); height: 26px; border-radius: 4px; display: flex; align-items: center; justify-content: center; font-size: 8px; font-weight: 700; color: #888;">02h</div>
+                                    <div style="background: rgba(255,255,255,0.06); height: 26px; border-radius: 4px; display: flex; align-items: center; justify-content: center; font-size: 8px; font-weight: 700; color: #888;">04h</div>
+                                    <div style="background: rgba(255,255,255,0.06); height: 26px; border-radius: 4px; display: flex; align-items: center; justify-content: center; font-size: 8px; font-weight: 700; color: #888;">06h</div>
+                                    <div style="background: rgba(245,158,11,0.2); height: 26px; border-radius: 4px; display: flex; align-items: center; justify-content: center; font-size: 8px; font-weight: 700; color: #f59e0b;">08h</div>
+                                    <div style="background: rgba(245,158,11,0.3); height: 26px; border-radius: 4px; display: flex; align-items: center; justify-content: center; font-size: 8px; font-weight: 700; color: #f59e0b;">10h</div>
+                                    <div style="background: rgba(245,158,11,0.4); height: 26px; border-radius: 4px; display: flex; align-items: center; justify-content: center; font-size: 8px; font-weight: 700; color: #f59e0b;">12h</div>
+                                    <div style="background: rgba(245,158,11,0.5); height: 26px; border-radius: 4px; display: flex; align-items: center; justify-content: center; font-size: 8px; font-weight: 700; color: #f59e0b;">14h</div>
+                                    <div style="background: rgba(245,158,11,0.85); height: 26px; border-radius: 4px; display: flex; align-items: center; justify-content: center; font-size: 8px; font-weight: 800; color: #000;">16h</div>
+                                    <div style="background: rgba(245,158,11,0.95); height: 26px; border-radius: 4px; display: flex; align-items: center; justify-content: center; font-size: 8px; font-weight: 800; color: #000;">18h</div>
+                                    <div style="background: rgba(245,158,11,1.0); height: 26px; border-radius: 4px; display: flex; align-items: center; justify-content: center; font-size: 8px; font-weight: 800; color: #000;">20h</div>
+                                    <div style="background: rgba(245,158,11,0.7); height: 26px; border-radius: 4px; display: flex; align-items: center; justify-content: center; font-size: 8px; font-weight: 800; color: #000;">22h</div>
+                                </div>
+                                <div style="font-size: 11px; color: var(--color-text-muted); text-align: center; font-family: var(--font-mono);">
+                                    <span style="color: var(--color-yellow-main); font-weight: 700;">Złote Okno Publikacji: 16:00 - 22:00</span> (Gwarancja najwyższego Hook Rate)
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </section>
+
+            </main>
+        </div>
+    </div>
+
+    <!-- Modals for Avatar Dropdown Menu Items -->
+    <div class="modal-overlay" id="modal-overlay">
+        
+        <!-- Modal: Profil -->
+        <div class="modal-card" id="modal-profile">
+            <button class="modal-close-btn">&times;</button>
+            <div class="modal-title">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                    <circle cx="12" cy="7" r="4"></circle>
+                </svg>
+                <span data-i18n="profile_title">Twój Profil</span>
+            </div>
+            <div class="modal-subtitle" data-i18n="select_avatar">Wybierz Avatar Konta spośród połączonych sieci społecznościowych.</div>
+            <div class="modal-content">
+                <div class="form-group">
+                    <label class="form-label" data-i18n="select_avatar">Dostępne Awatary z Połączonych Kont</label>
+                    <div id="social-avatars-picker" style="display: flex; gap: 12px; margin-top: 6px; flex-wrap: wrap;">
+                        <!-- Rendered dynamically by app.js (deduplicated unique avatars) -->
+                    </div>
+                </div>
+                <div class="form-group" style="margin-top: 14px;">
+                    <label class="form-label">Nazwa Użytkownika</label>
+                    <input type="text" class="form-input" id="profile-modal-username" value="Oskar_Algo" readonly>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Status Algorytmu</label>
+                    <input type="text" class="form-input" value="Zsynchronizowano Połączone Platformy" readonly>
+                </div>
+                <button class="btn-yellow" onclick="closeModal()" data-i18n="close">Zamknij</button>
+            </div>
+        </div>
+
+        <!-- Modal: Konto -->
+        <div class="modal-card" id="modal-account">
+            <button class="modal-close-btn">&times;</button>
+            <div class="modal-title">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+                    <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+                </svg>
+                <span data-i18n="account_settings">Ustawienia Konta i Logowania</span>
+            </div>
+            <div class="modal-subtitle" data-i18n="change_email_pass">Zarządzaj adresem e-mail, hasłem oraz językiem.</div>
+            <div class="modal-content">
+                <form id="form-algo-account-credentials" style="display: flex; flex-direction: column; gap: 14px;">
+                    <div class="form-group">
+                        <label class="form-label" data-i18n="language_label">Język Aplikacji / Language</label>
+                        <select id="algo-language-select" class="form-input" style="background: rgba(0,0,0,0.6); color: #fff; cursor: pointer;">
+                            <option value="pl">Polski 🇵🇱</option>
+                            <option value="en">English 🇬🇧</option>
+                            <option value="fr">Français 🇫🇷</option>
+                            <option value="ru">Русский 🇷🇺</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Adres Email</label>
+                        <input type="email" id="algo-input-email" class="form-input" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Nowe Hasło</label>
+                        <input type="password" id="algo-input-password" class="form-input" placeholder="Zostaw puste, jeśli nie chcesz zmieniać">
+                    </div>
+                    <button type="submit" class="btn-yellow" data-i18n="save_changes">Zapisz Zmiany</button>
+                </form>
+            </div>
+        </div>
+
+        <!-- Modal: Połączone konta -->
+        <div class="modal-card" id="modal-connected">
+            <button class="modal-close-btn">&times;</button>
+            <div class="modal-title">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path>
+                    <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path>
+                </svg>
+                <span data-i18n="connected_accounts">Połączone Konta Social Media</span>
+            </div>
+            <div class="modal-subtitle">Zarządzaj połączeniami swoich kont społecznościowych.</div>
+            <div class="modal-content">
+                <div id="algo-social-accounts-list" style="display: flex; flex-direction: column; gap: 12px;">
+                    <!-- Rendered dynamically by app.js -->
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Toast Notifications Container -->
+    <div class="toast-container" id="toast-container"></div>
+
+    <!-- Main JavaScript Logic -->
+    <script src="../js/data.js"></script>
+    <script src="js/i18n.js"></script>
+    <script src="js/particles.js"></script>
+    <script src="js/app.js"></script>
+</body>
+
+</html>

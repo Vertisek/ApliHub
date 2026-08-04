@@ -1,0 +1,150 @@
+Zaczynamy coś kompletnie nowego i o wiele bardziej skomplikowanego. Będzie to strona internetowa, z której będzie można pobrać autorskie wtyczki oraz aplikacje, które pomogę w codziennej pracy oraz przeglądaniu internetu. Wysyłam screena jak ma wyglądać strona. I Poniżej daje kolejność zakładek od lewej do prawej.
+
+- Atualności
+- Aplikacje
+- Wtyczki
+- Ważne
+
+Po prawej stronie na razie prowizoryczny przycisk profilu z zakładkami kolejno w dół:
+
+- Profil
+- Konto
+- Ustawienia
+- Połączone
+
+
+Zobaczymy jak to będzie wyglądało działaj.
+
+-------------------------------------------------------------------------------------
+-------------------------------------------------------------------------------------
+
+Lecimy dalej. Dzisiaj głównie wizualnie.
+
+1. Te panale które wysłałem ci na screenie są mega fajne i takie zostają. Zmieniamy tylko nazwy. i kolejno lecimy.
+
+● Jeden panel
+
+⭢ Nazwa = Algo Analyzer
+
+⭢ Opis = Zaawansowany analizer angorytmu YouTube oraz innych social mediów. Przeanalizuj zachowanie algorytmu i określ jak mniej więcej z nim pracować.
+
+● Drugi panel
+
+⭢ Nazwa = Fast Konwerter
+
+⭢ Opis = Prosty w obsłudze konwerter do social mediów. Pobierz film lub piosenkę z YouTube, TikToka albo Instagrama do pliku WAV, MP4 LUB MP3 jednym kliknięciem.
+
+● Trzeci panel
+
+⭢ Nazwa = Ofertomat
+
+⭢ Opis = Najprostsze wyszukiwanie najlepszych ofert tego, czego potrzebujesz. Wpisz nazwę przedmiotu, a my zajmiemy się resztą.
+
+● Czwarty panel
+
+⭢ Nazwa = Theme Injector
+
+⭢ Opis = Dopasuj motyw każdej strony z osobna pod siebie tak, aby przyjemniej przeglądało ci się internet.
+
+Z wtyczek to na razie tyle. Żeby byłm porządek to na razie ukryj wszystkie inne wtyczki i zamień je z tymi, które ci napisałem. Oczywiście panele mają wyglądać identycznie.
+
+2. Po kliknięciu w profil nie chce tam żadnego emaila ani nic tylko sam nick. Bez imienia i nazwiska, bo chcę, aby użytkownik czuł, że ma swoja prywatność. 
+
+Lecimy ze zmianami.
+
+1. W każdej zakładce zmień design i motyw na taki przyjemniejszy. Ten żółty jest mega fajny, ale za bardzo bije po oczach. Możesz też w tle dodać jakieś fajne particle poruszające się, ale ma to być nie przeszkadzające tylko dodające smaczku dla strony.
+
+2. W panelach są nazwy typu "CTR". Może zrób jakąś ściągę na dole ładną z tymi skrótami, aby użytkownik mógł się odnaleźć. I jeszcze od nośnie temu "Jak się wbić w algorytm..." daj tam coś jaśniejszego dla zrozumienia, bo to wygląda skomplikowanie i po co sobie utrudniać życie.
+
+3. Usuwamy niektóre nie potrzebne rzeczy z interfejsu i dodajemy nowe funkcje. To co na screenach to usuń i zaraz napisze ci co dodać.
+
+Dodajemy:
+
+- Możliwość zmiany emailu oraz hasła w aplikacji (ma to również działać na stronie)
+- Możliwość zmiany wyglądu strony tak, aby każdy mógł rozeznać się w panelach i wykresach i tam dodaj oraz wprowadź:
+
+● Opcję "Uproszczone" - Wszystkie wykresy oraz informacje mają być jak w trybie zaawansowanym, ale uproszczając wygląd oraz przejrzystość
+
+● Opcję "Zaawansowane" - Wszystkie wykresy mają być zaawansowane z jak największą ilością szczegółów i ma to też być przejrzyste. Po prostu ma być tego więcej dla lepszej analizy.
+
+To co opisałem na być wprowadzone w zakładce analiza
+
+---------------------
+Polaczone konta maja miec tylko:
+
+= YouTube -
+= TikTok -
+= Instagram -
+= Facebook -
+= Twitch - 
+
+Wszedzie tylko nazwa sociala i obok przycisk "Połącz". Oczywiscie gdy użytkownik polaczy konto to przycisk ma zamienic sie na przycisk "Odłącz".
+
+Pracuj.
+
+Dobra nastepne zmiany.
+
+1. Tryb wyglądu nie działa i nie zmienia wyglądu w ogóle. Zrób tak żeby działo to sensowanie. 
+
+2. Wygląd w ustawieniach profilu tam ukryj na razie bo nie potrzebny jest.
+
+3. O wiele przyjemniej wygląda to z tymi particlami, ale nadal troche za bardzo oczojebnie to wygląda. Zrób to troche mniej ostre wyglądowo i będzie super.
+
+4. Tam w prawym górnym zamiast "Nick: oskar" ndaj po prostu sam nick użytkownika, a nie imie. i oczywiscie usun slowo "Nick" bo nie potrzebne i zle to wyglada. 
+
+5. Zawsze po połaczeniu konta będzie w prawym górnym dany avatar z danego sociala. Czyli twitch to z twitcha itp.
+
+6. Jeszcze odnośnie tych avatarów z sociali z 5-ego punktu to będzie to wyglądało tak, że w zakładce profil będzie można wybrać sobie dany avatar. Jeżeli mamy połączone konta i wszystkie mają ten sam avatar to pokazany ma być tylko jeden, a nie kilka takich samych avatarów i tak samo w przypadku, gdy jest 1 avatar inny, a 3 takie same.
+
+7. Po pobraniu aplikacji pierwsze ma się pokazać okno z obowiązniek połączenia aplikacji z danym kontem na socialu. Bez tego użytkownik nie może wejść do aplikacji. To ma być zrobione ładnie też z pariclami w żółtym motywie. Taka stronka "logowania" ma być, ale nie chce jej na razie widziec, bo mi nie bedzie dzialala jako index.
+
+8. Wszystko co na stronie czyli przelaczanie zakladek, stron, jakies rozwijanie czegos itp. ma miec swoje ladne i przejrzyste oraz krotki animacje typu przejscia.
+
+9. Rob to tak, aby nie było praw autorskich. Ta aplikacja bedzie platna.
+
+10. Tam w tym proifilu itp w tych zakladkach dodaj opcje "Ustawienia aplikacji" i dodaj do niej:
+
+- Język | i tam do wyboru:
+
+> Angielski
+> Polski
+> Francuski
+> Rosyjski
+
+Wszystkie te języki przetłumacz na stronie jak najleiej potrafisz.
+
+11. Ten tryb wyglądu daj dopiero po kliknięciu w tany panel w socialach czyli w zakladce analiza. I tam pamiętaj żeby faktycznie to się zmieniało i było płynne.
+
+12. Dodaj tam do sociali i analizy twitcha.
+
+13. Z głównej strony analizy usuń ściągawkę, ale zostaw ją tam w panelach. Na głównej stronie mają być tylko panele jak na razie.
+
+14. Dobra nie ważne mój błąd. Co chodzi o tę ściongawkę to usuń ją z całej analizy, bo ona ma być po kliknięciu w zakładki z yt, tiktokiem itp. Do zakładek też dodaj twitcha i zrób w nim tak jak we wszystkim inncyh zakładkach czyli zgodnie z trendami itp.
+
+
+Działaj.
+
+Zmiany następne.
+
+1. Przy przelaczeniu się po zakładkach ma być plynne krotki i fajne przejście żeby to nie wygladalo tak sucho.
+
+2. Przy klikaniu w okres 7 dni, 30 dni i 90 dni, ma być tez ladne przejście.
+
+3. Tryb wyglądu nadal się nie zmienia, a powinien. Zmienia się tylko dlugosc wykresu. Ma się zmieniac caly wykres, panele itp. Jak zaawansowana opcja to wygląd o wiele bardziej zaawansowany, a jak uproszczona to wygląd uproszczony i tak wszędzie. W sumie to zamiast "Tryb wyglądu" napisz "Wygląd".
+
+4. Zależy mi na płynnych przejściach bo profesjonalniej to wygląda wtedy. Ma być przyjemnie dla oka.
+
+Leć.
+
+
+
+Usuwamy: 
+
+- Klucz API z zakładki z ustawieniami konta
+
+
+
+
+
+
+ 

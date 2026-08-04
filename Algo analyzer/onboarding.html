@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ApliHub Suite — Połącz Konta i Aktywuj Aplikację</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&family=Orbitron:wght@700;900&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-app: #07080d;
+      --color-gold: #f59e0b;
+      --color-amber: #d97706;
+      --text-main: #f8fafc;
+      --text-muted: #94a3b8;
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      background: var(--bg-app);
+      color: var(--text-main);
+      font-family: 'Inter', sans-serif;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+      position: relative;
+    }
+    .onboarding-card {
+      background: rgba(15, 18, 28, 0.85);
+      backdrop-filter: blur(20px);
+      border: 1px solid rgba(245, 158, 11, 0.25);
+      border-radius: 20px;
+      padding: 40px;
+      width: 100%;
+      max-width: 480px;
+      text-align: center;
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.8), 0 0 30px rgba(245, 158, 11, 0.12);
+      z-index: 10;
+      animation: fadeIn 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(15px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .brand-logo {
+      font-family: 'Orbitron', sans-serif;
+      font-size: 22px;
+      font-weight: 900;
+      color: var(--color-gold);
+      letter-spacing: 1px;
+      margin-bottom: 8px;
+    }
+    .subtitle {
+      font-size: 13px;
+      color: var(--text-muted);
+      margin-bottom: 28px;
+      line-height: 1.5;
+    }
+    .social-connect-grid {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      margin-bottom: 28px;
+    }
+    .social-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 12px 16px;
+      background: rgba(0, 0, 0, 0.35);
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      border-radius: 12px;
+      transition: all 0.2s ease;
+    }
+    .social-info {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-weight: 600;
+      font-size: 14px;
+    }
+    .btn-connect {
+      padding: 8px 18px;
+      border-radius: 8px;
+      border: 1px solid rgba(245, 158, 11, 0.4);
+      background: rgba(245, 158, 11, 0.12);
+      color: var(--color-gold);
+      font-weight: 700;
+      font-size: 13px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+    .btn-connect.connected {
+      background: rgba(16, 185, 129, 0.15);
+      border-color: rgba(16, 185, 129, 0.4);
+      color: #34d399;
+    }
+    .btn-enter-app {
+      width: 100%;
+      padding: 14px;
+      border-radius: 12px;
+      border: none;
+      background: linear-gradient(135deg, var(--color-gold), var(--color-amber));
+      color: #000;
+      font-weight: 800;
+      font-size: 15px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      opacity: 0.5;
+      pointer-events: none;
+      box-shadow: 0 4px 15px rgba(245, 158, 11, 0.2);
+    }
+    .btn-enter-app.enabled {
+      opacity: 1;
+      pointer-events: auto;
+    }
+    .btn-enter-app.enabled:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(245, 158, 11, 0.35);
+    }
+  </style>
+</head>
+<body>
+  <div class="onboarding-card">
+    <div class="brand-logo">APLIHUB SUITE</div>
+    <p class="subtitle">Wymagane jest połączenie co najmniej jednego konta społecznościowego, aby aktywować aplikację Algo Analyzer.</p>
+    
+    <div class="social-connect-grid">
+      <div class="social-row">
+        <div class="social-info"><span>🔴</span> YouTube</div>
+        <button class="btn-connect" data-key="youtube">Połącz</button>
+      </div>
+      <div class="social-row">
+        <div class="social-info"><span>🎵</span> TikTok</div>
+        <button class="btn-connect" data-key="tiktok">Połącz</button>
+      </div>
+      <div class="social-row">
+        <div class="social-info"><span>📸</span> Instagram</div>
+        <button class="btn-connect" data-key="instagram">Połącz</button>
+      </div>
+      <div class="social-row">
+        <div class="social-info"><span>📘</span> Facebook</div>
+        <button class="btn-connect" data-key="facebook">Połącz</button>
+      </div>
+      <div class="social-row">
+        <div class="social-info"><span>🟪</span> Twitch</div>
+        <button class="btn-connect" data-key="twitch">Połącz</button>
+      </div>
+    </div>
+
+    <button class="btn-enter-app" id="btnEnterApp" onclick="location.href='index.html'">
+      Wejdź do Aplikacji →
+    </button>
+  </div>
+
+  <script src="js/data.js"></script>
+  <script src="js/particles.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const buttons = document.querySelectorAll('.btn-connect');
+      const enterBtn = document.getElementById('btnEnterApp');
+
+      function updateEnterButton() {
+        const user = getApliHubUserData();
+        const hasConnected = Object.values(user.connectedAccounts).some(Boolean);
+        if (hasConnected) {
+          enterBtn.classList.add('enabled');
+        } else {
+          enterBtn.classList.remove('enabled');
+        }
+      }
+
+      buttons.forEach(btn => {
+        const key = btn.getAttribute('data-key');
+        const user = getApliHubUserData();
+        if (user.connectedAccounts[key]) {
+          btn.textContent = 'Odłącz';
+          btn.classList.add('connected');
+        }
+
+        btn.addEventListener('click', () => {
+          const currentUser = getApliHubUserData();
+          const newState = !currentUser.connectedAccounts[key];
+          currentUser.connectedAccounts[key] = newState;
+          saveApliHubUserData(currentUser);
+
+          if (newState) {
+            btn.textContent = 'Odłącz';
+            btn.classList.add('connected');
+          } else {
+            btn.textContent = 'Połącz';
+            btn.classList.remove('connected');
+          }
+
+          updateEnterButton();
+        });
+      });
+
+      updateEnterButton();
+    });
+  </script>
+</body>
+</html>
