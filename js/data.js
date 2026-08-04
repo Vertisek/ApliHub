@@ -7,8 +7,10 @@ const DEFAULT_USER_STORE = {
   email: "oskar@aplihub.pl",
   password: "password123",
   avatar: "O",
-  selectedAvatar: "default", // 'default' | 'youtube' | 'tiktok' | 'instagram' | 'facebook' | 'twitch'
+  selectedAvatar: "O", // Preset icon or custom symbol
   accountType: "PRO VIP",
+  isVerified: false,
+  joinedDate: "Sierpień 2026",
   connectedAccounts: {
     youtube: true,
     tiktok: false,
@@ -17,9 +19,10 @@ const DEFAULT_USER_STORE = {
     twitch: false
   },
   settings: {
-    autoUpdate: true,
     darkMode: true,
-    notifications: true,
+    soundEnabled: true,
+    soundVolume: 50,
+    emailNotifications: true,
     downloadPath: "C:\\Users\\oskar\\Downloads\\ApliHub"
   }
 };
@@ -53,23 +56,24 @@ function saveApliHubUserData(updatedData) {
 const APLIHUB_DATA = {
   user: getApliHubUserData(),
   
-  apps: [],
-
-  plugins: [
+  apps: [
     {
-      id: "plug-1",
+      id: "app-1",
       name: "Algo Analyzer",
       category: "Social Media",
-      badge: "Nowość",
+      badge: "Aplikacja",
       icon: "📊",
       desc: "Zaawansowany analizer algorytmu YouTube oraz innych social mediów. Przeanalizuj zachowanie algorytmu i określ jak mniej więcej z nim pracować.",
       version: "v1.0.0",
       size: "2.8 MB",
       downloads: "14,200",
       rating: "5.0★",
-      type: "plugin",
-      browser: "Chrome / Edge / Brave"
-    },
+      type: "app",
+      system: "Windows / macOS"
+    }
+  ],
+
+  plugins: [
     {
       id: "plug-2",
       name: "Fast Konwerter",
@@ -137,24 +141,33 @@ const APLIHUB_DATA = {
 
   important: [
     {
-      title: "Instrukcja instalacji wtyczek w Chrome / Edge",
-      desc: "Jak ręcznie załadować rozszerzenie w trybie deweloperskim krok po kroku.",
-      icon: "📘"
+      id: "imp-copyright",
+      title: "Prawa Autorskie & Licencja © ApliHub",
+      desc: "Wszelkie prawa zastrzeżone. Wszystkie wtyczki oraz aplikacje są autorskim projektem ApliHub. Kopiowanie lub redystrybucja bez zgody jest zabroniona.",
+      icon: "📜",
+      action: "copyright"
     },
     {
-      title: "Wymagania systemowe aplikacji",
-      desc: "Sprawdź kompatybilność swoich systemów Windows 10/11 oraz macOS.",
-      icon: "🖥️"
-    },
-    {
-      title: "Polityka prywatności i bezpieczeństwo",
-      desc: "Wszystkie nasze narzędzia działają lokalnie i nie zbierają danych osobowych.",
-      icon: "🔒"
-    },
-    {
+      id: "imp-bugs",
       title: "Zgłaszanie błędów i propozycji",
-      desc: "Masz pomysł na nową wtyczkę? Skontaktuj się z nami przez formularz zgłoszeniowy.",
-      icon: "💬"
+      desc: "Zauważyłeś błąd lub masz pomysł na nową funkcję? Daj nam znać przez specjalny formularz.",
+      icon: "💬",
+      action: "bugs-proposals"
+    },
+    {
+      id: "imp-contact",
+      title: "Skontaktuj się z nami",
+      desc: "Jeżeli potrzebujesz większej pomocy lub chcesz nawiązać współpracę napisz do nas.",
+      icon: "📬",
+      action: "contact-admins"
+    },
+    {
+      id: "imp-privacy",
+      title: "Polityka prywatności i bezpieczeństwo",
+      desc: "Wszystkie nasze narzędzia działają lokalnie i nie zbierają prywatnych danych użytkowników.",
+      icon: "🔒",
+      action: "privacy"
     }
   ]
 };
+

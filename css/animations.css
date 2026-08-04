@@ -1,11 +1,47 @@
 /* ApliHub Animations & Micro-interactions */
 
-@keyframes pulseGlow {
-  0%, 100% {
-    box-shadow: 0 0 20px rgba(59, 130, 246, 0.2), 0 0 40px rgba(139, 92, 246, 0.1);
+@property --border-angle {
+  syntax: '<angle>';
+  initial-value: 0deg;
+  inherits: false;
+}
+
+@keyframes spinBorder {
+  0% {
+    --border-angle: 0deg;
+  }
+  100% {
+    --border-angle: 360deg;
+  }
+}
+
+@keyframes logoShimmer {
+  0% {
+    background-position: 0% 50%;
   }
   50% {
-    box-shadow: 0 0 35px rgba(59, 130, 246, 0.45), 0 0 60px rgba(139, 92, 246, 0.25);
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+@keyframes logoBouncePulse {
+  0%, 100% {
+    transform: scale(1) rotate(0deg);
+  }
+  50% {
+    transform: scale(1.08) rotate(3deg);
+  }
+}
+
+@keyframes pulseGlow {
+  0%, 100% {
+    box-shadow: 0 0 20px rgba(245, 158, 11, 0.2), 0 0 40px rgba(245, 158, 11, 0.1);
+  }
+  50% {
+    box-shadow: 0 0 35px rgba(245, 158, 11, 0.45), 0 0 60px rgba(245, 158, 11, 0.25);
   }
 }
 
@@ -64,3 +100,4 @@
 .animate-slide-down {
   animation: slideDown 0.25s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
+

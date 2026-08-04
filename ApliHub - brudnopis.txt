@@ -1,6 +1,6 @@
 Zaczynamy coś kompletnie nowego i o wiele bardziej skomplikowanego. Będzie to strona internetowa, z której będzie można pobrać autorskie wtyczki oraz aplikacje, które pomogę w codziennej pracy oraz przeglądaniu internetu. Wysyłam screena jak ma wyglądać strona. I Poniżej daje kolejność zakładek od lewej do prawej.
 
-- Atualności
+- Aktualności
 - Aplikacje
 - Wtyczki
 - Ważne
@@ -54,7 +54,7 @@ Lecimy ze zmianami.
 
 1. W każdej zakładce zmień design i motyw na taki przyjemniejszy. Ten żółty jest mega fajny, ale za bardzo bije po oczach. Możesz też w tle dodać jakieś fajne particle poruszające się, ale ma to być nie przeszkadzające tylko dodające smaczku dla strony.
 
-2. W panelach są nazwy typu "CTR". Może zrób jakąś ściągę na dole ładną z tymi skrótami, aby użytkownik mógł się odnaleźć. I jeszcze od nośnie temu "Jak się wbić w algorytm..." daj tam coś jaśniejszego dla zrozumienia, bo to wygląda skomplikowanie i po co sobie utrudniać życie.
+2. W panelach są nazwy typu "CTR". Może zrób jakąś ściągę na dole ładną z tymi skrótami, aby użytkownik mógł się odnaleźć. I jeszcze odnośnie temu "Jak się wbić w algorytm..." daj tam coś jaśniejszego dla zrozumienia, bo to wygląda skomplikowanie i po co sobie utrudniać życie.
 
 3. Usuwamy niektóre nie potrzebne rzeczy z interfejsu i dodajemy nowe funkcje. To co na screenach to usuń i zaraz napisze ci co dodać.
 
@@ -136,15 +136,97 @@ Zmiany następne.
 
 Leć.
 
+Kolejne poprawki. Na screenach masz rzeczy, które usunąć.
+
+1. Na stronie przy algo analyzerze obok przycisku pobierz jest przycisk otwórz. Usuń go, bo jest zbędny. Użytnownik ma pobrać aplikację, a nie otworzyć.
+
+2. Ukryj zakładkę wszystko, bo w sumie nie jest potrzebna. Zobaczymy jak to wygląda bez niej, a jak coś to przywrócimy ją.
+
+3. Dodaj na stronie w zakładce ważne pełen wpis o prawach autorskich aplikacji. Ma być ładny i sensownie napisany z odpowiednimi znakami praw autorskich. Wszelkie prawa zastrzeżone.
+
+4. Gdy przesuwam kursorem na dany panel z wtyczką/aplikacją to chcę, aby wokół tego panelu był taki fajny żółty pasek animowany i świecący lecący wokół. Taka animacja.
+
+5. Algo analyzer daj do zakładki z aplikacjami, bo to nie jest wtyczka.
+
+6. Tytuł w zakładce aplikacje zmień na "Aplikacje", a w zakładce wtyczki na "Wtyczki"
+
+7. W profilu w zakładce profil zmiany:
+
+- Usuwamy email i przenosimy go do zakładki konto
+- Status konta tak samo do zakładki konta
+- Datę dołączenia też do zakładki konta. 
+- Dodajemy możliwość wyboru avataru tak jak w aplikacji algo analyzer
+- W zakładce konto dodajemy rzeczy:
+
+> Adres email z możliwością zmiany
+> Hasło z możliwością zmiany przez adres email
+> Gdzieś na dole informacje o dacie dołączenia
+> Możliwość zweryfikowania konta (później za to jakiś bonus dla tych użytkownikow)
+
+- W ustawieniach aplikacji zmiany:
+
+> Możliwość włączenia i wyłączenia dźwięku przesuwania kursorem po panelach oraz zakładkach.
+> Możliwość ściszenia oraz pogłośnienia tego dźwięku suwakiem.
+> Możliwość włączenia oraz wyłączenia powiadomienia odnośnie nowości na stronie (One mają wysyłać się na maila).
+> Usuń opcję automatycznych aktualizacji wtyczek.
+> Zrób przyjemniejszy wygląd tych wszystkich ustawień.
+
+8. Daj opcje wylogowania się w zakladkach w prawym gornym.
+
+9. W zakładce ważne w panelu "Zgłaszanie błedów i propozycji daj przycisk o nazwie "Wejdź" i po kliknięciu w niego przenieś użytkownika na następną stronę tylko płynnym przejściem gdzie będzie miał panele do wyboru obok siebie równo z nazwami kolejno:
+
+- Zgłoś błąd (Opis: Jeśli zauważyłeś błąd na stronie zgłoś go nam, a my się nim zajmiemy)
+- Dodaj propozycje (Opis: Jeśli masz propozycje odnośnie czegoś związanego z naszą stroną, aplikacjami lub wtyczkami to napisz tutaj. Jeżeli uznamy ten pomysł za fajny i dodamy go to podpiszemy ciebie jako pomysłodawcę!)
+
+Do panelu zgłoś błąd dodaj przycisk "Zgłoś" i tam zrób formularz, w którym ma być zawarte:
+
+- Nick
+- Email
+- Opcje do wyboru jaki to typ błędu:
+
+> Nieprawidłowe działanie funkcji
+> Problem z interfejsem
+> Błąd pobierania/instalacji
+> Problem z kontem
+> 
+
+10. W zakładce ważne dodaj również panel z kontaktem do właścicieli. Tam daj tytuł "Skontaktuj się z nami" oraz opis "Jeżeli potrzebujesz większej pomocy lub chcesz nawiązać współpracę napisz do nas". Daj tam przycisk "Kontakt" i zrób płynne przejście na kolejną stronę gdzie będzie panel z kontaktami do administratorow i ma wygladac jak ponizej:
+
+Tytuł: SKONTAKTUJ SIĘ Z ADMINISTRATORAMI
+
+Poniżej: Vertis CEO
+
+Email: aplihubvertis@gmail.com
+
+Instagram: https://www.instagram.com/vert1ss/ (Tu zrób przycisk po prostu, który przekieruje na mojego ig)
+
+Discord: the_vertis (Tutaj też zrób przycisk, który będzie prowadził do automatycznego zaproszenia lub do mojego profilu)
+
+Poniżej: Vezy Vice Ceo
+
+Instagram: vezy_ofc
+
+Pod spodem ładny napis: "Na kontakt proszę czekać do 48 godzin."
+
+11. Usuń wymagania sprzętowe z zakładki ważne.
+
+12. Ukryj intrukcje z zakładki ważne.
+
+13. Dodaj jakąś fajną animacje do tego napisu ApliHub w lewym górnym żeby nie był taki suchy.
+
+14. Dodaj nowe logo przy napisie ApliHub oraz nowe logo do zakładki strony. To co ci wysłałem to złote.
+
+Pracuj.
+
+
+
+
+
+
+
+
 
 
 Usuwamy: 
 
 - Klucz API z zakładki z ustawieniami konta
-
-
-
-
-
-
- 
