@@ -10,7 +10,7 @@ const DEFAULT_USER_STORE = {
   selectedAvatar: "O", // Preset icon or custom symbol
   accountType: "PRO VIP",
   isVerified: false,
-  joinedDate: "Sierpień 2026",
+  joinedDate: "01.08.2026 r.",
   connectedAccounts: {
     youtube: true,
     tiktok: false,
@@ -143,7 +143,7 @@ const APLIHUB_DATA = {
     {
       id: "imp-copyright",
       title: "Prawa Autorskie & Licencja © ApliHub",
-      desc: "Wszelkie prawa zastrzeżone. Wszystkie wtyczki oraz aplikacje są autorskim projektem ApliHub. Kopiowanie lub redystrybucja bez zgody jest zabroniona.",
+      desc: "Dowiedz się więcej o prawach autorskich strony, aplikacji oraz wtyczek.",
       icon: "📜",
       action: "copyright"
     },
@@ -164,7 +164,7 @@ const APLIHUB_DATA = {
     {
       id: "imp-privacy",
       title: "Polityka prywatności i bezpieczeństwo",
-      desc: "Wszystkie nasze narzędzia działają lokalnie i nie zbierają prywatnych danych użytkowników.",
+      desc: "Dowiedz się więcej o prywatności i bezpieczeństwie na stronie.",
       icon: "🔒",
       action: "privacy"
     }

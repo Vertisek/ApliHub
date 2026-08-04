@@ -145,29 +145,27 @@ document.addEventListener('DOMContentLoaded', () => {
       case 'konto':
         title = '💳 Ustawienia Konta i Bezpieczeństwa';
         html = `
-          <form id="account-credentials-form" style="display: flex; flex-direction: column; gap: 16px;">
+          <div style="display: flex; flex-direction: column; gap: 16px;">
             <div>
               <label style="display: block; font-size: 0.85rem; font-weight: 600; margin-bottom: 6px; color: var(--text-muted);">Adres E-mail</label>
-              <input type="email" id="input-account-email" value="${user.email}" required style="width: 100%; padding: 12px; background: rgba(15, 23, 42, 0.8); border: 1px solid var(--border-subtle); border-radius: 8px; color: #fff; font-size: 0.95rem; outline: none;">
-            </div>
-
-            <div>
-              <label style="display: block; font-size: 0.85rem; font-weight: 600; margin-bottom: 6px; color: var(--text-muted);">Zmień Hasło</label>
-              <div style="display: flex; gap: 10px;">
-                <input type="password" id="input-account-password" placeholder="Wpisz nowe hasło..." style="flex: 1; padding: 12px; background: rgba(15, 23, 42, 0.8); border: 1px solid var(--border-subtle); border-radius: 8px; color: #fff; font-size: 0.95rem; outline: none;">
-                <button type="button" id="btnSendResetEmail" style="padding: 12px 14px; background: rgba(59, 130, 246, 0.2); border: 1px solid rgba(59, 130, 246, 0.4); color: #60a5fa; font-weight: 700; border-radius: 8px; cursor: pointer; font-size: 0.85rem; whitespace: nowrap;">
-                  Wyślij link e-mail
+              <div style="display: flex; justify-content: space-between; align-items: center; padding: 12px 14px; background: rgba(15, 23, 42, 0.8); border: 1px solid var(--border-subtle); border-radius: 8px;">
+                <span style="color: #fff; font-weight: 700; font-size: 0.95rem;" id="current-account-email-display">${user.email}</span>
+                <button type="button" id="btnOpenChangeEmailModal" style="padding: 6px 14px; background: linear-gradient(135deg, #f59e0b, #d97706); color: #000; font-weight: 800; border: none; border-radius: 6px; cursor: pointer; font-size: 0.82rem; transition: var(--transition);">
+                  Zmień
                 </button>
               </div>
             </div>
 
-            <button type="submit" class="btn-yellow-save" style="width: 100%; padding: 12px; background: linear-gradient(135deg, #f59e0b, #d97706); color: #000; border: none; border-radius: 10px; font-weight: 800; cursor: pointer; margin-top: 4px; transition: all 0.2s ease;">
-              Zapisz Zmiany
-            </button>
+            <div>
+              <label style="display: block; font-size: 0.85rem; font-weight: 600; margin-bottom: 6px; color: var(--text-muted);">Bezpieczeństwo Hasła</label>
+              <button type="button" id="btnOpenChangePassModal" style="width: 100%; padding: 12px; background: rgba(59, 130, 246, 0.15); border: 1px solid rgba(59, 130, 246, 0.4); color: #60a5fa; font-weight: 800; border-radius: 10px; cursor: pointer; font-size: 0.92rem; transition: all 0.2s ease;">
+                🔑 Zmień hasło
+              </button>
+            </div>
 
             <!-- Verification & Account Info Section -->
             <div style="border-top: 1px solid var(--border-subtle); padding-top: 16px; margin-top: 8px;">
-              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px;">
                 <div>
                   <span style="display: block; font-weight: 700; font-size: 0.92rem; color: #fff;">Weryfikacja Konta</span>
                   <span style="font-size: 0.8rem; color: var(--text-muted);">Zyskaj odznakę i unikalne bonusy użytkownika</span>
@@ -183,12 +181,11 @@ document.addEventListener('DOMContentLoaded', () => {
                 `}
               </div>
 
-              <div style="display: flex; justify-content: space-between; font-size: 0.85rem; color: var(--text-muted); background: rgba(15, 23, 42, 0.5); padding: 10px 14px; border-radius: 8px; margin-top: 10px;">
-                <span>📅 Data dołączenia: <strong style="color: #fff;">${user.joinedDate || 'Sierpień 2026'}</strong></span>
-                <span>🛡️ Status: <strong style="color: #34d399;">Aktywne</strong></span>
+              <div style="font-size: 0.85rem; color: var(--text-muted); background: rgba(15, 23, 42, 0.5); padding: 10px 14px; border-radius: 8px; text-align: center;">
+                📅 Data dołączenia: <strong style="color: #fff;">${user.joinedDate || '01.08.2026 r.'}</strong>
               </div>
             </div>
-          </form>
+          </div>
         `;
         break;
 
@@ -304,28 +301,68 @@ document.addEventListener('DOMContentLoaded', () => {
 
       // Attach event listeners for Konto
       if (actionType === 'konto') {
-        const form = document.getElementById('account-credentials-form');
-        if (form) {
-          form.addEventListener('submit', (e) => {
-            e.preventDefault();
-            const newEmail = document.getElementById('input-account-email').value.trim();
-            const newPassword = document.getElementById('input-account-password').value.trim();
-            
-            const currentData = getApliHubUserData();
-            if (newEmail) currentData.email = newEmail;
-            if (newPassword) currentData.password = newPassword;
+        const btnChangeEmail = document.getElementById('btnOpenChangeEmailModal');
+        if (btnChangeEmail) {
+          btnChangeEmail.addEventListener('click', () => {
+            const userEmail = getApliHubUserData().email;
+            modalTitle.innerHTML = '✉️ Zmiana Adresu E-mail';
+            modalContent.innerHTML = `
+              <form id="email-link-form" style="display: flex; flex-direction: column; gap: 14px;">
+                <p style="font-size: 0.9rem; color: var(--text-muted); line-height: 1.5;">
+                  Podaj adres e-mail, na który ma zostać wysłana wiadomość z linkiem potwierdzającym zmianę adresu:
+                </p>
+                <div>
+                  <label style="display: block; font-size: 0.85rem; font-weight: 600; margin-bottom: 4px; color: var(--text-muted);">Docelowy adres e-mail</label>
+                  <input type="email" id="input-new-email-target" value="${userEmail}" required style="width: 100%; padding: 12px; background: rgba(15, 23, 42, 0.8); border: 1px solid var(--border-subtle); border-radius: 8px; color: #fff; font-size: 0.95rem; outline: none;">
+                </div>
+                <button type="submit" style="width: 100%; padding: 12px; background: linear-gradient(135deg, #f59e0b, #d97706); color: #000; border: none; border-radius: 10px; font-weight: 800; cursor: pointer; margin-top: 6px;">
+                  Wyślij link do zmiany e-maila
+                </button>
+              </form>
+            `;
 
-            saveApliHubUserData(currentData);
-            showToast('Zaktualizowano dane konta (E-mail / Hasło)!');
-            closeModal();
+            document.getElementById('email-link-form').addEventListener('submit', (e) => {
+              e.preventDefault();
+              const targetEmail = document.getElementById('input-new-email-target').value.trim();
+              if (targetEmail) {
+                const currentData = getApliHubUserData();
+                currentData.email = targetEmail;
+                saveApliHubUserData(currentData);
+                showToast(`Wysłano link ze stroną do zmiany e-maila na adres: ${targetEmail}`);
+                closeModal();
+              }
+            });
           });
         }
 
-        const btnResetEmail = document.getElementById('btnSendResetEmail');
-        if (btnResetEmail) {
-          btnResetEmail.addEventListener('click', () => {
-            const currentData = getApliHubUserData();
-            showToast(`Wysłano link do zmiany hasła na adres ${currentData.email}`);
+        const btnChangePass = document.getElementById('btnOpenChangePassModal');
+        if (btnChangePass) {
+          btnChangePass.addEventListener('click', () => {
+            const userEmail = getApliHubUserData().email;
+            modalTitle.innerHTML = '🔑 Zmiana Hasła';
+            modalContent.innerHTML = `
+              <form id="pass-link-form" style="display: flex; flex-direction: column; gap: 14px;">
+                <p style="font-size: 0.9rem; color: var(--text-muted); line-height: 1.5;">
+                  Podaj adres e-mail, na który ma zostać wysłany bezpieczny link do zmiany hasła:
+                </p>
+                <div>
+                  <label style="display: block; font-size: 0.85rem; font-weight: 600; margin-bottom: 4px; color: var(--text-muted);">Adres e-mail konta</label>
+                  <input type="email" id="input-pass-email-target" value="${userEmail}" required style="width: 100%; padding: 12px; background: rgba(15, 23, 42, 0.8); border: 1px solid var(--border-subtle); border-radius: 8px; color: #fff; font-size: 0.95rem; outline: none;">
+                </div>
+                <button type="submit" style="width: 100%; padding: 12px; background: linear-gradient(135deg, #3b82f6, #2563eb); color: #fff; border: none; border-radius: 10px; font-weight: 800; cursor: pointer; margin-top: 6px;">
+                  Wyślij link do zmiany hasła
+                </button>
+              </form>
+            `;
+
+            document.getElementById('pass-link-form').addEventListener('submit', (e) => {
+              e.preventDefault();
+              const targetEmail = document.getElementById('input-pass-email-target').value.trim();
+              if (targetEmail) {
+                showToast(`Wysłano link ze stroną do zmiany hasła na adres: ${targetEmail}`);
+                closeModal();
+              }
+            });
           });
         }
 
