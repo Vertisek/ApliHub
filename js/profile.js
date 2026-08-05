@@ -694,7 +694,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     if (form) {
-      form.addEventListener('submit', (e) => {
+      form.addEventListener('submit', async (e) => {
         e.preventDefault();
         hideAllErrors();
         let valid = true;
