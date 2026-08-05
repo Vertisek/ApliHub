@@ -69,17 +69,28 @@ document.addEventListener('DOMContentLoaded', () => {
       if (profileContainer) profileContainer.classList.remove('open');
 
       if (action === 'wyloguj') {
-        localStorage.setItem('aplihub_logged_out', 'true');
-        localStorage.removeItem('aplihub_user');
-        localStorage.removeItem('aplihub_user_store');
-        localStorage.removeItem('aplihub_token');
-        sessionStorage.clear();
+        const profileTriggerBtn = document.getElementById('profileTrigger');
+        const avatarCircle = profileTriggerBtn ? profileTriggerBtn.querySelector('.avatar-circle') : null;
 
-        const loggedOutData = { ...DEFAULT_USER_STORE, isLoggedIn: false, name: 'Gość', email: '' };
-        saveApliHubUserData(loggedOutData);
+        if (avatarCircle) {
+          avatarCircle.classList.remove('avatar-glow-pop', 'avatar-logout-shrink');
+          void avatarCircle.offsetWidth; // Force reflow
+          avatarCircle.classList.add('avatar-logout-shrink');
+        }
 
-        showToast('Zostałeś pomyślnie wylogowany!');
-        updateHeaderUserInfo();
+        setTimeout(() => {
+          localStorage.setItem('aplihub_logged_out', 'true');
+          localStorage.removeItem('aplihub_user');
+          localStorage.removeItem('aplihub_user_store');
+          localStorage.removeItem('aplihub_token');
+          sessionStorage.clear();
+
+          const loggedOutData = { ...DEFAULT_USER_STORE, isLoggedIn: false, name: 'Gość', email: '' };
+          saveApliHubUserData(loggedOutData);
+
+          showToast('👋 Zostałeś pomyślnie wylogowany. Do zobaczenia!');
+          updateHeaderUserInfo();
+        }, 200);
         return;
       }
 
