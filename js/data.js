@@ -3,6 +3,7 @@
    ========================================================================== */
 
 const DEFAULT_USER_STORE = {
+  isLoggedIn: true,
   name: "Oskar_Algo",
   email: "oskar@aplihub.pl",
   password: "password123",
@@ -30,6 +31,10 @@ const DEFAULT_USER_STORE = {
 // Helper to get persistent user data
 function getApliHubUserData() {
   try {
+    const isLoggedOut = localStorage.getItem('aplihub_logged_out') === 'true';
+    if (isLoggedOut) {
+      return { ...DEFAULT_USER_STORE, isLoggedIn: false, name: 'Gość', email: '' };
+    }
     const saved = localStorage.getItem('aplihub_user_store');
     if (saved) {
       const parsed = JSON.parse(saved);
@@ -44,6 +49,11 @@ function getApliHubUserData() {
 // Helper to save persistent user data
 function saveApliHubUserData(updatedData) {
   try {
+    if (updatedData && updatedData.isLoggedIn === false) {
+      localStorage.setItem('aplihub_logged_out', 'true');
+    } else {
+      localStorage.removeItem('aplihub_logged_out');
+    }
     localStorage.setItem('aplihub_user_store', JSON.stringify(updatedData));
     APLIHUB_DATA.user = updatedData;
     // Dispatch custom event for cross-component reactive updates

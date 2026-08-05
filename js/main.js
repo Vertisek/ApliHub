@@ -10,7 +10,7 @@ const SoundFX = {
   },
   // Distinct Sound 1: Nav Tabs Hover (Crisp light click/pop tone)
   playNavHover() {
-    const user = getApliHubUserData();
+    const user = typeof getApliHubUserData === 'function' ? getApliHubUserData() : {};
     if (!user.settings || !user.settings.soundEnabled) return;
     try {
       this.init();
@@ -37,7 +37,7 @@ const SoundFX = {
   },
   // Distinct Sound 2: Panel & Card Hover (Warm glowing soft resonant tone)
   playCardHover() {
-    const user = getApliHubUserData();
+    const user = typeof getApliHubUserData === 'function' ? getApliHubUserData() : {};
     if (!user.settings || !user.settings.soundEnabled) return;
     try {
       this.init();
@@ -789,69 +789,6 @@ function handleBackToLogin() {
   }
 }
 
-// SoundFX
-const SoundFX = {
-  ctx: null,
-  init() {
-    if (!this.ctx && (window.AudioContext || window.webkitAudioContext)) {
-      this.ctx = new (window.AudioContext || window.webkitAudioContext)();
-    }
-  },
-
-  playNavHover() {
-    const user = typeof getApliHubUserData === 'function' ? getApliHubUserData() : {};
-    if (!user.settings || !user.settings.soundEnabled) return;
-    try {
-      this.init();
-      if (!this.ctx) return;
-      if (this.ctx.state === 'suspended') this.ctx.resume();
-
-      const osc = this.ctx.createOscillator();
-      const gain = this.ctx.createGain();
-      const vol = (user.settings.soundVolume ?? 50) / 100 * 0.025;
-
-      osc.type = 'sine';
-      osc.frequency.setValueAtTime(650, this.ctx.currentTime);
-      osc.frequency.exponentialRampToValueAtTime(1050, this.ctx.currentTime + 0.025);
-
-      gain.gain.setValueAtTime(vol, this.ctx.currentTime);
-      gain.gain.exponentialRampToValueAtTime(0.0001, this.ctx.currentTime + 0.025);
-
-      osc.connect(gain);
-      gain.connect(this.ctx.destination);
-
-      osc.start();
-      osc.stop(this.ctx.currentTime + 0.025);
-    } catch (e) { }
-  },
-
-  playCardHover() {
-    const user = typeof getApliHubUserData === 'function' ? getApliHubUserData() : {};
-    if (!user.settings || !user.settings.soundEnabled) return;
-    try {
-      this.init();
-      if (!this.ctx) return;
-      if (this.ctx.state === 'suspended') this.ctx.resume();
-
-      const osc = this.ctx.createOscillator();
-      const gain = this.ctx.createGain();
-      const vol = (user.settings.soundVolume ?? 50) / 100 * 0.035;
-
-      osc.type = 'triangle';
-      osc.frequency.setValueAtTime(280, this.ctx.currentTime);
-      osc.frequency.exponentialRampToValueAtTime(460, this.ctx.currentTime + 0.045);
-
-      gain.gain.setValueAtTime(vol, this.ctx.currentTime);
-      gain.gain.exponentialRampToValueAtTime(0.0001, this.ctx.currentTime + 0.045);
-
-      osc.connect(gain);
-      gain.connect(this.ctx.destination);
-
-      osc.start();
-      osc.stop(this.ctx.currentTime + 0.045);
-    } catch (e) { }
-  }
-};
 
 // Bezpieczne rejestrowanie zdarzeń
 if (loginButton) loginButton.addEventListener('click', handleLogin);

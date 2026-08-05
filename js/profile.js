@@ -17,23 +17,42 @@ document.addEventListener('DOMContentLoaded', () => {
 
   function updateHeaderUserInfo() {
     const user = getApliHubUserData();
-    const nameElems = document.querySelectorAll('.profile-name, .dropdown-user-name');
-    nameElems.forEach(el => el.textContent = user.name);
-    const emailElem = document.querySelector('.dropdown-user-email');
-    if (emailElem) emailElem.textContent = user.email;
+    const profileTrigger = document.getElementById('profileTrigger');
 
-    // Update avatar circle text/icon
-    const avatarCircle = document.querySelector('.btn-profile-trigger .avatar-circle');
-    if (avatarCircle) {
-      avatarCircle.textContent = user.avatar || 'O';
+    if (!user || user.isLoggedIn === false) {
+      if (profileTrigger) {
+        profileTrigger.innerHTML = `
+          <div class="avatar-circle" style="background: linear-gradient(135deg, #475569, #334155); color: #94a3b8; font-size: 1rem;">🔑</div>
+          <span class="profile-name" style="color: #f59e0b; font-weight: 700;">Zaloguj się</span>
+        `;
+      }
+    } else {
+      if (profileTrigger) {
+        profileTrigger.innerHTML = `
+          <div class="avatar-circle">${user.avatar || 'O'}</div>
+          <span class="profile-name">${user.name || 'Oskar'}</span>
+          <svg class="caret-icon" viewBox="0 0 24 24">
+            <path d="M7 10l5 5 5-5H7z"></path>
+          </svg>
+        `;
+      }
+      const nameElems = document.querySelectorAll('.dropdown-user-name');
+      nameElems.forEach(el => el.textContent = user.name || 'Użytkownik');
+      const emailElem = document.querySelector('.dropdown-user-email');
+      if (emailElem) emailElem.textContent = user.email || '';
     }
   }
 
-  // Toggle Dropdown
+  // Toggle Dropdown or Open Login Modal
   if (profileTrigger && profileContainer) {
     profileTrigger.addEventListener('click', (e) => {
       e.stopPropagation();
-      profileContainer.classList.toggle('open');
+      const user = getApliHubUserData();
+      if (!user || user.isLoggedIn === false) {
+        openLoginModal();
+      } else {
+        profileContainer.classList.toggle('open');
+      }
     });
 
     document.addEventListener('click', (e) => {
@@ -50,16 +69,17 @@ document.addEventListener('DOMContentLoaded', () => {
       if (profileContainer) profileContainer.classList.remove('open');
 
       if (action === 'wyloguj') {
+        localStorage.setItem('aplihub_logged_out', 'true');
         localStorage.removeItem('aplihub_user');
         localStorage.removeItem('aplihub_user_store');
         localStorage.removeItem('aplihub_token');
         sessionStorage.clear();
-        fetch('/api/auth/logout', { method: 'POST', credentials: 'include' }).catch(() => {});
+
+        const loggedOutData = { ...DEFAULT_USER_STORE, isLoggedIn: false, name: 'Gość', email: '' };
+        saveApliHubUserData(loggedOutData);
+
         showToast('Zostałeś pomyślnie wylogowany!');
-        window.dispatchEvent(new CustomEvent('aplihub_user_updated', { detail: null }));
-        setTimeout(() => {
-          window.location.reload();
-        }, 600);
+        updateHeaderUserInfo();
         return;
       }
 
@@ -448,6 +468,60 @@ document.addEventListener('DOMContentLoaded', () => {
           });
         });
       }
+    }
+  }
+
+  function openLoginModal() {
+    if (!modalTitle || !modalContent || !modalBackdrop) return;
+    
+    modalTitle.innerHTML = '🔑 Logowanie do ApliHub';
+    modalContent.innerHTML = `
+      <form id="login-modal-form" style="display: flex; flex-direction: column; gap: 16px;">
+        <p style="font-size: 0.9rem; color: var(--text-muted); line-height: 1.5;">
+          Wprowadź swój e-mail i hasło, aby zalogować się do konta ApliHub i odblokować synchronizację.
+        </p>
+
+        <div>
+          <label style="display: block; font-size: 0.85rem; font-weight: 600; margin-bottom: 6px; color: var(--text-muted);">Adres E-mail</label>
+          <input type="email" id="modalAuthEmail" placeholder="np. oskar@aplihub.pl" required style="width: 100%; padding: 12px 14px; background: rgba(15, 23, 42, 0.8); border: 1px solid var(--border-subtle); border-radius: 10px; color: #fff; font-size: 0.95rem; outline: none;">
+        </div>
+
+        <div>
+          <label style="display: block; font-size: 0.85rem; font-weight: 600; margin-bottom: 6px; color: var(--text-muted);">Hasło</label>
+          <input type="password" id="modalAuthPassword" placeholder="••••••••" required style="width: 100%; padding: 12px 14px; background: rgba(15, 23, 42, 0.8); border: 1px solid var(--border-subtle); border-radius: 10px; color: #fff; font-size: 0.95rem; outline: none;">
+        </div>
+
+        <button type="submit" style="width: 100%; padding: 14px; background: linear-gradient(135deg, #f59e0b, #d97706); color: #000; border: none; border-radius: 12px; font-size: 1rem; font-weight: 800; cursor: pointer; transition: all 0.2s ease; margin-top: 6px; box-shadow: 0 4px 15px rgba(245, 158, 11, 0.3);">
+          ⚡ Zaloguj się
+        </button>
+      </form>
+    `;
+
+    modalBackdrop.classList.add('active');
+
+    const form = document.getElementById('login-modal-form');
+    if (form) {
+      form.addEventListener('submit', (e) => {
+        e.preventDefault();
+        const email = document.getElementById('modalAuthEmail').value.trim();
+        const name = email.split('@')[0] || 'Użytkownik';
+        const avatar = (email[0] || 'O').toUpperCase();
+
+        const userData = {
+          ...DEFAULT_USER_STORE,
+          isLoggedIn: true,
+          email: email,
+          name: name,
+          avatar: avatar,
+          selectedAvatar: avatar,
+          isVerified: true
+        };
+
+        saveApliHubUserData(userData);
+        showToast(`Zalogowano pomyślnie jako ${name}! 🎉`);
+        closeModal();
+        updateHeaderUserInfo();
+      });
     }
   }
 });
