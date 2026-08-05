@@ -574,9 +574,45 @@ document.addEventListener('DOMContentLoaded', () => {
           isVerified: true
         };
 
-        saveApliHubUserData(userData);
-        closeModal();
-        updateHeaderUserInfo();
+        // Smooth login transition
+        const submitBtn = form.querySelector('button[type="submit"]');
+        if (submitBtn) {
+          submitBtn.disabled = true;
+          submitBtn.innerHTML = '⏳ Logowanie...';
+          submitBtn.style.opacity = '0.8';
+        }
+
+        setTimeout(() => {
+          modalTitle.innerHTML = '<span style="display:block; text-align:center; width:100%; font-size: 1.35rem; font-weight: 800; color: #34d399;">Zalogowano!</span>';
+          modalContent.innerHTML = `
+            <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; gap: 16px; padding: 20px 0; animation: fadeIn 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;">
+              <div style="width: 64px; height: 64px; border-radius: 50%; background: linear-gradient(135deg, #10b981, #059669); border: 2px solid #34d399; display: flex; align-items: center; justify-content: center; font-size: 2rem; color: #fff; box-shadow: 0 0 30px rgba(16, 185, 129, 0.5); animation: logoBouncePulse 1s ease infinite;">
+                ✓
+              </div>
+              <div>
+                <h4 style="font-size: 1.25rem; font-weight: 800; color: #fff; margin-bottom: 6px;">Witaj ponownie, <span style="color: #f59e0b;">${name}</span>!</h4>
+                <p style="font-size: 0.88rem; color: var(--text-muted);">Płynne przekierowanie do serwisu ApliHub...</p>
+              </div>
+            </div>
+          `;
+
+          saveApliHubUserData(userData);
+          if (typeof showToast === 'function') {
+            showToast(`Witaj ponownie, ${name}! 🎉`, 'success');
+          }
+
+          setTimeout(() => {
+            closeModal();
+            updateHeaderUserInfo();
+
+            const avatarCircle = document.querySelector('.btn-profile-trigger .avatar-circle');
+            if (avatarCircle) {
+              avatarCircle.classList.remove('avatar-glow-pop');
+              void avatarCircle.offsetWidth; // Force reflow
+              avatarCircle.classList.add('avatar-glow-pop');
+            }
+          }, 650);
+        }, 350);
       });
     }
 
