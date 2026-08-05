@@ -50,10 +50,16 @@ document.addEventListener('DOMContentLoaded', () => {
       if (profileContainer) profileContainer.classList.remove('open');
 
       if (action === 'wyloguj') {
+        localStorage.removeItem('aplihub_user');
+        localStorage.removeItem('aplihub_user_store');
+        localStorage.removeItem('aplihub_token');
+        sessionStorage.clear();
+        fetch('/api/auth/logout', { method: 'POST', credentials: 'include' }).catch(() => {});
         showToast('Zostałeś pomyślnie wylogowany!');
+        window.dispatchEvent(new CustomEvent('aplihub_user_updated', { detail: null }));
         setTimeout(() => {
           window.location.reload();
-        }, 1200);
+        }, 600);
         return;
       }
 

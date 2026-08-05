@@ -218,6 +218,42 @@ Pod spodem ładny napis: "Na kontakt proszę czekać do 48 godzin."
 
 Pracuj.
 
+Jeszcze kilka poprawek.
+
+1. W zakładce ważne > prawa autorskie, licencja itp zrobimy inaczej. Dodaj tam przycisk "Więcej" i przenieś cały napis odnośnie praw autorskich właśnie do na tę stronę. Oczywiście po kliknięciu w przycisk "Więcej" ma być płynne przejście na następną stronę z całym opisem praw autorskich itp. Natomiast opis tego panelu zmień na "Dowiedz się więcej o prawach autorskich strony, aplikacji oraz wtyczek."
+
+2. Zmniejsz te panele wszystkie, bo są za duże. Mają być subtelne, ale nie zmieniaj opisów ani przycisków tylko jedynie zmniejsz ich wysokość. 
+
+3. Polityka prywatności i bezpieczeństwo. Tutaj zrób podobnie jak tam w prawach autorskich czyli przycisk ten sam i podmień opis na "Dowiedz się więcej o prywatności i bezpieczeństwie na stronie.". Po kliknięciu przycisku oczywiście płynne przejście na następną stronę gdzie będzie wszystko ładnie rozpisane co chodzi o bezpieczeństwo danych na tronie, poufności i prywatności. Twoim zadaniem jest to ładnie rozpisać, aby było przejrzyste i czytelne i nie że dwie linijki tylko serio ładnie napisać.
+
+4. Zmień dźwięk przesuwania kursorem po panelach na inny tak jak ci mówiłem. Na zakładkach ma być inny a na panelach inny.
+
+5. Usuń ten email pod nickiem po kliknieciu w prawy gorny. Tam ba też być tylko nick bez żadnych dopisów. 
+
+6. Zmiana dresu email ma wyglądać tak:
+
+Jest adres email i obok przycisk z napisem "Zmień". Po kliknięciu w ten przycisk ma wyskoczyć okno z obowiązkiem podania adresu email na który ma przyjść link ze stroną do zmiany email.
+
+7 Zmiana hasła. Pod emailem ma być przycisk na całej długości z nazwą "Zmień hasło" i podobnie jak przy zmianie emailu po kliknięciu w ten przycisk ma pojawić się okno z prośbą o wpisanie emaila na który ma przyjść link do zmiany hasła. Usuń napis zapisz zmiany bo jest zbędny w tym oknie konta. 
+
+8. Usuń status konta pod weryfikacją, bo nie jest potrzebny tam.
+
+9. W dacie dołączenia daj DOKŁADNĄ datę, a nie tlyko miesiąc i rok.
+
+10. Ukryj ten napis i opis z zakładki ważne "Twoje cyfrowe supermoce" i to co jest pod spodem. Tak samo ukryj pole do wyszukiwania.
+
+Działaj.
+
+
+Dalej...
+
+1. Mały szczegół, ale lepiej żeby był dopracowany. Przy klikaniu w zakładki interfejs tak dziwnie się porusza i przeskakuje prawo lewo o kilka milimetrow dziwnie. Napraw to.
+
+2. Przycisk wylogowania nie działa. Napraw go, bo logowanie będzie przez email i haslo.
+
+
+
+
 
 
 

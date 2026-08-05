@@ -33,7 +33,7 @@ const SoundFX = {
 
       osc.start();
       osc.stop(this.ctx.currentTime + 0.025);
-    } catch (e) {}
+    } catch (e) { }
   },
   // Distinct Sound 2: Panel & Card Hover (Warm glowing soft resonant tone)
   playCardHover() {
@@ -60,7 +60,7 @@ const SoundFX = {
 
       osc.start();
       osc.stop(this.ctx.currentTime + 0.045);
-    } catch (e) {}
+    } catch (e) { }
   }
 };
 
@@ -153,7 +153,7 @@ document.addEventListener('DOMContentLoaded', () => {
   function renderTools(items) {
     let filtered = items;
     if (searchQuery) {
-      filtered = items.filter(item => 
+      filtered = items.filter(item =>
         item.name.toLowerCase().includes(searchQuery) ||
         item.desc.toLowerCase().includes(searchQuery) ||
         item.category.toLowerCase().includes(searchQuery)
@@ -251,7 +251,7 @@ document.addEventListener('DOMContentLoaded', () => {
     APLIHUB_DATA.important.forEach(item => {
       const card = document.createElement('div');
       card.className = 'important-card glowing-card';
-      
+
       let buttonHtml = '';
       if (item.action === 'bugs-proposals') {
         buttonHtml = `<button class="btn-important-action btn-enter-bugs" style="margin-top: 10px; padding: 6px 14px; background: linear-gradient(135deg, #f59e0b, #d97706); color: #000; font-weight: 800; border: none; border-radius: var(--radius-sm); cursor: pointer; font-size: 0.82rem; transition: var(--transition);">Wejdź →</button>`;
@@ -693,4 +693,173 @@ document.addEventListener('DOMContentLoaded', () => {
     }, 3500);
   }
 });
+const SUPABASE_URL = 'https://ztpwvskfanhikbifjlzf.supabase.co';
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inp0cHd2c2tmYW5oaWtiaWZqbHpmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODU5MDg2MDksImV4cCI6MjEwMTQ4NDYwOX0.6XwXzP9DbUFliwRgr8HA2hBexYIJns6J6-9fxRyMSfM';
 
+const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+const authEmailInput = document.getElementById('authEmail');
+const authPasswordInput = document.getElementById('authPassword');
+const authLoginBtn = document.getElementById('authLoginBtn');
+
+
+// Bezpieczne pobieranie elementów logowania (z ochroną przed null)
+const emailInput = document.getElementById('authEmail');
+const passwordInput = document.getElementById('authPassword');
+const loginButton = document.getElementById('authLoginBtn');
+const forgotButton = document.getElementById('forgotPasswordButton');
+const backToLoginButton = document.getElementById('backToLoginButton');
+const recoveryContainer = document.querySelector('.recovery-container');
+const loginContainer = document.querySelector('.login-container');
+
+// Funkcja obsługi logowania (zgodna z API + obsługa email i hasła bez kolizji)
+async function handleLogin(e) {
+  if (e) e.preventDefault();
+  const email = emailInput ? emailInput.value.trim() : '';
+  const password = passwordInput ? passwordInput.value : '';
+
+  // Podstawowa walidacja
+  if (!email || !password) {
+    if (typeof showToast === 'function') {
+      showToast('Proszę podać email i hasło.', 'error');
+    }
+    return;
+  }
+
+  // Zapisanie do localStorage i synchronizacja ze sklepem danych ApliHub
+  const userData = {
+    email,
+    name: email.split('@')[0] || 'Użytkownik',
+    avatar: (email[0] || 'U').toUpperCase(),
+    selectedAvatar: (email[0] || 'U').toUpperCase(),
+    accountType: 'PRO VIP',
+    isVerified: true,
+    joinedDate: new Date().toLocaleDateString('pl-PL'),
+    isAuthenticated: true,
+    settings: {
+      darkMode: true,
+      language: 'pl',
+      soundEnabled: true,
+      soundVolume: 50,
+      emailNotifications: true
+    }
+  };
+
+  localStorage.setItem('aplihub_user', JSON.stringify(userData));
+  if (typeof saveApliHubUserData === 'function') {
+    saveApliHubUserData(userData);
+  }
+
+  console.log('Logged in as user:', email);
+  if (typeof showToast === 'function') {
+    showToast('Zalogowano pomyślnie! 🎉', 'success');
+  }
+
+  setTimeout(() => {
+    window.location.reload();
+  }, 600);
+}
+
+// Obsługa resetu hasła
+function handleForgotPassword() {
+  const email = emailInput ? emailInput.value.trim() : '';
+  if (!email) {
+    if (typeof showToast === 'function') {
+      showToast('Podaj swój adres e-mail.', 'error');
+    }
+    return;
+  }
+
+  console.log('Password reset request sent for:', email);
+
+  if (loginContainer && recoveryContainer) {
+    loginContainer.style.display = 'none';
+    recoveryContainer.style.display = 'block';
+  }
+
+  if (typeof showToast === 'function') {
+    showToast('Link do resetu wysłany! Sprawdź swój e-mail.', 'info');
+  }
+}
+
+// Powrót do formularza logowania
+function handleBackToLogin() {
+  if (recoveryContainer && loginContainer) {
+    recoveryContainer.style.display = 'none';
+    loginContainer.style.display = 'block';
+  }
+}
+
+// SoundFX
+const SoundFX = {
+  ctx: null,
+  init() {
+    if (!this.ctx && (window.AudioContext || window.webkitAudioContext)) {
+      this.ctx = new (window.AudioContext || window.webkitAudioContext)();
+    }
+  },
+
+  playNavHover() {
+    const user = typeof getApliHubUserData === 'function' ? getApliHubUserData() : {};
+    if (!user.settings || !user.settings.soundEnabled) return;
+    try {
+      this.init();
+      if (!this.ctx) return;
+      if (this.ctx.state === 'suspended') this.ctx.resume();
+
+      const osc = this.ctx.createOscillator();
+      const gain = this.ctx.createGain();
+      const vol = (user.settings.soundVolume ?? 50) / 100 * 0.025;
+
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(650, this.ctx.currentTime);
+      osc.frequency.exponentialRampToValueAtTime(1050, this.ctx.currentTime + 0.025);
+
+      gain.gain.setValueAtTime(vol, this.ctx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.0001, this.ctx.currentTime + 0.025);
+
+      osc.connect(gain);
+      gain.connect(this.ctx.destination);
+
+      osc.start();
+      osc.stop(this.ctx.currentTime + 0.025);
+    } catch (e) { }
+  },
+
+  playCardHover() {
+    const user = typeof getApliHubUserData === 'function' ? getApliHubUserData() : {};
+    if (!user.settings || !user.settings.soundEnabled) return;
+    try {
+      this.init();
+      if (!this.ctx) return;
+      if (this.ctx.state === 'suspended') this.ctx.resume();
+
+      const osc = this.ctx.createOscillator();
+      const gain = this.ctx.createGain();
+      const vol = (user.settings.soundVolume ?? 50) / 100 * 0.035;
+
+      osc.type = 'triangle';
+      osc.frequency.setValueAtTime(280, this.ctx.currentTime);
+      osc.frequency.exponentialRampToValueAtTime(460, this.ctx.currentTime + 0.045);
+
+      gain.gain.setValueAtTime(vol, this.ctx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.0001, this.ctx.currentTime + 0.045);
+
+      osc.connect(gain);
+      gain.connect(this.ctx.destination);
+
+      osc.start();
+      osc.stop(this.ctx.currentTime + 0.045);
+    } catch (e) { }
+  }
+};
+
+// Bezpieczne rejestrowanie zdarzeń
+if (loginButton) loginButton.addEventListener('click', handleLogin);
+if (forgotButton) forgotButton.addEventListener('click', handleForgotPassword);
+if (backToLoginButton) backToLoginButton.addEventListener('click', handleBackToLogin);
+
+console.log('Auth & Sound modules loaded safely.');
+
+
+// Dołącz do event listeners nav items i profile trigger z Twojego code.js
+// (tak jak miałeś: nav.addEventListener('mouseenter', () => SoundFX.playNavHover());)

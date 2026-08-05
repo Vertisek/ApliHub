@@ -1,0 +1,5 @@
+Hasło Supabase ApliHub: i9sqPnLvK5lgR1mW
+
+Public Key: sb_publishable_YWi27uWaKyNqVMoSKoGP8w_4_vBr95r
+Aon Key: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inp0cHd2c2tmYW5oaWtiaWZqbHpmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODU5MDg2MDksImV4cCI6MjEwMTQ4NDYwOX0.6XwXzP9DbUFliwRgr8HA2hBexYIJns6J6-9fxRyMSfM
+
