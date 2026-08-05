@@ -92,9 +92,14 @@ document.addEventListener('DOMContentLoaded', () => {
     closeModalBtn.addEventListener('click', closeModal);
   }
 
+  let modalMouseDownTarget = null;
   if (modalBackdrop) {
+    modalBackdrop.addEventListener('mousedown', (e) => {
+      modalMouseDownTarget = e.target;
+    });
+
     modalBackdrop.addEventListener('click', (e) => {
-      if (e.target === modalBackdrop) {
+      if (e.target === modalBackdrop && modalMouseDownTarget === modalBackdrop) {
         closeModal();
       }
     });
@@ -476,10 +481,11 @@ document.addEventListener('DOMContentLoaded', () => {
     
     modalTitle.innerHTML = '<span style="display:block; text-align:center; width:100%; font-size: 1.35rem; font-weight: 800; color: #fff;">Zaloguj się</span>';
     modalContent.innerHTML = `
-      <form id="login-modal-form" style="display: flex; flex-direction: column; gap: 16px;">
+      <form id="login-modal-form" novalidate style="display: flex; flex-direction: column; gap: 16px;">
         <div>
           <label style="display: block; font-size: 0.85rem; font-weight: 600; margin-bottom: 6px; color: var(--text-muted);">Adres E-mail</label>
-          <input type="email" id="modalAuthEmail" value="${prefillEmail}" placeholder="użytkownik123@aplihub.pl" required style="width: 100%; padding: 12px 14px; background: rgba(15, 23, 42, 0.8); border: 1px solid var(--border-subtle); border-radius: 10px; color: #fff; font-size: 0.95rem; outline: none;">
+          <input type="email" id="modalAuthEmail" value="${prefillEmail}" placeholder="użytkownik123@aplihub.pl" autocomplete="off" style="width: 100%; padding: 12px 14px; background: rgba(15, 23, 42, 0.8); border: 1px solid var(--border-subtle); border-radius: 10px; color: #fff; font-size: 0.95rem; outline: none;">
+          <div id="errLoginEmail" style="display: none; color: #ef4444; font-size: 0.8rem; font-weight: 600; margin-top: 4px;"></div>
         </div>
 
         <div>
@@ -487,11 +493,12 @@ document.addEventListener('DOMContentLoaded', () => {
             <label style="font-size: 0.85rem; font-weight: 600; color: var(--text-muted);">Hasło</label>
             <button type="button" id="btnOpenForgotPassword" style="background: none; border: none; color: #f59e0b; font-size: 0.8rem; font-weight: 600; cursor: pointer; text-decoration: underline; padding: 0;">Nie pamiętam hasła</button>
           </div>
-          <input type="password" id="modalAuthPassword" placeholder="••••••••" required style="width: 100%; padding: 12px 14px; background: rgba(15, 23, 42, 0.8); border: 1px solid var(--border-subtle); border-radius: 10px; color: #fff; font-size: 0.95rem; outline: none;">
+          <input type="password" id="modalAuthPassword" value="" placeholder="••••••••" autocomplete="new-password" style="width: 100%; padding: 12px 14px; background: rgba(15, 23, 42, 0.8); border: 1px solid var(--border-subtle); border-radius: 10px; color: #fff; font-size: 0.95rem; outline: none;">
+          <div id="errLoginPassword" style="display: none; color: #ef4444; font-size: 0.8rem; font-weight: 600; margin-top: 4px;"></div>
         </div>
 
         <button type="submit" style="width: 100%; padding: 14px; background: linear-gradient(135deg, #f59e0b, #d97706); color: #000; border: none; border-radius: 12px; font-size: 1rem; font-weight: 800; cursor: pointer; transition: all 0.2s ease; margin-top: 4px; box-shadow: 0 4px 15px rgba(245, 158, 11, 0.3);">
-          ⚡ Zaloguj się
+          Zaloguj się
         </button>
 
         <button type="button" id="btnOpenRegister" style="width: 100%; padding: 12px; background: rgba(30, 41, 59, 0.7); border: 1px solid var(--border-subtle); color: #fff; border-radius: 12px; font-weight: 700; font-size: 0.92rem; cursor: pointer; transition: all 0.2s ease;">
@@ -502,19 +509,55 @@ document.addEventListener('DOMContentLoaded', () => {
 
     modalBackdrop.classList.add('active');
 
+    const emailInput = document.getElementById('modalAuthEmail');
+    const passInput = document.getElementById('modalAuthPassword');
+    const errEmail = document.getElementById('errLoginEmail');
+    const errPass = document.getElementById('errLoginPassword');
+
+    // Fix 6: Explicitly reset inputs on opening login modal
+    if (!prefillEmail && emailInput) emailInput.value = '';
+    if (passInput) passInput.value = '';
+
     const form = document.getElementById('login-modal-form');
     if (form) {
       form.addEventListener('submit', (e) => {
         e.preventDefault();
-        const email = document.getElementById('modalAuthEmail').value.trim();
-        const password = document.getElementById('modalAuthPassword').value;
+        let valid = true;
+
+        if (errEmail) errEmail.style.display = 'none';
+        if (errPass) errPass.style.display = 'none';
+
+        const email = emailInput ? emailInput.value.trim() : '';
+        const password = passInput ? passInput.value : '';
+
+        // Fix 3: Custom validation text
+        if (!email) {
+          if (errEmail) {
+            errEmail.textContent = '⚠️ Wypełnij pole: Adres E-mail';
+            errEmail.style.display = 'block';
+          }
+          valid = false;
+        }
+
+        if (!password) {
+          if (errPass) {
+            errPass.textContent = '⚠️ Wypełnij pole: Hasło';
+            errPass.style.display = 'block';
+          }
+          valid = false;
+        }
+
+        if (!valid) return;
 
         // Check against registered users
         const registeredUsers = typeof getApliHubRegisteredUsers === 'function' ? getApliHubRegisteredUsers() : {};
         const registered = registeredUsers[email.toLowerCase()];
 
         if (registered && registered.password !== password) {
-          showToast('Niepoprawne hasło dla podanego adresu e-mail.', 'error');
+          if (errPass) {
+            errPass.textContent = '⚠️ Niepoprawne hasło dla podanego adresu e-mail.';
+            errPass.style.display = 'block';
+          }
           return;
         }
 
@@ -554,30 +597,35 @@ document.addEventListener('DOMContentLoaded', () => {
 
     modalTitle.innerHTML = '<span style="display:block; text-align:center; width:100%; font-size: 1.35rem; font-weight: 800; color: #fff;">Zarejestruj się</span>';
     modalContent.innerHTML = `
-      <form id="register-form-step1" style="display: flex; flex-direction: column; gap: 13px;">
+      <form id="register-form-step1" novalidate style="display: flex; flex-direction: column; gap: 13px;">
         <div>
           <label style="display: block; font-size: 0.82rem; font-weight: 600; margin-bottom: 4px; color: var(--text-muted);">Nazwa użytkownika</label>
-          <input type="text" id="regUsername" placeholder="np. jan_kowalski" required style="width: 100%; padding: 11px 14px; background: rgba(15, 23, 42, 0.8); border: 1px solid var(--border-subtle); border-radius: 10px; color: #fff; font-size: 0.92rem; outline: none;">
+          <input type="text" id="regUsername" placeholder="np. Użytkownik_123" autocomplete="off" style="width: 100%; padding: 11px 14px; background: rgba(15, 23, 42, 0.8); border: 1px solid var(--border-subtle); border-radius: 10px; color: #fff; font-size: 0.92rem; outline: none;">
+          <div id="errRegUsername" style="display: none; color: #ef4444; font-size: 0.8rem; font-weight: 600; margin-top: 4px;"></div>
         </div>
 
         <div>
           <label style="display: block; font-size: 0.82rem; font-weight: 600; margin-bottom: 4px; color: var(--text-muted);">Nick (wyświetlana nazwa)</label>
-          <input type="text" id="regNickname" placeholder="np. Janek" required style="width: 100%; padding: 11px 14px; background: rgba(15, 23, 42, 0.8); border: 1px solid var(--border-subtle); border-radius: 10px; color: #fff; font-size: 0.92rem; outline: none;">
+          <input type="text" id="regNickname" placeholder="np. Fajny nick" autocomplete="off" style="width: 100%; padding: 11px 14px; background: rgba(15, 23, 42, 0.8); border: 1px solid var(--border-subtle); border-radius: 10px; color: #fff; font-size: 0.92rem; outline: none;">
+          <div id="errRegNickname" style="display: none; color: #ef4444; font-size: 0.8rem; font-weight: 600; margin-top: 4px;"></div>
         </div>
 
         <div>
           <label style="display: block; font-size: 0.82rem; font-weight: 600; margin-bottom: 4px; color: var(--text-muted);">Email</label>
-          <input type="email" id="regEmail" placeholder="jan@aplihub.pl" required style="width: 100%; padding: 11px 14px; background: rgba(15, 23, 42, 0.8); border: 1px solid var(--border-subtle); border-radius: 10px; color: #fff; font-size: 0.92rem; outline: none;">
+          <input type="email" id="regEmail" placeholder="Uzytkownik123@super.pl" autocomplete="off" style="width: 100%; padding: 11px 14px; background: rgba(15, 23, 42, 0.8); border: 1px solid var(--border-subtle); border-radius: 10px; color: #fff; font-size: 0.92rem; outline: none;">
+          <div id="errRegEmail" style="display: none; color: #ef4444; font-size: 0.8rem; font-weight: 600; margin-top: 4px;"></div>
         </div>
 
         <div>
           <label style="display: block; font-size: 0.82rem; font-weight: 600; margin-bottom: 4px; color: var(--text-muted);">Hasło</label>
-          <input type="password" id="regPassword" placeholder="••••••••" required style="width: 100%; padding: 11px 14px; background: rgba(15, 23, 42, 0.8); border: 1px solid var(--border-subtle); border-radius: 10px; color: #fff; font-size: 0.92rem; outline: none;">
+          <input type="password" id="regPassword" placeholder="••••••••" autocomplete="new-password" style="width: 100%; padding: 11px 14px; background: rgba(15, 23, 42, 0.8); border: 1px solid var(--border-subtle); border-radius: 10px; color: #fff; font-size: 0.92rem; outline: none;">
+          <div id="errRegPassword" style="display: none; color: #ef4444; font-size: 0.8rem; font-weight: 600; margin-top: 4px;"></div>
         </div>
 
         <div>
           <label style="display: block; font-size: 0.82rem; font-weight: 600; margin-bottom: 4px; color: var(--text-muted);">Potwierdź hasło</label>
-          <input type="password" id="regConfirmPassword" placeholder="••••••••" required style="width: 100%; padding: 11px 14px; background: rgba(15, 23, 42, 0.8); border: 1px solid var(--border-subtle); border-radius: 10px; color: #fff; font-size: 0.92rem; outline: none;">
+          <input type="password" id="regConfirmPassword" placeholder="••••••••" autocomplete="new-password" style="width: 100%; padding: 11px 14px; background: rgba(15, 23, 42, 0.8); border: 1px solid var(--border-subtle); border-radius: 10px; color: #fff; font-size: 0.92rem; outline: none;">
+          <div id="errRegConfirmPassword" style="display: none; color: #ef4444; font-size: 0.8rem; font-weight: 600; margin-top: 4px;"></div>
         </div>
 
         <div style="margin-top: 4px;">
@@ -619,6 +667,24 @@ document.addEventListener('DOMContentLoaded', () => {
     const termsCheckbox = document.getElementById('regTermsCheckbox');
     const termsErrorMsg = document.getElementById('termsErrorMsg');
 
+    const usernameInput = document.getElementById('regUsername');
+    const nicknameInput = document.getElementById('regNickname');
+    const emailInput = document.getElementById('regEmail');
+    const passInput = document.getElementById('regPassword');
+    const confirmPassInput = document.getElementById('regConfirmPassword');
+
+    const errUsername = document.getElementById('errRegUsername');
+    const errNickname = document.getElementById('errRegNickname');
+    const errEmail = document.getElementById('errRegEmail');
+    const errPass = document.getElementById('errRegPassword');
+    const errConfirm = document.getElementById('errRegConfirmPassword');
+
+    function hideAllErrors() {
+      [errUsername, errNickname, errEmail, errPass, errConfirm, termsErrorMsg].forEach(el => {
+        if (el) el.style.display = 'none';
+      });
+    }
+
     if (termsCheckbox) {
       termsCheckbox.addEventListener('change', () => {
         if (termsCheckbox.checked && termsErrorMsg) {
@@ -630,21 +696,83 @@ document.addEventListener('DOMContentLoaded', () => {
     if (form) {
       form.addEventListener('submit', (e) => {
         e.preventDefault();
-        const username = document.getElementById('regUsername').value.trim();
-        const nickname = document.getElementById('regNickname').value.trim();
-        const email = document.getElementById('regEmail').value.trim();
-        const password = document.getElementById('regPassword').value;
-        const confirmPass = document.getElementById('regConfirmPassword').value;
+        hideAllErrors();
+        let valid = true;
 
-        if (password !== confirmPass) {
-          showToast('Hasła nie są identyczne!', 'error');
-          return;
+        const username = usernameInput ? usernameInput.value.trim() : '';
+        const nickname = nicknameInput ? nicknameInput.value.trim() : '';
+        const email = emailInput ? emailInput.value.trim() : '';
+        const password = passInput ? passInput.value : '';
+        const confirmPass = confirmPassInput ? confirmPassInput.value : '';
+
+        // Fix 3 & 2: Custom validation for empty or taken username
+        if (!username) {
+          if (errUsername) {
+            errUsername.textContent = '⚠️ Wypełnij pole: Nazwa użytkownika';
+            errUsername.style.display = 'block';
+          }
+          valid = false;
+        } else if (typeof isUsernameTaken === 'function' && isUsernameTaken(username)) {
+          if (errUsername) {
+            errUsername.textContent = '⚠️ Ta nazwa użytkownika jest już zajęta. Wybierz inną.';
+            errUsername.style.display = 'block';
+          }
+          valid = false;
+        }
+
+        // Fix 3: Custom validation for Nick
+        if (!nickname) {
+          if (errNickname) {
+            errNickname.textContent = '⚠️ Wypełnij pole: Nick (wyświetlana nazwa)';
+            errNickname.style.display = 'block';
+          }
+          valid = false;
+        }
+
+        // Fix 3 & 1: Custom validation for Email & duplicate email check
+        if (!email) {
+          if (errEmail) {
+            errEmail.textContent = '⚠️ Wypełnij pole: Email';
+            errEmail.style.display = 'block';
+          }
+          valid = false;
+        } else if (typeof isEmailRegistered === 'function' && isEmailRegistered(email)) {
+          if (errEmail) {
+            errEmail.textContent = '⚠️ Ten adres e-mail jest już zarejestrowany w serwisie ApliHub.';
+            errEmail.style.display = 'block';
+          }
+          valid = false;
+        }
+
+        // Fix 3: Custom validation for Password
+        if (!password) {
+          if (errPass) {
+            errPass.textContent = '⚠️ Wypełnij pole: Hasło';
+            errPass.style.display = 'block';
+          }
+          valid = false;
+        }
+
+        if (!confirmPass) {
+          if (errConfirm) {
+            errConfirm.textContent = '⚠️ Wypełnij pole: Potwierdź hasło';
+            errConfirm.style.display = 'block';
+          }
+          valid = false;
+        } else if (password !== confirmPass) {
+          if (errConfirm) {
+            errConfirm.textContent = '⚠️ Podane hasła nie są identyczne.';
+            errConfirm.style.display = 'block';
+          }
+          valid = false;
         }
 
         if (!termsCheckbox || !termsCheckbox.checked) {
           if (termsErrorMsg) termsErrorMsg.style.display = 'block';
-          return;
+          valid = false;
         }
+
+        if (!valid) return;
 
         openRegisterModalStep2({ username, name: nickname, email, password });
       });
@@ -654,21 +782,22 @@ document.addEventListener('DOMContentLoaded', () => {
   function openRegisterModalStep2(userData) {
     if (!modalTitle || !modalContent || !modalBackdrop) return;
 
+    // Send toast simulation email notification
+    if (typeof showToast === 'function') {
+      showToast(`Wysłano wiadomość e-mail z kodem weryfikacyjnym na adres: ${userData.email}`);
+    }
+
     modalTitle.innerHTML = '<span style="display:block; text-align:center; width:100%; font-size: 1.35rem; font-weight: 800; color: #fff;">Weryfikacja E-mail</span>';
     modalContent.innerHTML = `
-      <form id="register-form-step2" style="display: flex; flex-direction: column; gap: 16px;">
+      <form id="register-form-step2" novalidate style="display: flex; flex-direction: column; gap: 16px;">
         <p style="font-size: 0.9rem; color: var(--text-muted); line-height: 1.5;">
-          Na Twój adres e-mail <strong style="color: #fff;">${userData.email}</strong> został wysłany 6-cyfrowy kod weryfikacyjny.
+          Na Twój adres e-mail <strong style="color: #fff;">${userData.email}</strong> został wysłany kod weryfikacyjny.
         </p>
-
-        <div style="background: rgba(245, 158, 11, 0.1); border: 1px dashed rgba(245, 158, 11, 0.4); padding: 12px 16px; border-radius: 10px; text-align: center;">
-          <span style="font-size: 0.8rem; color: var(--text-muted); display: block; margin-bottom: 4px;">📧 Podgląd wiadomości e-mail (Symulacja):</span>
-          <span style="font-size: 1.3rem; font-weight: 800; color: #f59e0b; letter-spacing: 4px;">123456</span>
-        </div>
 
         <div>
           <label style="display: block; font-size: 0.85rem; font-weight: 600; margin-bottom: 6px; color: var(--text-muted);">Kod weryfikacyjny</label>
-          <input type="text" id="regVerifyCode" placeholder="123456" maxlength="6" required style="width: 100%; padding: 12px; background: rgba(15, 23, 42, 0.8); border: 1px solid var(--border-subtle); border-radius: 10px; color: #fff; font-size: 1.1rem; text-align: center; letter-spacing: 4px; outline: none;">
+          <input type="text" id="regVerifyCode" placeholder="Wprowadź kod" autocomplete="off" style="width: 100%; padding: 12px; background: rgba(15, 23, 42, 0.8); border: 1px solid var(--border-subtle); border-radius: 10px; color: #fff; font-size: 1.05rem; text-align: center; outline: none;">
+          <div id="errRegCode" style="display: none; color: #ef4444; font-size: 0.8rem; font-weight: 600; margin-top: 4px;"></div>
         </div>
 
         <button type="submit" style="width: 100%; padding: 13px; background: linear-gradient(135deg, #f59e0b, #d97706); color: #000; border: none; border-radius: 12px; font-size: 0.98rem; font-weight: 800; cursor: pointer; box-shadow: 0 4px 15px rgba(245, 158, 11, 0.3);">
@@ -678,12 +807,22 @@ document.addEventListener('DOMContentLoaded', () => {
     `;
 
     const form = document.getElementById('register-form-step2');
+    const errCode = document.getElementById('errRegCode');
+
     if (form) {
       form.addEventListener('submit', (e) => {
         e.preventDefault();
-        const code = document.getElementById('regVerifyCode').value.trim();
-        if (code !== '123456' && code.length < 4) {
-          showToast('Wprowadzono niepoprawny kod weryfikacyjny.', 'error');
+        if (errCode) errCode.style.display = 'none';
+
+        const codeInput = document.getElementById('regVerifyCode');
+        const code = codeInput ? codeInput.value.trim() : '';
+
+        // Fix 3: Custom validation message
+        if (!code) {
+          if (errCode) {
+            errCode.textContent = '⚠️ Wypełnij pole: Kod weryfikacyjny';
+            errCode.style.display = 'block';
+          }
           return;
         }
 
@@ -747,14 +886,15 @@ document.addEventListener('DOMContentLoaded', () => {
 
     modalTitle.innerHTML = '<span style="display:block; text-align:center; width:100%; font-size: 1.35rem; font-weight: 800; color: #fff;">Resetowanie Hasła</span>';
     modalContent.innerHTML = `
-      <form id="forgot-form-step1" style="display: flex; flex-direction: column; gap: 16px;">
+      <form id="forgot-form-step1" novalidate style="display: flex; flex-direction: column; gap: 16px;">
         <p style="font-size: 0.9rem; color: var(--text-muted); line-height: 1.5;">
           Wprowadź swój adres e-mail, na który wyślemy wiadomość z linkiem do zresetowania hasła.
         </p>
 
         <div>
           <label style="display: block; font-size: 0.85rem; font-weight: 600; margin-bottom: 6px; color: var(--text-muted);">Adres E-mail</label>
-          <input type="email" id="forgotEmail" placeholder="jan@aplihub.pl" required style="width: 100%; padding: 12px 14px; background: rgba(15, 23, 42, 0.8); border: 1px solid var(--border-subtle); border-radius: 10px; color: #fff; font-size: 0.95rem; outline: none;">
+          <input type="email" id="forgotEmail" placeholder="Uzytkownik123@super.pl" autocomplete="off" style="width: 100%; padding: 12px 14px; background: rgba(15, 23, 42, 0.8); border: 1px solid var(--border-subtle); border-radius: 10px; color: #fff; font-size: 0.95rem; outline: none;">
+          <div id="errForgotEmail" style="display: none; color: #ef4444; font-size: 0.8rem; font-weight: 600; margin-top: 4px;"></div>
         </div>
 
         <button type="submit" style="width: 100%; padding: 13px; background: linear-gradient(135deg, #f59e0b, #d97706); color: #000; border: none; border-radius: 12px; font-size: 0.98rem; font-weight: 800; cursor: pointer; box-shadow: 0 4px 15px rgba(245, 158, 11, 0.3);">
@@ -773,10 +913,25 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     const form = document.getElementById('forgot-form-step1');
+    const errForgotEmail = document.getElementById('errForgotEmail');
+
     if (form) {
       form.addEventListener('submit', (e) => {
         e.preventDefault();
-        const email = document.getElementById('forgotEmail').value.trim();
+        if (errForgotEmail) errForgotEmail.style.display = 'none';
+
+        const emailInput = document.getElementById('forgotEmail');
+        const email = emailInput ? emailInput.value.trim() : '';
+
+        // Fix 3: Custom validation message
+        if (!email) {
+          if (errForgotEmail) {
+            errForgotEmail.textContent = '⚠️ Wypełnij pole: Adres E-mail';
+            errForgotEmail.style.display = 'block';
+          }
+          return;
+        }
+
         openForgotPasswordStep2(email);
       });
     }
@@ -785,6 +940,10 @@ document.addEventListener('DOMContentLoaded', () => {
   function openForgotPasswordStep2(email) {
     if (!modalTitle || !modalContent || !modalBackdrop) return;
 
+    if (typeof showToast === 'function') {
+      showToast(`Wysłano wiadomość e-mail z linkiem do resetu hasła na adres: ${email}`);
+    }
+
     modalTitle.innerHTML = '<span style="display:block; text-align:center; width:100%; font-size: 1.35rem; font-weight: 800; color: #fff;">Wiadomość Wysłana</span>';
     modalContent.innerHTML = `
       <div style="display: flex; flex-direction: column; gap: 16px;">
@@ -792,12 +951,9 @@ document.addEventListener('DOMContentLoaded', () => {
           Wysłano wiadomość e-mail z instrukcją resetu hasła na adres: <strong style="color: #fff;">${email}</strong>.
         </p>
 
-        <div style="background: rgba(59, 130, 246, 0.1); border: 1px dashed rgba(59, 130, 246, 0.4); padding: 14px; border-radius: 10px; text-align: center;">
-          <span style="font-size: 0.82rem; color: var(--text-muted); display: block; margin-bottom: 8px;">📧 Podgląd wiadomości e-mail (Symulacja):</span>
-          <button type="button" id="btnSimulateResetLink" style="padding: 10px 18px; background: linear-gradient(135deg, #3b82f6, #2563eb); color: #fff; border: none; border-radius: 8px; font-weight: 800; font-size: 0.88rem; cursor: pointer;">
-            🔗 Zresetuj hasło
-          </button>
-        </div>
+        <button type="button" id="btnSimulateResetLink" style="width: 100%; padding: 13px; background: linear-gradient(135deg, #3b82f6, #2563eb); color: #fff; border: none; border-radius: 12px; font-weight: 800; font-size: 0.95rem; cursor: pointer; box-shadow: 0 4px 15px rgba(59, 130, 246, 0.3);">
+          Przejdź do resetu hasła
+        </button>
       </div>
     `;
 
@@ -812,15 +968,17 @@ document.addEventListener('DOMContentLoaded', () => {
 
     modalTitle.innerHTML = '<span style="display:block; text-align:center; width:100%; font-size: 1.35rem; font-weight: 800; color: #fff;">Ustaw Nowe Hasło</span>';
     modalContent.innerHTML = `
-      <form id="forgot-form-step3" style="display: flex; flex-direction: column; gap: 14px;">
+      <form id="forgot-form-step3" novalidate style="display: flex; flex-direction: column; gap: 14px;">
         <div>
           <label style="display: block; font-size: 0.85rem; font-weight: 600; margin-bottom: 6px; color: var(--text-muted);">Nowe hasło</label>
-          <input type="password" id="resetNewPass" placeholder="••••••••" required style="width: 100%; padding: 12px 14px; background: rgba(15, 23, 42, 0.8); border: 1px solid var(--border-subtle); border-radius: 10px; color: #fff; font-size: 0.95rem; outline: none;">
+          <input type="password" id="resetNewPass" placeholder="••••••••" autocomplete="new-password" style="width: 100%; padding: 12px 14px; background: rgba(15, 23, 42, 0.8); border: 1px solid var(--border-subtle); border-radius: 10px; color: #fff; font-size: 0.95rem; outline: none;">
+          <div id="errResetPass" style="display: none; color: #ef4444; font-size: 0.8rem; font-weight: 600; margin-top: 4px;"></div>
         </div>
 
         <div>
           <label style="display: block; font-size: 0.85rem; font-weight: 600; margin-bottom: 6px; color: var(--text-muted);">Powtórz hasło</label>
-          <input type="password" id="resetConfirmPass" placeholder="••••••••" required style="width: 100%; padding: 12px 14px; background: rgba(15, 23, 42, 0.8); border: 1px solid var(--border-subtle); border-radius: 10px; color: #fff; font-size: 0.95rem; outline: none;">
+          <input type="password" id="resetConfirmPass" placeholder="••••••••" autocomplete="new-password" style="width: 100%; padding: 12px 14px; background: rgba(15, 23, 42, 0.8); border: 1px solid var(--border-subtle); border-radius: 10px; color: #fff; font-size: 0.95rem; outline: none;">
+          <div id="errResetConfirm" style="display: none; color: #ef4444; font-size: 0.8rem; font-weight: 600; margin-top: 4px;"></div>
         </div>
 
         <button type="submit" style="width: 100%; padding: 13px; background: linear-gradient(135deg, #f59e0b, #d97706); color: #000; border: none; border-radius: 12px; font-size: 0.98rem; font-weight: 800; cursor: pointer; box-shadow: 0 4px 15px rgba(245, 158, 11, 0.3); margin-top: 4px;">
@@ -830,16 +988,46 @@ document.addEventListener('DOMContentLoaded', () => {
     `;
 
     const form = document.getElementById('forgot-form-step3');
+    const errResetPass = document.getElementById('errResetPass');
+    const errResetConfirm = document.getElementById('errResetConfirm');
+
     if (form) {
       form.addEventListener('submit', (e) => {
         e.preventDefault();
-        const newPass = document.getElementById('resetNewPass').value;
-        const confirmPass = document.getElementById('resetConfirmPass').value;
+        if (errResetPass) errResetPass.style.display = 'none';
+        if (errResetConfirm) errResetConfirm.style.display = 'none';
 
-        if (newPass !== confirmPass) {
-          showToast('Hasła nie są identyczne!', 'error');
-          return;
+        const newPassInput = document.getElementById('resetNewPass');
+        const confirmPassInput = document.getElementById('resetConfirmPass');
+
+        const newPass = newPassInput ? newPassInput.value : '';
+        const confirmPass = confirmPassInput ? confirmPassInput.value : '';
+
+        let valid = true;
+
+        if (!newPass) {
+          if (errResetPass) {
+            errResetPass.textContent = '⚠️ Wypełnij pole: Nowe hasło';
+            errResetPass.style.display = 'block';
+          }
+          valid = false;
         }
+
+        if (!confirmPass) {
+          if (errResetConfirm) {
+            errResetConfirm.textContent = '⚠️ Wypełnij pole: Powtórz hasło';
+            errResetConfirm.style.display = 'block';
+          }
+          valid = false;
+        } else if (newPass !== confirmPass) {
+          if (errResetConfirm) {
+            errResetConfirm.textContent = '⚠️ Podane hasła nie są identyczne.';
+            errResetConfirm.style.display = 'block';
+          }
+          valid = false;
+        }
+
+        if (!valid) return;
 
         if (typeof updateApliHubPassword === 'function') {
           updateApliHubPassword(email, newPass);

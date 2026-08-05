@@ -112,6 +112,29 @@ function updateApliHubPassword(email, newPassword) {
   return false;
 }
 
+function isEmailRegistered(email) {
+  if (!email) return false;
+  const cleanEmail = email.toLowerCase().trim();
+  if (DEFAULT_USER_STORE.email && DEFAULT_USER_STORE.email.toLowerCase() === cleanEmail) {
+    return true;
+  }
+  const users = getApliHubRegisteredUsers();
+  return !!users[cleanEmail];
+}
+
+function isUsernameTaken(username) {
+  if (!username) return false;
+  const cleanUser = username.toLowerCase().trim();
+  if (DEFAULT_USER_STORE.name && DEFAULT_USER_STORE.name.toLowerCase() === cleanUser) {
+    return true;
+  }
+  const users = getApliHubRegisteredUsers();
+  return Object.values(users).some(u => 
+    (u.username && u.username.toLowerCase().trim() === cleanUser) ||
+    (u.name && u.name.toLowerCase().trim() === cleanUser)
+  );
+}
+
 const APLIHUB_DATA = {
   user: getApliHubUserData(),
   
