@@ -2,6 +2,20 @@
    ApliHub Central Data & Persistent State Store (localStorage Sync)
    ========================================================================== */
 
+const SUPABASE_URL = 'https://ztpwvskfanhikbifjlzf.supabase.co';
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inp0cHd2c2tmYW5oaWtiaWZqbHpmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODU5MDg2MDksImV4cCI6MjEwMTQ4NDYwOX0.6XwXzP9DbUFliwRgr8HA2hBexYIJns6J6-9fxRyMSfM';
+
+function getSupabaseClient() {
+  if (!window.supabaseClient && window.supabase && typeof window.supabase.createClient === 'function') {
+    try {
+      window.supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+    } catch (e) {
+      console.error('Error initializing Supabase:', e);
+    }
+  }
+  return window.supabaseClient || null;
+}
+
 const DEFAULT_USER_STORE = {
   isLoggedIn: true,
   name: "Oskar_Algo",

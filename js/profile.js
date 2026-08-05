@@ -774,6 +774,33 @@ document.addEventListener('DOMContentLoaded', () => {
 
         if (!valid) return;
 
+        // Real Supabase Auth Integration
+        const supabase = typeof getSupabaseClient === 'function' ? getSupabaseClient() : null;
+        if (supabase) {
+          try {
+            const { data, error } = await supabase.auth.signUp({
+              email: email,
+              password: password,
+              options: {
+                data: {
+                  username: username,
+                  display_name: nickname
+                }
+              }
+            });
+
+            if (error) {
+              if (errEmail) {
+                errEmail.textContent = '⚠️ Błąd rejestracji Supabase: ' + error.message;
+                errEmail.style.display = 'block';
+              }
+              return;
+            }
+          } catch (err) {
+            console.warn('Supabase signUp fallback:', err);
+          }
+        }
+
         openRegisterModalStep2({ username, name: nickname, email, password });
       });
     }
@@ -810,7 +837,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const errCode = document.getElementById('errRegCode');
 
     if (form) {
-      form.addEventListener('submit', (e) => {
+      form.addEventListener('submit', async (e) => {
         e.preventDefault();
         if (errCode) errCode.style.display = 'none';
 
@@ -824,6 +851,28 @@ document.addEventListener('DOMContentLoaded', () => {
             errCode.style.display = 'block';
           }
           return;
+        }
+
+        // Real Supabase OTP Verification
+        const supabase = typeof getSupabaseClient === 'function' ? getSupabaseClient() : null;
+        if (supabase) {
+          try {
+            const { data, error } = await supabase.auth.verifyOtp({
+              email: userData.email,
+              token: code,
+              type: 'signup'
+            });
+
+            if (error) {
+              if (errCode) {
+                errCode.textContent = '⚠️ Błędny kod lub kod wygasł: ' + error.message;
+                errCode.style.display = 'block';
+              }
+              return;
+            }
+          } catch (err) {
+            console.warn('Supabase verifyOtp fallback:', err);
+          }
         }
 
         // Register user in store
