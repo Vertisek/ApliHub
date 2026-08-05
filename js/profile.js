@@ -471,28 +471,31 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
 
-  function openLoginModal() {
+  function openLoginModal(prefillEmail = '') {
     if (!modalTitle || !modalContent || !modalBackdrop) return;
     
-    modalTitle.innerHTML = '🔑 Logowanie do ApliHub';
+    modalTitle.innerHTML = '<span style="display:block; text-align:center; width:100%; font-size: 1.35rem; font-weight: 800; color: #fff;">Zaloguj się</span>';
     modalContent.innerHTML = `
       <form id="login-modal-form" style="display: flex; flex-direction: column; gap: 16px;">
-        <p style="font-size: 0.9rem; color: var(--text-muted); line-height: 1.5;">
-          Wprowadź swój e-mail i hasło, aby zalogować się do konta ApliHub i odblokować synchronizację.
-        </p>
-
         <div>
           <label style="display: block; font-size: 0.85rem; font-weight: 600; margin-bottom: 6px; color: var(--text-muted);">Adres E-mail</label>
-          <input type="email" id="modalAuthEmail" placeholder="np. oskar@aplihub.pl" required style="width: 100%; padding: 12px 14px; background: rgba(15, 23, 42, 0.8); border: 1px solid var(--border-subtle); border-radius: 10px; color: #fff; font-size: 0.95rem; outline: none;">
+          <input type="email" id="modalAuthEmail" value="${prefillEmail}" placeholder="użytkownik123@aplihub.pl" required style="width: 100%; padding: 12px 14px; background: rgba(15, 23, 42, 0.8); border: 1px solid var(--border-subtle); border-radius: 10px; color: #fff; font-size: 0.95rem; outline: none;">
         </div>
 
         <div>
-          <label style="display: block; font-size: 0.85rem; font-weight: 600; margin-bottom: 6px; color: var(--text-muted);">Hasło</label>
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+            <label style="font-size: 0.85rem; font-weight: 600; color: var(--text-muted);">Hasło</label>
+            <button type="button" id="btnOpenForgotPassword" style="background: none; border: none; color: #f59e0b; font-size: 0.8rem; font-weight: 600; cursor: pointer; text-decoration: underline; padding: 0;">Nie pamiętam hasła</button>
+          </div>
           <input type="password" id="modalAuthPassword" placeholder="••••••••" required style="width: 100%; padding: 12px 14px; background: rgba(15, 23, 42, 0.8); border: 1px solid var(--border-subtle); border-radius: 10px; color: #fff; font-size: 0.95rem; outline: none;">
         </div>
 
-        <button type="submit" style="width: 100%; padding: 14px; background: linear-gradient(135deg, #f59e0b, #d97706); color: #000; border: none; border-radius: 12px; font-size: 1rem; font-weight: 800; cursor: pointer; transition: all 0.2s ease; margin-top: 6px; box-shadow: 0 4px 15px rgba(245, 158, 11, 0.3);">
+        <button type="submit" style="width: 100%; padding: 14px; background: linear-gradient(135deg, #f59e0b, #d97706); color: #000; border: none; border-radius: 12px; font-size: 1rem; font-weight: 800; cursor: pointer; transition: all 0.2s ease; margin-top: 4px; box-shadow: 0 4px 15px rgba(245, 158, 11, 0.3);">
           ⚡ Zaloguj się
+        </button>
+
+        <button type="button" id="btnOpenRegister" style="width: 100%; padding: 12px; background: rgba(30, 41, 59, 0.7); border: 1px solid var(--border-subtle); color: #fff; border-radius: 12px; font-weight: 700; font-size: 0.92rem; cursor: pointer; transition: all 0.2s ease;">
+          Zarejestruj się
         </button>
       </form>
     `;
@@ -504,8 +507,19 @@ document.addEventListener('DOMContentLoaded', () => {
       form.addEventListener('submit', (e) => {
         e.preventDefault();
         const email = document.getElementById('modalAuthEmail').value.trim();
-        const name = email.split('@')[0] || 'Użytkownik';
-        const avatar = (email[0] || 'O').toUpperCase();
+        const password = document.getElementById('modalAuthPassword').value;
+
+        // Check against registered users
+        const registeredUsers = typeof getApliHubRegisteredUsers === 'function' ? getApliHubRegisteredUsers() : {};
+        const registered = registeredUsers[email.toLowerCase()];
+
+        if (registered && registered.password !== password) {
+          showToast('Niepoprawne hasło dla podanego adresu e-mail.', 'error');
+          return;
+        }
+
+        const name = registered ? registered.name : (email.split('@')[0] || 'Użytkownik');
+        const avatar = registered ? registered.avatar : (email[0] || 'O').toUpperCase();
 
         const userData = {
           ...DEFAULT_USER_STORE,
@@ -518,9 +532,359 @@ document.addEventListener('DOMContentLoaded', () => {
         };
 
         saveApliHubUserData(userData);
-        showToast(`Zalogowano pomyślnie jako ${name}! 🎉`);
         closeModal();
         updateHeaderUserInfo();
+      });
+    }
+
+    const btnReg = document.getElementById('btnOpenRegister');
+    if (btnReg) {
+      btnReg.addEventListener('click', () => openRegisterModalStep1());
+    }
+
+    const btnForgot = document.getElementById('btnOpenForgotPassword');
+    if (btnForgot) {
+      btnForgot.addEventListener('click', () => openForgotPasswordStep1());
+    }
+  }
+
+  // Multi-step Registration Workflow
+  function openRegisterModalStep1() {
+    if (!modalTitle || !modalContent || !modalBackdrop) return;
+
+    modalTitle.innerHTML = '<span style="display:block; text-align:center; width:100%; font-size: 1.35rem; font-weight: 800; color: #fff;">Zarejestruj się</span>';
+    modalContent.innerHTML = `
+      <form id="register-form-step1" style="display: flex; flex-direction: column; gap: 13px;">
+        <div>
+          <label style="display: block; font-size: 0.82rem; font-weight: 600; margin-bottom: 4px; color: var(--text-muted);">Nazwa użytkownika</label>
+          <input type="text" id="regUsername" placeholder="np. jan_kowalski" required style="width: 100%; padding: 11px 14px; background: rgba(15, 23, 42, 0.8); border: 1px solid var(--border-subtle); border-radius: 10px; color: #fff; font-size: 0.92rem; outline: none;">
+        </div>
+
+        <div>
+          <label style="display: block; font-size: 0.82rem; font-weight: 600; margin-bottom: 4px; color: var(--text-muted);">Nick (wyświetlana nazwa)</label>
+          <input type="text" id="regNickname" placeholder="np. Janek" required style="width: 100%; padding: 11px 14px; background: rgba(15, 23, 42, 0.8); border: 1px solid var(--border-subtle); border-radius: 10px; color: #fff; font-size: 0.92rem; outline: none;">
+        </div>
+
+        <div>
+          <label style="display: block; font-size: 0.82rem; font-weight: 600; margin-bottom: 4px; color: var(--text-muted);">Email</label>
+          <input type="email" id="regEmail" placeholder="jan@aplihub.pl" required style="width: 100%; padding: 11px 14px; background: rgba(15, 23, 42, 0.8); border: 1px solid var(--border-subtle); border-radius: 10px; color: #fff; font-size: 0.92rem; outline: none;">
+        </div>
+
+        <div>
+          <label style="display: block; font-size: 0.82rem; font-weight: 600; margin-bottom: 4px; color: var(--text-muted);">Hasło</label>
+          <input type="password" id="regPassword" placeholder="••••••••" required style="width: 100%; padding: 11px 14px; background: rgba(15, 23, 42, 0.8); border: 1px solid var(--border-subtle); border-radius: 10px; color: #fff; font-size: 0.92rem; outline: none;">
+        </div>
+
+        <div>
+          <label style="display: block; font-size: 0.82rem; font-weight: 600; margin-bottom: 4px; color: var(--text-muted);">Potwierdź hasło</label>
+          <input type="password" id="regConfirmPassword" placeholder="••••••••" required style="width: 100%; padding: 11px 14px; background: rgba(15, 23, 42, 0.8); border: 1px solid var(--border-subtle); border-radius: 10px; color: #fff; font-size: 0.92rem; outline: none;">
+        </div>
+
+        <div style="margin-top: 4px;">
+          <label style="display: flex; align-items: flex-start; gap: 10px; font-size: 0.82rem; color: var(--text-muted); cursor: pointer; line-height: 1.4;">
+            <input type="checkbox" id="regTermsCheckbox" style="margin-top: 3px; accent-color: #f59e0b; width: 16px; height: 16px; cursor: pointer;">
+            <span>Zapoznałem/am się z <a href="#" id="linkOpenTerms" style="color: #f59e0b; text-decoration: underline; font-weight: 600;">Regulaminem, Prawami Autorskimi i Polityką Prywatności</a> serwisu ApliHub.</span>
+          </label>
+          <div id="termsErrorMsg" style="display: none; color: #ef4444; font-size: 0.82rem; font-weight: 700; background: rgba(239, 68, 68, 0.12); padding: 10px 14px; border-radius: 8px; border: 1px solid rgba(239, 68, 68, 0.3); margin-top: 8px; line-height: 1.4;">
+            ⚠️ Zapoznanie się i akceptacja Regulaminu, Praw Autorskich oraz Polityki Prywatności jest wymagana, aby utworzyć konto w serwisie ApliHub.
+          </div>
+        </div>
+
+        <button type="submit" style="width: 100%; padding: 13px; background: linear-gradient(135deg, #f59e0b, #d97706); color: #000; border: none; border-radius: 12px; font-size: 0.98rem; font-weight: 800; cursor: pointer; transition: all 0.2s ease; margin-top: 4px; box-shadow: 0 4px 15px rgba(245, 158, 11, 0.3);">
+          Dalej ➔
+        </button>
+
+        <button type="button" id="btnBackToLogin" style="width: 100%; padding: 8px; background: transparent; border: none; color: var(--text-muted); font-size: 0.86rem; cursor: pointer; text-decoration: underline;">
+          ← Wróć do logowania
+        </button>
+      </form>
+    `;
+
+    modalBackdrop.classList.add('active');
+
+    const linkTerms = document.getElementById('linkOpenTerms');
+    if (linkTerms) {
+      linkTerms.addEventListener('click', (e) => {
+        e.preventDefault();
+        openTermsModal();
+      });
+    }
+
+    const btnBack = document.getElementById('btnBackToLogin');
+    if (btnBack) {
+      btnBack.addEventListener('click', () => openLoginModal());
+    }
+
+    const form = document.getElementById('register-form-step1');
+    const termsCheckbox = document.getElementById('regTermsCheckbox');
+    const termsErrorMsg = document.getElementById('termsErrorMsg');
+
+    if (termsCheckbox) {
+      termsCheckbox.addEventListener('change', () => {
+        if (termsCheckbox.checked && termsErrorMsg) {
+          termsErrorMsg.style.display = 'none';
+        }
+      });
+    }
+
+    if (form) {
+      form.addEventListener('submit', (e) => {
+        e.preventDefault();
+        const username = document.getElementById('regUsername').value.trim();
+        const nickname = document.getElementById('regNickname').value.trim();
+        const email = document.getElementById('regEmail').value.trim();
+        const password = document.getElementById('regPassword').value;
+        const confirmPass = document.getElementById('regConfirmPassword').value;
+
+        if (password !== confirmPass) {
+          showToast('Hasła nie są identyczne!', 'error');
+          return;
+        }
+
+        if (!termsCheckbox || !termsCheckbox.checked) {
+          if (termsErrorMsg) termsErrorMsg.style.display = 'block';
+          return;
+        }
+
+        openRegisterModalStep2({ username, name: nickname, email, password });
+      });
+    }
+  }
+
+  function openRegisterModalStep2(userData) {
+    if (!modalTitle || !modalContent || !modalBackdrop) return;
+
+    modalTitle.innerHTML = '<span style="display:block; text-align:center; width:100%; font-size: 1.35rem; font-weight: 800; color: #fff;">Weryfikacja E-mail</span>';
+    modalContent.innerHTML = `
+      <form id="register-form-step2" style="display: flex; flex-direction: column; gap: 16px;">
+        <p style="font-size: 0.9rem; color: var(--text-muted); line-height: 1.5;">
+          Na Twój adres e-mail <strong style="color: #fff;">${userData.email}</strong> został wysłany 6-cyfrowy kod weryfikacyjny.
+        </p>
+
+        <div style="background: rgba(245, 158, 11, 0.1); border: 1px dashed rgba(245, 158, 11, 0.4); padding: 12px 16px; border-radius: 10px; text-align: center;">
+          <span style="font-size: 0.8rem; color: var(--text-muted); display: block; margin-bottom: 4px;">📧 Podgląd wiadomości e-mail (Symulacja):</span>
+          <span style="font-size: 1.3rem; font-weight: 800; color: #f59e0b; letter-spacing: 4px;">123456</span>
+        </div>
+
+        <div>
+          <label style="display: block; font-size: 0.85rem; font-weight: 600; margin-bottom: 6px; color: var(--text-muted);">Kod weryfikacyjny</label>
+          <input type="text" id="regVerifyCode" placeholder="123456" maxlength="6" required style="width: 100%; padding: 12px; background: rgba(15, 23, 42, 0.8); border: 1px solid var(--border-subtle); border-radius: 10px; color: #fff; font-size: 1.1rem; text-align: center; letter-spacing: 4px; outline: none;">
+        </div>
+
+        <button type="submit" style="width: 100%; padding: 13px; background: linear-gradient(135deg, #f59e0b, #d97706); color: #000; border: none; border-radius: 12px; font-size: 0.98rem; font-weight: 800; cursor: pointer; box-shadow: 0 4px 15px rgba(245, 158, 11, 0.3);">
+          Dalej ➔
+        </button>
+      </form>
+    `;
+
+    const form = document.getElementById('register-form-step2');
+    if (form) {
+      form.addEventListener('submit', (e) => {
+        e.preventDefault();
+        const code = document.getElementById('regVerifyCode').value.trim();
+        if (code !== '123456' && code.length < 4) {
+          showToast('Wprowadzono niepoprawny kod weryfikacyjny.', 'error');
+          return;
+        }
+
+        // Register user in store
+        if (typeof registerApliHubUser === 'function') {
+          registerApliHubUser(userData);
+        }
+
+        openRegisterModalStep3(userData);
+      });
+    }
+  }
+
+  function openRegisterModalStep3(userData) {
+    if (!modalTitle || !modalContent || !modalBackdrop) return;
+
+    modalTitle.innerHTML = '<span style="display:block; text-align:center; width:100%; font-size: 1.35rem; font-weight: 800; color: #34d399;">Konto Utworzone!</span>';
+    modalContent.innerHTML = `
+      <div style="display: flex; flex-direction: column; align-items: center; text-align: center; gap: 16px; padding: 10px 0;">
+        <div style="width: 60px; height: 60px; border-radius: 50%; background: rgba(16, 185, 129, 0.2); border: 2px solid #10b981; display: flex; align-items: center; justify-content: center; font-size: 1.8rem; color: #34d399;">
+          ✓
+        </div>
+
+        <div>
+          <p style="font-size: 0.95rem; color: #fff; font-weight: 700; margin-bottom: 6px;">
+            Pomyślnie utworzono konto dla <span style="color: #f59e0b;">${userData.email}</span>!
+          </p>
+          <p style="font-size: 0.88rem; color: var(--text-muted); line-height: 1.5;">
+            Teraz zaloguj się swoimi danymi. Za chwilę nastąpi automatyczne przekierowanie do okna logowania...
+          </p>
+        </div>
+
+        <div style="width: 100%; background: rgba(30, 41, 59, 0.8); height: 8px; border-radius: 4px; overflow: hidden; margin-top: 8px;">
+          <div id="redirectProgressBar" style="width: 0%; height: 100%; background: linear-gradient(90deg, #f59e0b, #34d399); transition: width 3.5s linear;"></div>
+        </div>
+
+        <span style="font-size: 0.82rem; color: var(--text-muted);">Przekierowanie za <strong id="countdownText" style="color: #f59e0b;">4</strong> sekundy...</span>
+      </div>
+    `;
+
+    setTimeout(() => {
+      const progressBar = document.getElementById('redirectProgressBar');
+      if (progressBar) progressBar.style.width = '100%';
+    }, 50);
+
+    let secLeft = 4;
+    const interval = setInterval(() => {
+      secLeft--;
+      const textElem = document.getElementById('countdownText');
+      if (textElem) textElem.textContent = secLeft;
+      if (secLeft <= 0) {
+        clearInterval(interval);
+        openLoginModal(userData.email);
+      }
+    }, 900);
+  }
+
+  // Password Reset Workflow
+  function openForgotPasswordStep1() {
+    if (!modalTitle || !modalContent || !modalBackdrop) return;
+
+    modalTitle.innerHTML = '<span style="display:block; text-align:center; width:100%; font-size: 1.35rem; font-weight: 800; color: #fff;">Resetowanie Hasła</span>';
+    modalContent.innerHTML = `
+      <form id="forgot-form-step1" style="display: flex; flex-direction: column; gap: 16px;">
+        <p style="font-size: 0.9rem; color: var(--text-muted); line-height: 1.5;">
+          Wprowadź swój adres e-mail, na który wyślemy wiadomość z linkiem do zresetowania hasła.
+        </p>
+
+        <div>
+          <label style="display: block; font-size: 0.85rem; font-weight: 600; margin-bottom: 6px; color: var(--text-muted);">Adres E-mail</label>
+          <input type="email" id="forgotEmail" placeholder="jan@aplihub.pl" required style="width: 100%; padding: 12px 14px; background: rgba(15, 23, 42, 0.8); border: 1px solid var(--border-subtle); border-radius: 10px; color: #fff; font-size: 0.95rem; outline: none;">
+        </div>
+
+        <button type="submit" style="width: 100%; padding: 13px; background: linear-gradient(135deg, #f59e0b, #d97706); color: #000; border: none; border-radius: 12px; font-size: 0.98rem; font-weight: 800; cursor: pointer; box-shadow: 0 4px 15px rgba(245, 158, 11, 0.3);">
+          Dalej ➔
+        </button>
+
+        <button type="button" id="btnBackToLoginForgot" style="width: 100%; padding: 8px; background: transparent; border: none; color: var(--text-muted); font-size: 0.86rem; cursor: pointer; text-decoration: underline;">
+          ← Wróć do logowania
+        </button>
+      </form>
+    `;
+
+    const btnBack = document.getElementById('btnBackToLoginForgot');
+    if (btnBack) {
+      btnBack.addEventListener('click', () => openLoginModal());
+    }
+
+    const form = document.getElementById('forgot-form-step1');
+    if (form) {
+      form.addEventListener('submit', (e) => {
+        e.preventDefault();
+        const email = document.getElementById('forgotEmail').value.trim();
+        openForgotPasswordStep2(email);
+      });
+    }
+  }
+
+  function openForgotPasswordStep2(email) {
+    if (!modalTitle || !modalContent || !modalBackdrop) return;
+
+    modalTitle.innerHTML = '<span style="display:block; text-align:center; width:100%; font-size: 1.35rem; font-weight: 800; color: #fff;">Wiadomość Wysłana</span>';
+    modalContent.innerHTML = `
+      <div style="display: flex; flex-direction: column; gap: 16px;">
+        <p style="font-size: 0.9rem; color: var(--text-muted); line-height: 1.5;">
+          Wysłano wiadomość e-mail z instrukcją resetu hasła na adres: <strong style="color: #fff;">${email}</strong>.
+        </p>
+
+        <div style="background: rgba(59, 130, 246, 0.1); border: 1px dashed rgba(59, 130, 246, 0.4); padding: 14px; border-radius: 10px; text-align: center;">
+          <span style="font-size: 0.82rem; color: var(--text-muted); display: block; margin-bottom: 8px;">📧 Podgląd wiadomości e-mail (Symulacja):</span>
+          <button type="button" id="btnSimulateResetLink" style="padding: 10px 18px; background: linear-gradient(135deg, #3b82f6, #2563eb); color: #fff; border: none; border-radius: 8px; font-weight: 800; font-size: 0.88rem; cursor: pointer;">
+            🔗 Zresetuj hasło
+          </button>
+        </div>
+      </div>
+    `;
+
+    const btnSim = document.getElementById('btnSimulateResetLink');
+    if (btnSim) {
+      btnSim.addEventListener('click', () => openForgotPasswordStep3(email));
+    }
+  }
+
+  function openForgotPasswordStep3(email) {
+    if (!modalTitle || !modalContent || !modalBackdrop) return;
+
+    modalTitle.innerHTML = '<span style="display:block; text-align:center; width:100%; font-size: 1.35rem; font-weight: 800; color: #fff;">Ustaw Nowe Hasło</span>';
+    modalContent.innerHTML = `
+      <form id="forgot-form-step3" style="display: flex; flex-direction: column; gap: 14px;">
+        <div>
+          <label style="display: block; font-size: 0.85rem; font-weight: 600; margin-bottom: 6px; color: var(--text-muted);">Nowe hasło</label>
+          <input type="password" id="resetNewPass" placeholder="••••••••" required style="width: 100%; padding: 12px 14px; background: rgba(15, 23, 42, 0.8); border: 1px solid var(--border-subtle); border-radius: 10px; color: #fff; font-size: 0.95rem; outline: none;">
+        </div>
+
+        <div>
+          <label style="display: block; font-size: 0.85rem; font-weight: 600; margin-bottom: 6px; color: var(--text-muted);">Powtórz hasło</label>
+          <input type="password" id="resetConfirmPass" placeholder="••••••••" required style="width: 100%; padding: 12px 14px; background: rgba(15, 23, 42, 0.8); border: 1px solid var(--border-subtle); border-radius: 10px; color: #fff; font-size: 0.95rem; outline: none;">
+        </div>
+
+        <button type="submit" style="width: 100%; padding: 13px; background: linear-gradient(135deg, #f59e0b, #d97706); color: #000; border: none; border-radius: 12px; font-size: 0.98rem; font-weight: 800; cursor: pointer; box-shadow: 0 4px 15px rgba(245, 158, 11, 0.3); margin-top: 4px;">
+          Zatwierdź
+        </button>
+      </form>
+    `;
+
+    const form = document.getElementById('forgot-form-step3');
+    if (form) {
+      form.addEventListener('submit', (e) => {
+        e.preventDefault();
+        const newPass = document.getElementById('resetNewPass').value;
+        const confirmPass = document.getElementById('resetConfirmPass').value;
+
+        if (newPass !== confirmPass) {
+          showToast('Hasła nie są identyczne!', 'error');
+          return;
+        }
+
+        if (typeof updateApliHubPassword === 'function') {
+          updateApliHubPassword(email, newPass);
+        }
+
+        showToast('Hasło zostało pomyślnie zmienione! Zaloguj się nowym hasłem.');
+        openLoginModal(email);
+      });
+    }
+  }
+
+  // Terms & Privacy Modal
+  function openTermsModal() {
+    if (!modalTitle || !modalContent || !modalBackdrop) return;
+
+    modalTitle.innerHTML = '📜 Regulamin & Polityka Prywatności ApliHub';
+    modalContent.innerHTML = `
+      <div style="max-height: 55vh; overflow-y: auto; padding-right: 8px; font-size: 0.86rem; color: var(--text-muted); line-height: 1.6; display: flex; flex-direction: column; gap: 14px;">
+        <h4 style="color: #fff; font-size: 0.98rem; font-weight: 700;">1. Regulamin Korzystania z Serwisu</h4>
+        <p>Serwis ApliHub udostępnia autorskie wtyczki oraz aplikacje narzędziowe. Rejestrując konto, Użytkownik zobowiązuje się do korzystania z platformy w sposób zgodny z obowiązującym prawem oraz nienaruszający praw autorskich twórców.</p>
+
+        <h4 style="color: #fff; font-size: 0.98rem; font-weight: 700;">2. Prawa Autorskie & Licencja Oprogramowania ©</h4>
+        <p>Wszystkie udostępniane wtyczki, aplikacje, pliki binarne, interfejs graficzny oraz kod źródłowy stanowią wyłączną własność intelektualną ApliHub. Pobieranie oprogramowania odbywa się na zasadach darmowej licencji osobistej (EULA) bez prawa do odsprzedaży lub inżynierii wstecznej.</p>
+
+        <h4 style="color: #fff; font-size: 0.98rem; font-weight: 700;">3. Polityka Prywatności & Ochrona Danych (RODO)</h4>
+        <p>Szanujemy Twoją prywatność. Dane podawane podczas rejestracji (adres e-mail, nazwa użytkownika) są chronione i służą wyłącznie do autoryzacji oraz lokalnej synchronizacji ustawień wtyczek. ApliHub nie sprzedaje ani nie przekazuje danych podmiotom trzecim.</p>
+      </div>
+
+      <button type="button" id="btnAcceptTermsClose" style="width: 100%; padding: 12px; background: linear-gradient(135deg, #f59e0b, #d97706); color: #000; border: none; border-radius: 10px; font-weight: 800; cursor: pointer; margin-top: 14px;">
+        Zamknij i Akceptuj
+      </button>
+    `;
+
+    modalBackdrop.classList.add('active');
+
+    const btnClose = document.getElementById('btnAcceptTermsClose');
+    if (btnClose) {
+      btnClose.addEventListener('click', () => {
+        closeModal();
+        const termsCheckbox = document.getElementById('regTermsCheckbox');
+        const termsErrorMsg = document.getElementById('termsErrorMsg');
+        if (termsCheckbox) {
+          termsCheckbox.checked = true;
+          if (termsErrorMsg) termsErrorMsg.style.display = 'none';
+        }
       });
     }
   }

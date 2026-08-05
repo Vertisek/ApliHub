@@ -63,6 +63,55 @@ function saveApliHubUserData(updatedData) {
   }
 }
 
+// Registered users management helpers
+function getApliHubRegisteredUsers() {
+  try {
+    const saved = localStorage.getItem('aplihub_registered_users');
+    if (saved) return JSON.parse(saved);
+  } catch (e) {
+    console.error('Error loading registered users:', e);
+  }
+  return {};
+}
+
+function registerApliHubUser(user) {
+  try {
+    const users = getApliHubRegisteredUsers();
+    const key = user.email.toLowerCase().trim();
+    users[key] = {
+      username: user.username,
+      name: user.name || user.username,
+      email: user.email,
+      password: user.password,
+      avatar: (user.name || user.username || 'U')[0].toUpperCase(),
+      selectedAvatar: (user.name || user.username || 'U')[0].toUpperCase(),
+      accountType: 'Użytkownik',
+      isVerified: true,
+      joinedDate: new Date().toLocaleDateString('pl-PL')
+    };
+    localStorage.setItem('aplihub_registered_users', JSON.stringify(users));
+    return users[key];
+  } catch (e) {
+    console.error('Error registering user:', e);
+  }
+  return null;
+}
+
+function updateApliHubPassword(email, newPassword) {
+  try {
+    const users = getApliHubRegisteredUsers();
+    const key = email.toLowerCase().trim();
+    if (users[key]) {
+      users[key].password = newPassword;
+      localStorage.setItem('aplihub_registered_users', JSON.stringify(users));
+      return true;
+    }
+  } catch (e) {
+    console.error('Error updating password:', e);
+  }
+  return false;
+}
+
 const APLIHUB_DATA = {
   user: getApliHubUserData(),
   
