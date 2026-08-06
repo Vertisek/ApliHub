@@ -251,6 +251,62 @@ Dalej...
 
 2. Przycisk wylogowania nie działa. Napraw go, bo logowanie będzie przez email i haslo.
 
+Poprawki:
+
+1. Nadal jest to przesuwanie o którym mówiłem, a to źle wygląda. Napraw to znajdź przyczynę. Jak przełączam zakładki te górne to cały interfejs (Logo, nazwa strony, profil) przesuwa się prawo lewo tak przeskakuje dziwnie. 
+
+2. Gdy klikam wyloguj to nadal nie wylogowuje mnie, a chcę sprawdzić działanie logowania.
+
+Super. Naprawiłeś to o co cię prosiłem, ale fajnie jakbyś od razu to robił porządnie, bo tracę za dużo czasu na pisanie ci rzeczy, która mogła by być zrobiona od razu dokładnie i dobrze. Mam nadzieję, że rozumiesz i lecimy z następnymi poprawkami i zmianami.
+
+1. Przy logowaniu okno wygląda fajnie, ale...
+
+> Dodaj taki sam przycisk pod "Zaloguj się", ale z nazwą "Zarejestruj się" i po kliknięciu ma pojawić się okno z formularzem logowania z następującymi rubrykami:
+
+- Nazwa użytkownika
+- Nick (wyświetlana nazwa)
+- Email
+- Hasło
+- Potwierdź hasło
+
+Na dole pole do zaznaczenia, że użytkownik zapoznał się z regulaminem strony, prawami autorskimi i polityką prywatności. Niech tam będzie też link, który prowadzi do takiej strony i na tej stronie tam ładnie to opisz wszystko. No jak na profesjonalnej stronie ma to wyglądać. Jeżeli użytkownik nie kliknie tego "ptaszka" to ma mu się na dole wyświetlić komunikat że nie kliknął, a to jest obowiązkowe (jakoś to tam ładnie napisz najwyżej zmienimy). Gdy wpisze wszystkie dane i zaznaczy to może kliknąć przycisk dalej, który przekieruje go do kolejnego okna gdzie napisane będzie o obowiązku zweryfikowania adresu email. Po tym wchodzi na swojego maila gdzie dostanie kod i ten kod ma wpisać znowu na stronie aplihub. Po wpisaniu klika przycisk o nazwie "Dalej" i wyświetla mu się komunikat, że pomyślnie utworzono konto i teraz trzeba się zalogować, ale ma pozostać w tym oknie, bo zaraz przekieruje go do okna z logowaniem. To przekierowanie ma być po około 3/4 sekundach, niech się wszystko dobrze wczyta i załaduje. Oczywiście Wszystko ma dobrze działać i być dopracowane i ładnie wyglądające. Wiadomość email też, ale to chyba sam ręcznie napiszę (na razie ty napisz cos prowizorycznego tak dla sprawdzenia). Gdy przekieruje na strone z logowaniem to użytkownik ma się zalogować tym samym emailem i hasłem co przy rejestracji i po tym ma ładnie i płynnie przenieść go już na stronę. Tylko tu bez komunikatów żadnych bo bez sensu będą.
+
+> Obok pola z hasłem daj przycisk "Nie pamiętam hasła", ale ma być on mały i przyjemny, a nie jakiś mega duży. Po kliknięciu w niego pojawia się płynnym przejściem następne okno z wymaganym adresem email. Po wpisaniu na dole przycisk dalej, który przekierowuje na kolejne okno z napisem że wysłano wiadomość email z resetem hasła czy cos takiego i wtedy tam w tej wiadomości przycisk o nazwie " Zresetuj hasło", który przekierowuje znowu na stronę, ale z oknem do resetu hasła. W tym oknie pola:
+
+- Nowe hasło
+- Powtórz hasło
+
+I na dole przycisk "Zatwierdź". Po kliknięciu przekierowuje na stronę z logowaniem gdzie już normalnie można się zalogować. 
+
+2. Zmiany wizualne okna z logowaniem:
+
+> "Logowanie do ApliHub" zmień na "Zaloguj się" i daj to na sam środek tego okna u góry.
+> W adresie email zamiast tego "oskar@..." wpisz "użytkownik123@...".
+
+Podziałaj coś.
+
+Na screenach wysłałem ci rzeczy do usuniecia i zmiany. Poprawki:
+
+1. Gdy użytkownik jest zarejestrowany już na danym emailu to po wpisaniu tego samego wyświetl komunikat obok, że taki email już jest.
+
+2. Nie może być dwóch takich samych NAZW UŻYTKOWNIKA. Gdy dana nazwa jest zajęta poinformuj o tym rejestrującego się użytkownika i wyświetl komunikat, że jest zajęta. Usuń kod weryfikacyjny w weryfikacji emaila, zamiast podanego kodu w rubryce wpisz "Wprowadź kod". Jeśli dasz radę to zrób tak, aby już teraz wysyłała się wiadomość z tym wszystkim na adres email, a podgląd wiadomości usuń. 
+
+3. Tam gdzie jest komunikat "Wypełnij pole" zmień to na taki, który jest nad daną rubryką. 
+
+4. Gdy zaznaczam hasło przeciągając myszką i odkliknę lewy przycisk myszy poza polem z logowaniem to wyłącza się okno i jest to irytujące. Zmień to trochę. 
+
+5. W rejestracji zmiany małe:
+
+- Jan_kowalski zmień na "np. Użytkownik_123"
+- Nick zmień na "np. Fajny nick"
+- Email zmień na "Uzytkownik123@super.pl
+
+6. Po kliknięciu w zaloguj się widzę, że jest moja nazwa lub czasami email i od razu wpisane hasło. Niech to się resetuje za każdym razem. 
+
+7. Usuń emotkę z przycisku zaloguj, bo tutaj nie fajnie wygląda.
+
+Działaj.
+
 
 
 

@@ -143,7 +143,7 @@ function isUsernameTaken(username) {
     return true;
   }
   const users = getApliHubRegisteredUsers();
-  return Object.values(users).some(u => 
+  return Object.values(users).some(u =>
     (u.username && u.username.toLowerCase().trim() === cleanUser) ||
     (u.name && u.name.toLowerCase().trim() === cleanUser)
   );
@@ -151,7 +151,7 @@ function isUsernameTaken(username) {
 
 const APLIHUB_DATA = {
   user: getApliHubUserData(),
-  
+
   apps: [
     {
       id: "app-1",
@@ -266,4 +266,71 @@ const APLIHUB_DATA = {
     }
   ]
 };
+// --- KOD NA SAMYM KOŃCU PLIKU ---
+
+const emailInput = document.getElementById('email');
+const passwordInput = document.getElementById('password');
+const btnRegister = document.getElementById('btn-register');
+const authContainer = document.getElementById('auth-container');
+const otpContainer = document.getElementById('otp-container');
+const otpCodeInput = document.getElementById('otp-code');
+const btnVerify = document.getElementById('btn-verify');
+const authMessage = document.getElementById('auth-message'); // Element na komunikaty (jeśli go używasz)
+
+let pendingEmail = '';
+
+// 1. Rejestracja
+if (btnRegister) {
+  btnRegister.addEventListener('click', async () => {
+    const email = emailInput ? emailInput.value : '';
+    const password = passwordInput ? passwordInput.value : '';
+
+    if (!email || !password) {
+      alert('Wpisz e-mail i hasło!');
+      return;
+    }
+
+    const { data, error } = await supabase.auth.signUp({
+      email: email,
+      password: password
+    });
+
+    if (error) {
+      // Wyświetlanie czytelnego błędu w alercie lub na stronie
+      const msg = 'Błąd rejestracji Supabase: ' + error.message;
+      if (authMessage) authMessage.textContent = msg;
+      else alert(msg);
+    } else {
+      pendingEmail = email;
+      if (authContainer) authContainer.style.display = 'none';
+      if (otpContainer) otpContainer.style.display = 'block';
+      alert('Wysłano kod weryfikacyjny na Twój e-mail!');
+    }
+  });
+}
+
+// 2. Weryfikacja kodu OTP
+if (btnVerify) {
+  btnVerify.addEventListener('click', async () => {
+    const token = otpCodeInput ? otpCodeInput.value : '';
+
+    if (!token) {
+      alert('Wpisz kod z e-maila!');
+      return;
+    }
+
+    const { data, error } = await supabase.auth.verifyOtp({
+      email: pendingEmail,
+      token: token,
+      type: 'signup'
+    });
+
+    if (error) {
+      alert('Błędny kod lub kod wygasł: ' + error.message);
+    } else {
+      alert('Konto aktywowane! Jesteś zalogowany.');
+      if (otpContainer) otpContainer.style.display = 'none';
+    }
+  });
+}
 
