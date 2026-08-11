@@ -1,0 +1,32 @@
+{
+  "manifest_version": 3,
+  "name": "ReTrap konwerter",
+  "version": "1.0",
+  "description": "Prosty konwerter wideo z YouTube do formatów MP3, WAV, MP4 1080p oraz MP4 720p w wysokiej jakości.",
+  "permissions": [
+    "storage",
+    "downloads"
+  ],
+  "host_permissions": [
+    "<all_urls>"
+  ],
+  "background": {
+    "service_worker": "background.js"
+  },
+  "content_scripts": [
+    {
+      "matches": [
+        "*://*.youtube.com/*"
+      ],
+      "js": [
+        "content.js"
+      ],
+      "run_at": "document_idle"
+    }
+  ],
+  "icons": {
+    "16": "icon16.png",
+    "48": "icon48.png",
+    "128": "icon128.png"
+  }
+}

@@ -2,6 +2,129 @@
    Algo Analyzer - Application Core & Social Algorithm Trends Intelligence
    ========================================================================== */
 
+/* ==========================================================================
+   WEB AUDIO SOUND FX ENGINE FOR ALGO ANALYZER
+   ========================================================================== */
+const AlgoSoundFX = {
+  ctx: null,
+  init() {
+    if (!this.ctx && (window.AudioContext || window.webkitAudioContext)) {
+      this.ctx = new (window.AudioContext || window.webkitAudioContext)();
+    }
+  },
+  getSettings() {
+    const user = typeof getApliHubUserData === 'function' ? getApliHubUserData() : {};
+    return {
+      enabled: user.settings?.soundEnabled ?? true,
+      volume: (user.settings?.soundVolume ?? 50) / 100
+    };
+  },
+  playTabSwitch() {
+    const { enabled, volume } = this.getSettings();
+    if (!enabled || volume <= 0) return;
+    try {
+      this.init();
+      if (!this.ctx) return;
+      if (this.ctx.state === 'suspended') this.ctx.resume();
+
+      const osc = this.ctx.createOscillator();
+      const gain = this.ctx.createGain();
+      const now = this.ctx.currentTime;
+
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(520, now);
+      osc.frequency.exponentialRampToValueAtTime(880, now + 0.04);
+
+      gain.gain.setValueAtTime(volume * 0.05, now);
+      gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.04);
+
+      osc.connect(gain);
+      gain.connect(this.ctx.destination);
+
+      osc.start(now);
+      osc.stop(now + 0.04);
+    } catch (e) {}
+  },
+  playClick() {
+    const { enabled, volume } = this.getSettings();
+    if (!enabled || volume <= 0) return;
+    try {
+      this.init();
+      if (!this.ctx) return;
+      if (this.ctx.state === 'suspended') this.ctx.resume();
+
+      const osc = this.ctx.createOscillator();
+      const gain = this.ctx.createGain();
+      const now = this.ctx.currentTime;
+
+      osc.type = 'triangle';
+      osc.frequency.setValueAtTime(320, now);
+      osc.frequency.exponentialRampToValueAtTime(160, now + 0.03);
+
+      gain.gain.setValueAtTime(volume * 0.06, now);
+      gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.03);
+
+      osc.connect(gain);
+      gain.connect(this.ctx.destination);
+
+      osc.start(now);
+      osc.stop(now + 0.03);
+    } catch (e) {}
+  },
+  playModalOpen() {
+    const { enabled, volume } = this.getSettings();
+    if (!enabled || volume <= 0) return;
+    try {
+      this.init();
+      if (!this.ctx) return;
+      if (this.ctx.state === 'suspended') this.ctx.resume();
+
+      const now = this.ctx.currentTime;
+      [440, 554.37, 659.25].forEach((freq, idx) => {
+        const osc = this.ctx.createOscillator();
+        const gain = this.ctx.createGain();
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(freq, now + idx * 0.03);
+
+        gain.gain.setValueAtTime(volume * 0.04, now + idx * 0.03);
+        gain.gain.exponentialRampToValueAtTime(0.0001, now + idx * 0.03 + 0.08);
+
+        osc.connect(gain);
+        gain.connect(this.ctx.destination);
+
+        osc.start(now + idx * 0.03);
+        osc.stop(now + idx * 0.03 + 0.08);
+      });
+    } catch (e) {}
+  },
+  playConnectSuccess() {
+    const { enabled, volume } = this.getSettings();
+    if (!enabled || volume <= 0) return;
+    try {
+      this.init();
+      if (!this.ctx) return;
+      if (this.ctx.state === 'suspended') this.ctx.resume();
+
+      const now = this.ctx.currentTime;
+      [523.25, 659.25, 783.99, 1046.50].forEach((freq, idx) => {
+        const osc = this.ctx.createOscillator();
+        const gain = this.ctx.createGain();
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(freq, now + idx * 0.04);
+
+        gain.gain.setValueAtTime(volume * 0.05, now + idx * 0.04);
+        gain.gain.exponentialRampToValueAtTime(0.0001, now + idx * 0.04 + 0.12);
+
+        osc.connect(gain);
+        gain.connect(this.ctx.destination);
+
+        osc.start(now + idx * 0.04);
+        osc.stop(now + idx * 0.04 + 0.12);
+      });
+    } catch (e) {}
+  }
+};
+
 document.addEventListener('DOMContentLoaded', () => {
     // Initialize Core Modules
     initSidebarNavigation();
@@ -11,6 +134,8 @@ document.addEventListener('DOMContentLoaded', () => {
     initViewModeSwitcher();
     initAccountCredentialsForm();
     initLanguageSelector();
+    initYouTubeAIAnalyzer();
+    initSettingsForm();
 
     // Sync header user info and avatar
     syncUserInfo();
@@ -40,9 +165,6 @@ function syncUserInfo() {
         else el.textContent = user.name;
     });
 
-    const emailElem = document.querySelector('.user-email');
-    if (emailElem) emailElem.textContent = user.email;
-
     const modalEmailInput = document.getElementById('algo-input-email');
     if (modalEmailInput) modalEmailInput.value = user.email;
 
@@ -52,6 +174,28 @@ function syncUserInfo() {
         const avatarIcon = getAvatarVisual(user.selectedAvatar || 'default');
         topAvatarFrame.innerHTML = `<span>${avatarIcon}</span>`;
     }
+}
+
+function initLanguageSelector() {
+    const langSelect = document.getElementById('algo-language-select');
+    if (langSelect) {
+        langSelect.value = localStorage.getItem('aplihub_lang') || 'pl';
+        langSelect.addEventListener('change', (e) => {
+            if (typeof setAppLanguage === 'function') {
+                setAppLanguage(e.target.value);
+                showToast(`Zmieniono język na: ${e.target.value.toUpperCase()}`);
+            }
+        });
+    }
+}
+
+function updateUILanguage() {
+    document.querySelectorAll('[data-i18n]').forEach(el => {
+        const key = el.getAttribute('data-i18n');
+        if (typeof t === 'function' && key) {
+            el.textContent = t(key);
+        }
+    });
 }
 
 function getAvatarVisual(avatarKey) {
@@ -291,11 +435,69 @@ const SOCIAL_TREND_HUB_DATA = {
    RENDER SOCIAL TAB DASHBOARDS (WITH METRICS, CHARTS, GUIDES & CHEAT SHEET)
    ========================================================================== */
 function renderSocialTrendHubs() {
+    const user = typeof getApliHubUserData === 'function' ? getApliHubUserData() : { connectedAccounts: {} };
+    const connected = user.connectedAccounts || {};
+    const planMode = localStorage.getItem('aplihub_plan_mode') || 'plan_a';
+    const hasAnyConnected = Object.values(connected).some(val => val === true);
+
     ['youtube', 'tiktok', 'instagram', 'facebook', 'twitch'].forEach(platformKey => {
         const container = document.getElementById(`tab-${platformKey}`);
         const hubData = SOCIAL_TREND_HUB_DATA[platformKey];
         const platformData = PLATFORM_DATA[platformKey];
         if (!container || !hubData || !platformData) return;
+
+        const isPlatformConnected = !!connected[platformKey];
+
+        // PLAN A: Show single main start callout if NO accounts are connected
+        if (planMode === 'plan_a' && !hasAnyConnected) {
+            container.innerHTML = `
+                <div class="page-header">
+                    <h1 class="page-title">
+                        <span class="page-title-accent">Witaj w Algo Analyzer</span>
+                    </h1>
+                    <p class="page-description">Połącz swoje konta społecznościowe, aby odblokować pełną analitykę i wskazówki algorytmu.</p>
+                </div>
+                <div class="unconnected-callout-card">
+                    <div style="font-size: 3.5rem; margin-bottom: 16px;">🔗</div>
+                    <div class="unconnected-callout-title">
+                        Aby przeanalizować swoje materiały oraz algorytm social mediów połącz konto z aplikacją klikając przycisk poniżej
+                    </div>
+                    <p style="font-size: 14px; color: var(--color-text-muted); max-width: 580px; margin: 0 auto 28px auto; line-height: 1.6;">
+                        Połącz przynajmniej jedno konto społecznościowe (YouTube, TikTok, Instagram, Facebook lub Twitch), aby Twoje konto uzyskało automatyczną licencję i odblokowało analitykę.
+                    </p>
+                    <button class="unconnected-callout-btn" onclick="AlgoSoundFX.playClick(); renderConnectedSocialAccounts(); openModal('modal-connected');">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg>
+                        Połącz Konto z Aplikacją
+                    </button>
+                </div>
+            `;
+            return;
+        }
+
+        // PLAN B: If specific platform is disconnected, show callout card inside that platform tab
+        if (planMode === 'plan_b' && !isPlatformConnected) {
+            container.innerHTML = `
+                <div class="page-header">
+                    <h1 class="page-title">
+                        <span class="page-title-accent">${hubData.title}</span>
+                    </h1>
+                    <p class="page-description">${hubData.subtitle}</p>
+                </div>
+                <div class="unconnected-callout-card">
+                    <div style="font-size: 3.5rem; margin-bottom: 16px;">🔗</div>
+                    <div class="unconnected-callout-title">
+                        Aby przeanalizować swoje materiały oraz algorytm social mediów połącz konto z aplikacją klikając przycisk poniżej
+                    </div>
+                    <p style="font-size: 14px; color: var(--color-text-muted); max-width: 580px; margin: 0 auto 28px auto; line-height: 1.6;">
+                        Twoje konto ${platformData.name} nie jest jeszcze połączone. Połącz je, aby odblokować dedykowane parametry i sugestie.
+                    </p>
+                    <button class="unconnected-callout-btn" onclick="AlgoSoundFX.playClick(); renderConnectedSocialAccounts(); openModal('modal-connected');">
+                        Połącz Konto ${platformData.name}
+                    </button>
+                </div>
+            `;
+            return;
+        }
 
         container.innerHTML = `
             <div class="page-header">
@@ -499,6 +701,7 @@ function initSidebarNavigation() {
 
     tabButtons.forEach(btn => {
         btn.addEventListener('click', () => {
+            AlgoSoundFX.playTabSwitch();
             const targetTab = btn.getAttribute('data-target');
 
             tabButtons.forEach(b => b.classList.remove('active'));
@@ -530,6 +733,7 @@ function initUserAvatarDropdown() {
     if (userAvatarBtn && userWrapper) {
         userAvatarBtn.addEventListener('click', (e) => {
             e.stopPropagation();
+            AlgoSoundFX.playClick();
             userWrapper.classList.toggle('active');
         });
 
@@ -551,6 +755,7 @@ function initUserAvatarDropdown() {
 }
 
 function handleDropdownAction(action) {
+    AlgoSoundFX.playClick();
     switch (action) {
         case 'profil':
             renderSocialAvatarsPicker();
@@ -558,6 +763,9 @@ function handleDropdownAction(action) {
             break;
         case 'konto':
             openModal('modal-account');
+            break;
+        case 'ustawienia':
+            openModal('modal-settings');
             break;
         case 'polaczone':
             renderConnectedSocialAccounts();
@@ -652,6 +860,77 @@ function initAccountCredentialsForm() {
     }
 }
 
+/* ==========================================================================
+   SETTINGS MODAL & APP SOUND FX CONTROLS
+   ========================================================================== */
+function initSettingsForm() {
+    const user = typeof getApliHubUserData === 'function' ? getApliHubUserData() : {};
+    
+    // Sound enabled toggle
+    const soundToggle = document.getElementById('setting-sound-enabled');
+    if (soundToggle) {
+        soundToggle.checked = user.settings?.soundEnabled ?? true;
+        soundToggle.addEventListener('change', (e) => {
+            const currentUser = getApliHubUserData();
+            if (!currentUser.settings) currentUser.settings = {};
+            currentUser.settings.soundEnabled = e.target.checked;
+            saveApliHubUserData(currentUser);
+            if (e.target.checked) AlgoSoundFX.playClick();
+        });
+    }
+
+    // Volume slider
+    const volumeSlider = document.getElementById('setting-sound-volume');
+    const volumeVal = document.getElementById('setting-volume-val');
+    if (volumeSlider) {
+        const initialVol = user.settings?.soundVolume ?? 50;
+        volumeSlider.value = initialVol;
+        if (volumeVal) volumeVal.textContent = `${initialVol}%`;
+
+        volumeSlider.addEventListener('input', (e) => {
+            const val = parseInt(e.target.value, 10);
+            if (volumeVal) volumeVal.textContent = `${val}%`;
+            const currentUser = getApliHubUserData();
+            if (!currentUser.settings) currentUser.settings = {};
+            currentUser.settings.soundVolume = val;
+            saveApliHubUserData(currentUser);
+        });
+        volumeSlider.addEventListener('change', () => {
+            AlgoSoundFX.playClick();
+        });
+    }
+
+    // Plan A vs Plan B radio choice
+    const planMode = localStorage.getItem('aplihub_plan_mode') || 'plan_a';
+    const radioPlanA = document.getElementById('radio-plan-a');
+    const radioPlanB = document.getElementById('radio-plan-b');
+    if (radioPlanA && radioPlanB) {
+        if (planMode === 'plan_b') radioPlanB.checked = true;
+        else radioPlanA.checked = true;
+
+        [radioPlanA, radioPlanB].forEach(radio => {
+            radio.addEventListener('change', (e) => {
+                if (e.target.checked) {
+                    const chosen = e.target.value;
+                    localStorage.setItem('aplihub_plan_mode', chosen);
+                    AlgoSoundFX.playClick();
+                    renderSocialTrendHubs();
+                    showToast(`Przełączono tryb na: ${chosen === 'plan_a' ? 'Plan A (Jedna Zakładka Startowa)' : 'Plan B (Karty wewnątrz zakładek)'}`);
+                }
+            });
+        });
+    }
+
+    // Apli Pro button in App Header
+    const btnApliProApp = document.getElementById('btnApliProApp');
+    if (btnApliProApp) {
+        btnApliProApp.addEventListener('click', () => {
+            AlgoSoundFX.playClick();
+            showToast('👑 Apli Pro: Subskrypcja premium do odblokowywania płatnych aplikacji będzie dostępna wkrótce!');
+        });
+    }
+}
+
 function renderConnectedSocialAccounts() {
     const container = document.getElementById('algo-social-accounts-list');
     if (!container || typeof getApliHubUserData !== 'function') return;
@@ -689,6 +968,10 @@ function renderConnectedSocialAccounts() {
 
             saveApliHubUserData(currentUser);
             renderConnectedSocialAccounts();
+            renderSocialTrendHubs();
+
+            if (newState) AlgoSoundFX.playConnectSuccess();
+            else AlgoSoundFX.playClick();
 
             showToast(newState ? `Połączono konto ${key.toUpperCase()}` : `Odłączono konto ${key.toUpperCase()}`);
         });
@@ -1233,3 +1516,109 @@ function getPlatformSvgIcon(platformKey) {
             return `<svg viewBox="0 0 24 24" fill="#f59e0b"><circle cx="12" cy="12" r="10"/></svg>`;
     }
 }
+
+/* ==========================================================================
+   YOUTUBE AI TRANSCRIPT & ALGORITHM ANALYZER INTEGRATION
+   ========================================================================== */
+function initYouTubeAIAnalyzer() {
+    const btnRun = document.getElementById('btn-run-yt-analysis');
+    if (!btnRun) return;
+
+    btnRun.addEventListener('click', async () => {
+        const youtubeKeyOrChannel = document.getElementById('yt-api-key-input')?.value?.trim();
+        const openAiKey = document.getElementById('openai-api-key-input')?.value?.trim();
+
+        const loader = document.getElementById('yt-ai-loading');
+        const resultsContainer = document.getElementById('yt-ai-results-container');
+        const btnText = document.getElementById('btn-run-yt-text');
+
+        if (loader) loader.style.display = 'block';
+        if (resultsContainer) resultsContainer.style.display = 'none';
+        if (btnText) btnText.textContent = 'Analizowanie (TypeScript & OpenAI)...';
+        btnRun.disabled = true;
+
+        try {
+            if (typeof YouTubeAnalytics === 'undefined' || typeof YouTubeAnalytics.processYouTubeStatsAndAnalyze !== 'function') {
+                throw new Error('Moduł YouTubeAnalytics nie został wczytany.');
+            }
+
+            const output = await YouTubeAnalytics.processYouTubeStatsAndAnalyze({
+                youtubeApiKey: youtubeKeyOrChannel,
+                channelId: youtubeKeyOrChannel,
+                openAiApiKey: openAiKey
+            });
+
+            renderYouTubeAIResults(output);
+
+            if (resultsContainer) resultsContainer.style.display = 'block';
+            showToast('✅ Przeanalizowano statystyki i transkrypcje Top 5 z OpenAI!', 'success');
+        } catch (error) {
+            console.error('Błąd podczas analizy YouTube AI:', error);
+            showToast('❌ Wystąpił błąd: ' + error.message, 'error');
+        } finally {
+            if (loader) loader.style.display = 'none';
+            if (btnText) btnText.textContent = 'Analizuj Top 5 i Transkrypcje (TypeScript)';
+            btnRun.disabled = false;
+        }
+    });
+}
+
+function renderYouTubeAIResults(output) {
+    if (!output) return;
+
+    const { metrics, aiAnalysis } = output;
+
+    // 1. CTR & AVD & Fit Score
+    const avgCtrElem = document.getElementById('yt-res-avg-ctr');
+    if (avgCtrElem) avgCtrElem.textContent = `${metrics.averageCTR}%`;
+
+    const avgAvdElem = document.getElementById('yt-res-avg-avd');
+    if (avgAvdElem) avgAvdElem.textContent = metrics.averageAVDFormatted;
+
+    const fitScoreElem = document.getElementById('yt-res-fit-score');
+    if (fitScoreElem) fitScoreElem.textContent = `${aiAnalysis.algorithm_fit_score}%`;
+
+    // 2. Best Publish Time Badge
+    const publishBadge = document.getElementById('yt-res-publish-time-badge');
+    if (publishBadge) publishBadge.textContent = aiAnalysis.best_publish_time;
+
+    // 3. Render Top 5 Videos List
+    const top5Container = document.getElementById('yt-top5-list-container');
+    if (top5Container && metrics.top5Videos) {
+        top5Container.innerHTML = metrics.top5Videos.map((vid, idx) => `
+            <div style="background: rgba(0,0,0,0.4); padding: 10px 14px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.05); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;">
+                <div style="display: flex; align-items: center; gap: 10px; flex: 1; min-width: 240px;">
+                    <span style="font-family: var(--font-mono); font-weight: 800; color: var(--color-yellow-main); font-size: 13px;">#${idx + 1}</span>
+                    <span style="font-size: 13px; font-weight: 600; color: var(--color-text-primary); text-overflow: ellipsis; overflow: hidden; white-space: nowrap; max-width: 420px;">${vid.title}</span>
+                </div>
+                <div style="display: flex; align-items: center; gap: 14px; font-size: 12px; font-family: var(--font-mono);">
+                    <span style="color: var(--color-text-muted);">👁 ${vid.viewCount.toLocaleString('pl-PL')} wyświetleń</span>
+                    <span style="color: var(--color-yellow-main); font-weight: 700;">CTR: ${vid.ctr}%</span>
+                    <span style="color: #00f2fe; font-weight: 700;">AVD: ${vid.avdFormatted}</span>
+                </div>
+            </div>
+        `).join('');
+    }
+
+    // 4. Render Hooks (JSON: hooks)
+    const hooksContainer = document.getElementById('yt-res-hooks-list');
+    if (hooksContainer && aiAnalysis.hooks) {
+        hooksContainer.innerHTML = aiAnalysis.hooks.map(hook => `
+            <div style="background: rgba(0,0,0,0.3); padding: 10px 14px; border-radius: 8px; border-left: 3px solid var(--color-yellow-main); font-size: 13px; color: var(--color-text-primary); line-height: 1.4;">
+                ${hook}
+            </div>
+        `).join('');
+    }
+
+    // 5. Render Dynamic Recommendations (JSON: dynamic_recommendations)
+    const recsContainer = document.getElementById('yt-res-recs-list');
+    if (recsContainer && aiAnalysis.dynamic_recommendations) {
+        recsContainer.innerHTML = aiAnalysis.dynamic_recommendations.map(rec => `
+            <div style="background: rgba(0,0,0,0.3); padding: 12px; border-radius: 8px; border: 1px solid rgba(16, 185, 129, 0.2); font-size: 12px; color: var(--color-text-primary); line-height: 1.4; display: flex; align-items: flex-start; gap: 8px;">
+                <span style="color: #10b981; font-weight: 800;">✓</span>
+                <span>${rec}</span>
+            </div>
+        `).join('');
+    }
+}
+

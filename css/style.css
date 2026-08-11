@@ -837,3 +837,51 @@ input {
     font-size: 0.85rem;
   }
 }
+
+/* ==========================================================================
+   Apli Pro Premium Button & Gated Download Styles
+   ========================================================================== */
+.btn-apli-pro {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 7px 16px;
+  border-radius: 20px;
+  background: linear-gradient(135deg, #f59e0b 0%, #d97706 40%, #7c3aed 100%);
+  background-size: 200% 200%;
+  border: 1px solid rgba(245, 158, 11, 0.6);
+  color: #ffffff;
+  font-family: inherit;
+  font-size: 0.85rem;
+  font-weight: 800;
+  letter-spacing: 0.03em;
+  cursor: pointer;
+  box-shadow: 0 0 16px rgba(245, 158, 11, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.4);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  animation: apliProShimmer 4s ease infinite;
+}
+
+.btn-apli-pro:hover {
+  transform: translateY(-2px) scale(1.03);
+  box-shadow: 0 0 24px rgba(245, 158, 11, 0.6), 0 0 12px rgba(124, 58, 237, 0.4);
+  border-color: rgba(255, 255, 255, 0.9);
+}
+
+@keyframes apliProShimmer {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+.btn-apli-pro .pro-crown {
+  font-size: 0.95rem;
+  filter: drop-shadow(0 0 4px rgba(255, 215, 0, 0.8));
+}
+
+.btn-download-restricted {
+  background: rgba(255, 255, 255, 0.05) !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+  color: #64748b !important;
+  cursor: not-allowed !important;
+  opacity: 0.6;
+}

@@ -27,7 +27,13 @@
                 <!-- Left area clean without badges -->
             </div>
 
-            <div class="top-header-right">
+            <div class="top-header-right" style="display: flex; align-items: center; gap: 12px;">
+                <!-- Premium Apli Pro Subscription Button -->
+                <button class="btn-apli-pro" id="btnApliProApp" title="Kup Subskrypcję Apli Pro">
+                    <span class="pro-crown">👑</span>
+                    <span class="pro-text">Apli Pro</span>
+                </button>
+
                 <!-- User Avatar Profile Menu Container -->
                 <div class="user-profile-wrapper" id="user-profile-wrapper">
                     <div class="user-avatar-btn" id="user-avatar-btn" title="Konto użytkownika">
@@ -42,11 +48,10 @@
                         </svg>
                     </div>
 
-                    <!-- Dropdown Panel (Profil, Konto, Połączone konta, Wyloguj) -->
+                    <!-- Dropdown Panel (Profil, Konto, Ustawienia, Połączone, Wyloguj) -->
                     <div class="user-dropdown-menu" id="user-dropdown-menu">
                         <div class="dropdown-header">
-                            <div style="font-weight: 600; font-size: 13px;" id="dropdown-user-name">Oskar_Algo</div>
-                            <div class="user-email">oskar@aplihub.pl</div>
+                            <div style="font-weight: 700; font-size: 14px; color: #fff;" id="dropdown-user-name">Oskar_Algo</div>
                         </div>
 
                         <button class="dropdown-item" data-action="profil">
@@ -65,12 +70,19 @@
                             <span data-i18n="account_settings">Konto</span>
                         </button>
 
+                        <button class="dropdown-item" data-action="ustawienia">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M19.14 12.94c.04-.3.06-.61.06-.94 0-.32-.02-.64-.07-.94l2.03-1.58c.18-.14.23-.41.12-.61l-1.92-3.32c-.12-.22-.37-.29-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54c-.04-.24-.24-.41-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96c-.22-.08-.47 0-.59.22L2.74 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.05.3-.09.63-.09.94s.02.64.07.94l-2.03 1.58c-.18.14-.23.41-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.47-.12-.61l-2.01-1.58zM12 15.6c-1.98 0-3.6-1.62-3.6-3.6s1.62-3.6 3.6-3.6 3.6 1.62 3.6 3.6-1.62 3.6-3.6-3.6z"/>
+                            </svg>
+                            <span>Ustawienia</span>
+                        </button>
+
                         <button class="dropdown-item" data-action="polaczone">
                             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                 <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path>
                                 <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path>
                             </svg>
-                            <span data-i18n="connected_accounts">Połączone konta</span>
+                            <span data-i18n="connected_accounts">Połączone</span>
                         </button>
 
                         <div style="height: 1px; background: rgba(255,255,255,0.06); margin: 4px 0;"></div>
@@ -239,6 +251,120 @@
                                 <div style="font-size: 14px; font-weight: 600; color: var(--color-text-primary);">Shorts: 1x dziennie | Filmy Długie: 2-3x w tygodniu</div>
                             </div>
                         </div>
+                    </div>
+
+                    <!-- AI YouTube Transcript & Algorithm Analyzer Card -->
+                    <div class="glass-card" style="margin-bottom: 30px; padding: 25px; border: 1px solid rgba(245, 158, 11, 0.4); background: var(--color-card-bg);">
+                        <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 15px; margin-bottom: 20px; border-bottom: 1px solid rgba(245, 158, 11, 0.2); padding-bottom: 15px;">
+                            <div>
+                                <h3 style="font-family: var(--font-tech); color: var(--color-yellow-main); font-size: 19px; display: flex; align-items: center; gap: 10px; margin-bottom: 4px;">
+                                    <span>🤖</span> AI YouTube Transcript & Algorytm Analyzer
+                                </h3>
+                                <p style="font-size: 13px; color: var(--color-text-muted); margin: 0;">
+                                    Wyliczaj średni CTR oraz AVD z YouTube API i przesytaj transkrypcje Top 5 filmów do OpenAI API dla bezpośredniej analizy w UI.
+                                </p>
+                            </div>
+                            <span style="font-family: var(--font-mono); font-size: 11px; background: rgba(245, 158, 11, 0.15); color: var(--color-yellow-main); border: 1px solid rgba(245, 158, 11, 0.4); padding: 5px 12px; border-radius: 8px; font-weight: 700;">
+                                TypeScript + OpenAI API
+                            </span>
+                        </div>
+
+                        <!-- API Keys & Inputs Controls -->
+                        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 14px; margin-bottom: 20px;">
+                            <div>
+                                <label style="display: block; font-size: 11px; font-weight: 700; color: var(--color-text-muted); text-transform: uppercase; margin-bottom: 6px;">YouTube Channel ID / API Key (Opcjonalne)</label>
+                                <input type="text" id="yt-api-key-input" class="form-input" placeholder="Channel ID lub Klucz YouTube API..." style="background: rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; padding: 10px 14px; font-size: 13px; color: #fff; width: 100%;">
+                            </div>
+                            <div>
+                                <label style="display: block; font-size: 11px; font-weight: 700; color: var(--color-text-muted); text-transform: uppercase; margin-bottom: 6px;">OpenAI API Key (sk-... Opcjonalne)</label>
+                                <input type="password" id="openai-api-key-input" class="form-input" placeholder="Wklej swój OpenAI API Key..." style="background: rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; padding: 10px 14px; font-size: 13px; color: #fff; width: 100%;">
+                            </div>
+                            <div style="display: flex; align-items: flex-end;">
+                                <button id="btn-run-yt-analysis" class="btn-yellow" style="width: 100%; height: 42px; font-weight: 700; display: flex; align-items: center; justify-content: center; gap: 10px; cursor: pointer;">
+                                    <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2">
+                                        <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon>
+                                    </svg>
+                                    <span id="btn-run-yt-text">Analizuj Top 5 i Transkrypcje (TypeScript)</span>
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Status Loader Indicator -->
+                        <div id="yt-ai-loading" style="display: none; text-align: center; padding: 25px; background: rgba(0,0,0,0.3); border-radius: 12px; margin-bottom: 20px; border: 1px dashed var(--color-yellow-main);">
+                            <div style="font-family: var(--font-mono); color: var(--color-yellow-main); font-size: 14px; font-weight: 700; margin-bottom: 6px;" id="yt-ai-loading-text">
+                                ⏳ Pobieranie statystyk YouTube API oraz analiza transkrypcji Top 5 w OpenAI...
+                            </div>
+                            <div style="font-size: 12px; color: var(--color-text-muted);">Przetwarzanie średnich CTR, AVD i pobieranie ustrukturyzowanego JSON-a...</div>
+                        </div>
+
+                        <!-- Results Container -->
+                        <div id="yt-ai-results-container" style="display: none; animation: fadeIn 0.4s ease-out;">
+                            <!-- Metric Summary Header -->
+                            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-bottom: 20px;">
+                                <div style="background: rgba(0,0,0,0.4); padding: 16px; border-radius: 12px; border: 1px solid rgba(245, 158, 11, 0.25);">
+                                    <div style="font-size: 11px; color: var(--color-text-muted); text-transform: uppercase; font-family: var(--font-mono);">Wyliczony Średni CTR</div>
+                                    <div id="yt-res-avg-ctr" style="font-size: 26px; font-weight: 800; color: var(--color-yellow-main); font-family: var(--font-tech); margin-top: 4px;">--%</div>
+                                    <div style="font-size: 11px; color: #10b981; margin-top: 2px;">★ Wyklikliwość miniatur</div>
+                                </div>
+                                <div style="background: rgba(0,0,0,0.4); padding: 16px; border-radius: 12px; border: 1px solid rgba(245, 158, 11, 0.25);">
+                                    <div style="font-size: 11px; color: var(--color-text-muted); text-transform: uppercase; font-family: var(--font-mono);">Wyliczony Średni AVD</div>
+                                    <div id="yt-res-avg-avd" style="font-size: 26px; font-weight: 800; color: #00f2fe; font-family: var(--font-tech); margin-top: 4px;">--</div>
+                                    <div style="font-size: 11px; color: var(--color-text-muted); margin-top: 2px;">⏱ Utrzymanie uwagi widzów</div>
+                                </div>
+                                <div style="background: rgba(0,0,0,0.4); padding: 16px; border-radius: 12px; border: 1px solid rgba(245, 158, 11, 0.25);">
+                                    <div style="font-size: 11px; color: var(--color-text-muted); text-transform: uppercase; font-family: var(--font-mono);">Score Dopasowania AI</div>
+                                    <div id="yt-res-fit-score" style="font-size: 26px; font-weight: 800; color: #10b981; font-family: var(--font-tech); margin-top: 4px;">--%</div>
+                                    <div style="font-size: 11px; color: var(--color-text-muted); margin-top: 2px;">⚡ OpenAI Algorithm Fit</div>
+                                </div>
+                            </div>
+
+                            <!-- Top 5 Popular Videos List -->
+                            <div style="margin-bottom: 20px; background: rgba(0,0,0,0.3); border-radius: 12px; padding: 18px; border: 1px solid rgba(255,255,255,0.06);">
+                                <h4 style="font-family: var(--font-tech); color: var(--color-text-primary); font-size: 14px; margin-bottom: 12px; display: flex; align-items: center; justify-content: space-between;">
+                                    <span>🔥 Top 5 Najpopularniejszych Filmów (Przesłano transkrypcje do OpenAI)</span>
+                                    <span style="font-size: 11px; font-family: var(--font-mono); color: var(--color-yellow-main);" id="yt-res-total-videos">5 filmów</span>
+                                </h4>
+                                <div id="yt-top5-list-container" style="display: flex; flex-direction: column; gap: 8px;">
+                                    <!-- Rendered dynamically -->
+                                </div>
+                            </div>
+
+                            <!-- OpenAI JSON Analysis Section -->
+                            <div style="background: rgba(15, 23, 42, 0.8); border: 1px solid var(--color-yellow-main); border-radius: 14px; padding: 20px;">
+                                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; border-bottom: 1px dashed rgba(245, 158, 11, 0.3); padding-bottom: 10px; flex-wrap: wrap; gap: 10px;">
+                                    <h4 style="font-family: var(--font-tech); color: var(--color-yellow-main); font-size: 16px; display: flex; align-items: center; gap: 8px; margin: 0;">
+                                        <span>🧠</span> Wyniki OpenAI API z JSON-a
+                                    </h4>
+                                    <div style="display: flex; align-items: center; gap: 8px;">
+                                        <span style="font-size: 11px; color: var(--color-text-muted); font-weight: 600;">best_publish_time:</span>
+                                        <span id="yt-res-publish-time-badge" style="font-family: var(--font-mono); font-size: 11px; background: rgba(16, 185, 129, 0.2); color: #10b981; border: 1px solid rgba(16, 185, 129, 0.4); padding: 4px 10px; border-radius: 6px; font-weight: 700;">
+                                            --
+                                        </span>
+                                    </div>
+                                </div>
+
+                                <!-- Hooks & Highlights -->
+                                <div style="margin-bottom: 18px;">
+                                    <div style="font-size: 12px; font-weight: 700; color: var(--color-text-muted); text-transform: uppercase; margin-bottom: 8px; font-family: var(--font-mono);">
+                                        🪝 Wykryte Haczyki w Transkrypcjach (hooks)
+                                    </div>
+                                    <div id="yt-res-hooks-list" style="display: flex; flex-direction: column; gap: 8px;">
+                                        <!-- Rendered dynamically -->
+                                    </div>
+                                </div>
+
+                                <!-- Dynamic Recommendations -->
+                                <div>
+                                    <div style="font-size: 12px; font-weight: 700; color: var(--color-text-muted); text-transform: uppercase; margin-bottom: 8px; font-family: var(--font-mono);">
+                                        💡 Dynamiczne Rekomendacje dla Algorytmu (dynamic_recommendations)
+                                    </div>
+                                    <div id="yt-res-recs-list" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 10px;">
+                                        <!-- Rendered dynamically -->
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
                     </div>
 
                     <div class="cheat-sheet-section" style="margin-top: 30px; padding: 25px; background: var(--color-card-bg); border: 1px solid var(--color-card-border); border-radius: var(--border-radius); backdrop-filter: blur(16px);">
@@ -1262,6 +1388,72 @@
             </div>
         </div>
 
+        <!-- Modal: Ustawienia -->
+        <div class="modal-card" id="modal-settings">
+            <button class="modal-close-btn">&times;</button>
+            <div class="modal-title">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M19.14 12.94c.04-.3.06-.61.06-.94 0-.32-.02-.64-.07-.94l2.03-1.58c.18-.14.23-.41.12-.61l-1.92-3.32c-.12-.22-.37-.29-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54c-.04-.24-.24-.41-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96c-.22-.08-.47 0-.59.22L2.74 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.05.3-.09.63-.09.94s.02.64.07.94l-2.03 1.58c-.18.14-.23.41-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.47-.12-.61l-2.01-1.58zM12 15.6c-1.98 0-3.6-1.62-3.6-3.6s1.62-3.6 3.6-3.6 3.6 1.62 3.6 3.6-1.62 3.6-3.6-3.6z"/>
+                </svg>
+                <span>Ustawienia Aplikacji & Dźwięku</span>
+            </div>
+            <div class="modal-subtitle">Dostosuj efety dźwiękowe, głośność oraz styl powiązanych kont.</div>
+            <div class="modal-content" style="display: flex; flex-direction: column; gap: 20px;">
+                
+                <!-- Sound Toggle & Volume -->
+                <div style="background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.08); padding: 16px; border-radius: 12px;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px;">
+                        <div>
+                            <div style="font-weight: 700; font-size: 14px; color: #fff; display: flex; align-items: center; gap: 8px;">
+                                <span>🔊</span> Efekty Dźwiękowe Aplikacji
+                            </div>
+                            <div style="font-size: 12px; color: var(--color-text-muted);">Dźwięki kliknięć, zakładek i interakcji</div>
+                        </div>
+                        <label class="switch-toggle" style="position: relative; display: inline-block; width: 44px; height: 24px;">
+                            <input type="checkbox" id="setting-sound-enabled" checked style="opacity: 0; width: 0; height: 0;">
+                            <span class="toggle-slider" style="position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #334155; transition: .3s; border-radius: 24px; border: 1px solid rgba(255,255,255,0.1);"></span>
+                        </label>
+                    </div>
+
+                    <div>
+                        <div style="display: flex; justify-content: space-between; font-size: 12px; margin-bottom: 6px; color: var(--color-text-muted);">
+                            <span>Głośność Dźwięków UI</span>
+                            <span id="setting-volume-val" style="font-weight: 700; color: var(--color-yellow-main); font-family: var(--font-mono);">50%</span>
+                        </div>
+                        <input type="range" id="setting-sound-volume" min="0" max="100" value="50" style="width: 100%; accent-color: var(--color-yellow-main); cursor: pointer;">
+                    </div>
+                </div>
+
+                <!-- Plan A vs Plan B View Mode Toggle -->
+                <div style="background: rgba(0,0,0,0.3); border: 1px solid rgba(245,158,11,0.2); padding: 16px; border-radius: 12px;">
+                    <div style="font-weight: 700; font-size: 14px; color: var(--color-yellow-main); margin-bottom: 4px; display: flex; align-items: center; gap: 8px;">
+                        <span>🔗</span> Wariant Połączonych Kont (Test Plan A / Plan B)
+                    </div>
+                    <div style="font-size: 12px; color: var(--color-text-muted); margin-bottom: 12px;">Wybierz jak aplikacja zachowuje się przed połączeniem kont społecznościowych:</div>
+                    
+                    <div style="display: flex; flex-direction: column; gap: 10px;">
+                        <label style="display: flex; align-items: flex-start; gap: 10px; cursor: pointer; padding: 10px; border-radius: 8px; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.06);">
+                            <input type="radio" name="plan_mode_choice" value="plan_a" id="radio-plan-a" checked style="accent-color: var(--color-yellow-main); margin-top: 3px;">
+                            <div>
+                                <div style="font-size: 13px; font-weight: 700; color: #fff;">Plan A (Jedna Zakładka Startowa)</div>
+                                <div style="font-size: 11px; color: var(--color-text-muted);">Na początku pokazuje pojedynczy ekran z zachętą i przyciskiem do połączenia kont. Po połączeniu odblokowują się wszystkie meytryki.</div>
+                            </div>
+                        </label>
+                        
+                        <label style="display: flex; align-items: flex-start; gap: 10px; cursor: pointer; padding: 10px; border-radius: 8px; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.06);">
+                            <input type="radio" name="plan_mode_choice" value="plan_b" id="radio-plan-b" style="accent-color: var(--color-yellow-main); margin-top: 3px;">
+                            <div>
+                                <div style="font-size: 13px; font-weight: 700; color: #fff;">Plan B (Wszystkie Zakładki z Karta Połączenia)</div>
+                                <div style="font-size: 11px; color: var(--color-text-muted);">Wszystkie zakładki w menu są widoczne, ale wewnątrz niepołączonych platform wyświetla się karta zachęcająca do połączenia.</div>
+                            </div>
+                        </label>
+                    </div>
+                </div>
+
+                <button class="btn-yellow" onclick="closeModal()">Zapisz Ustawienia</button>
+            </div>
+        </div>
+
         <!-- Modal: Połączone konta -->
         <div class="modal-card" id="modal-connected">
             <button class="modal-close-btn">&times;</button>
@@ -1289,6 +1481,7 @@
     <script src="../js/data.js"></script>
     <script src="js/i18n.js"></script>
     <script src="js/particles.js"></script>
+    <script src="js/youtubeAnalytics.js"></script>
     <script src="js/app.js"></script>
 </body>
 

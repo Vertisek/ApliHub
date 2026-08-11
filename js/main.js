@@ -85,6 +85,13 @@ document.addEventListener('DOMContentLoaded', () => {
     profileTrigger.addEventListener('mouseenter', () => SoundFX.playNavHover());
   }
 
+  const btnApliPro = document.getElementById('btnApliPro');
+  if (btnApliPro) {
+    btnApliPro.addEventListener('click', () => {
+      showToast('👑 Apli Pro: Subskrypcja premium do odblokowywania płatnych aplikacji będzie dostępna wkrótce!');
+    });
+  }
+
   // Initialize view
   renderView();
 
@@ -180,10 +187,52 @@ document.addEventListener('DOMContentLoaded', () => {
     const card = document.createElement('div');
     card.className = 'card glowing-card';
 
+    const user = typeof getApliHubUserData === 'function' ? getApliHubUserData() : null;
+    const isDevAuthorized = user && user.isLoggedIn && user.email && user.email.toLowerCase().trim() === 'vertis.biznes758@gmail.com';
+
+    let buttonHtml = '';
+    if (item.id === 'app-1' || item.name.includes('Algo Analyzer')) {
+      if (isDevAuthorized) {
+        buttonHtml = `
+          <a class="btn-download btn-installer-active" href="assets/installer/ApliHub_AlgoAnalyzer_Setup.exe" download="ApliHub_AlgoAnalyzer_Setup.exe" style="background: linear-gradient(135deg, #10b981, #059669); color: #fff; text-decoration: none; display: inline-flex; align-items: center; gap: 6px; padding: 7px 16px; border-radius: var(--radius-sm); font-weight: 700; font-size: 0.82rem; box-shadow: 0 0 12px rgba(16,185,129,0.3);">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+              <polyline points="7 10 12 15 17 10"></polyline>
+              <line x1="12" y1="15" x2="12" y2="3"></line>
+            </svg>
+            Pobierz i Zainstaluj (.exe)
+          </a>
+        `;
+      } else {
+        buttonHtml = `
+          <button class="btn-download btn-download-restricted" disabled style="opacity: 0.55; cursor: not-allowed; background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.1); color: #94a3b8; display: inline-flex; align-items: center; gap: 6px; padding: 7px 16px; border-radius: var(--radius-sm); font-weight: 600; font-size: 0.82rem;" title="Opcja pobierania dostępna wyłącznie dla konta deweloperskiego: vertis.biznes758@gmail.com">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+              <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+            </svg>
+            Pobieranie wyłączone
+          </button>
+        `;
+      }
+    } else {
+      buttonHtml = `
+        <button class="btn-download" data-download-id="${item.id}" data-download-name="${item.name}">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+            <polyline points="7 10 12 15 17 10"></polyline>
+            <line x1="12" y1="15" x2="12" y2="3"></line>
+          </svg>
+          Pobierz
+        </button>
+      `;
+    }
+
     card.innerHTML = `
       <div>
         <div class="card-top">
-          <div class="card-icon">${item.icon}</div>
+          <div class="card-icon" style="position: relative;">
+            ${item.id === 'app-1' ? `<img src="assets/images/algo_app_icon.png" alt="Algo Icon" style="width: 44px; height: 44px; border-radius: 10px; object-fit: cover;">` : item.icon}
+          </div>
           <div class="card-info">
             <h3 class="card-title">${item.name}</h3>
             <span class="card-badge">${item.badge}</span>
@@ -199,14 +248,7 @@ document.addEventListener('DOMContentLoaded', () => {
           <span>${item.downloads} pobrań</span>
         </div>
         <div style="display: flex; gap: 8px; align-items: center;">
-          <button class="btn-download" data-download-id="${item.id}" data-download-name="${item.name}">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
-              <polyline points="7 10 12 15 17 10"></polyline>
-              <line x1="12" y1="15" x2="12" y2="3"></line>
-            </svg>
-            Pobierz
-          </button>
+          ${buttonHtml}
         </div>
       </div>
     `;
@@ -214,11 +256,13 @@ document.addEventListener('DOMContentLoaded', () => {
     // Sound FX 2 on card hover
     card.addEventListener('mouseenter', () => SoundFX.playCardHover());
 
-    const downloadBtn = card.querySelector('.btn-download');
-    downloadBtn.addEventListener('click', (e) => {
-      e.stopPropagation();
-      handleDownload(item);
-    });
+    const downloadBtn = card.querySelector('.btn-download:not(.btn-download-restricted)');
+    if (downloadBtn) {
+      downloadBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        handleDownload(item);
+      });
+    }
 
     return card;
   }

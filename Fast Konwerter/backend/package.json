@@ -1,0 +1,26 @@
+{
+  "name": "retrap-youtube-converter-backend",
+  "version": "1.0.0",
+  "description": "Node.js (Express.js) backend for YouTube video and audio conversion using yt-dlp-exec and fluent-ffmpeg",
+  "main": "server.js",
+  "type": "commonjs",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node --watch server.js"
+  },
+  "keywords": [
+    "youtube",
+    "converter",
+    "express",
+    "yt-dlp",
+    "ffmpeg"
+  ],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "cors": "^2.8.5",
+    "express": "^4.21.2",
+    "fluent-ffmpeg": "^2.1.3",
+    "yt-dlp-exec": "^1.0.2"
+  }
+}
