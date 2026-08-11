@@ -456,7 +456,9 @@ document.addEventListener('DOMContentLoaded', () => {
             currentData.settings.emailNotifications = emailToggle.checked;
             saveApliHubUserData(currentData);
             showToast(emailToggle.checked ? 'Włączono powiadomienia e-mail' : 'Wyłączono powiadomienia e-mail');
-      // Attach event listeners for connected accounts buttons (removed)
+          });
+        }
+      }
     }
   }
 
