@@ -22,17 +22,10 @@ const DEFAULT_USER_STORE = {
   email: "oskar@aplihub.pl",
   password: "password123",
   avatar: "O",
-  selectedAvatar: "O", // Preset icon or custom symbol
+  selectedAvatar: "O",
   accountType: "PRO VIP",
   isVerified: false,
   joinedDate: "01.08.2026 r.",
-  connectedAccounts: {
-    youtube: true,
-    tiktok: false,
-    instagram: true,
-    facebook: false,
-    twitch: false
-  },
   settings: {
     darkMode: true,
     soundEnabled: true,

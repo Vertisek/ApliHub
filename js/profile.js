@@ -28,8 +28,13 @@ document.addEventListener('DOMContentLoaded', () => {
       }
     } else {
       if (profileTrigger) {
+        const isCustomImage = user.avatar && (user.avatar.startsWith('data:image/') || user.avatar.startsWith('http') || user.avatar.startsWith('blob:'));
+        const avatarHtml = isCustomImage 
+          ? `<img src="${user.avatar}" alt="Avatar" style="width: 100%; height: 100%; border-radius: 50%; object-fit: cover;">`
+          : (user.avatar || (user.name || 'O')[0].toUpperCase());
+
         profileTrigger.innerHTML = `
-          <div class="avatar-circle">${user.avatar || 'O'}</div>
+          <div class="avatar-circle">${avatarHtml}</div>
           <span class="profile-name">${user.name || 'Oskar'}</span>
           <svg class="caret-icon" viewBox="0 0 24 24">
             <path d="M7 10l5 5 5-5H7z"></path>
@@ -141,7 +146,7 @@ document.addEventListener('DOMContentLoaded', () => {
     let html = '';
     let title = '';
 
-    const avatarPresets = ['O', '⚡', '📊', '🔴', '🎵', '📸', '🟪', '💎', '🔥', '👑'];
+    const isCustomImage = user.avatar && (user.avatar.startsWith('data:image/') || user.avatar.startsWith('http') || user.avatar.startsWith('blob:'));
 
     switch (actionType) {
       case 'profil':
@@ -149,8 +154,10 @@ document.addEventListener('DOMContentLoaded', () => {
         html = `
           <div style="display: flex; flex-direction: column; gap: 20px;">
             <div style="display: flex; align-items: center; gap: 20px; padding-bottom: 20px; border-bottom: 1px solid var(--border-subtle);">
-              <div id="current-modal-avatar" style="width: 68px; height: 68px; border-radius: 50%; background: linear-gradient(135deg, #d97706, #f59e0b); display: flex; align-items: center; justify-content: center; font-size: 2rem; font-weight: 800; color: #000; box-shadow: 0 0 20px rgba(245, 158, 11, 0.4);">
-                ${user.avatar}
+              <div id="current-modal-avatar" style="width: 68px; height: 68px; border-radius: 50%; background: linear-gradient(135deg, #d97706, #f59e0b); display: flex; align-items: center; justify-content: center; font-size: 2rem; font-weight: 800; color: #000; box-shadow: 0 0 20px rgba(245, 158, 11, 0.4); overflow: hidden;">
+                ${isCustomImage 
+                  ? `<img src="${user.avatar}" alt="Avatar" style="width: 100%; height: 100%; border-radius: 50%; object-fit: cover;">`
+                  : (user.avatar || (user.name || 'O')[0].toUpperCase())}
               </div>
               <div>
                 <h3 style="font-size: 1.3rem; font-weight: 800; color: #fff;">${user.name}</h3>
@@ -167,18 +174,31 @@ document.addEventListener('DOMContentLoaded', () => {
               </div>
             </div>
 
-            <!-- Choose Avatar Section -->
+            <!-- Custom Avatar Upload Section -->
             <div>
-              <label style="display: block; font-size: 0.9rem; font-weight: 700; color: #fff; margin-bottom: 12px;">
-                🎨 Wybierz Swój Avatar:
+              <label style="display: block; font-size: 0.9rem; font-weight: 700; color: #fff; margin-bottom: 10px;">
+                🖼️ Wgraj własny avatar z komputera:
               </label>
-              <div style="display: flex; flex-wrap: wrap; gap: 10px;" id="avatar-picker-grid">
-                ${avatarPresets.map(av => `
-                  <button class="btn-avatar-option ${user.avatar === av ? 'selected' : ''}" data-avatar-val="${av}" style="width: 44px; height: 44px; border-radius: 12px; background: ${user.avatar === av ? 'linear-gradient(135deg, #f59e0b, #d97706)' : 'rgba(30, 41, 59, 0.8)'}; border: 1px solid ${user.avatar === av ? '#f59e0b' : 'var(--border-subtle)'}; color: ${user.avatar === av ? '#000' : '#fff'}; font-size: 1.2rem; font-weight: 800; cursor: pointer; transition: all 0.2s ease;">
-                    ${av}
+              <div style="display: flex; gap: 12px; align-items: center; flex-wrap: wrap;">
+                <label for="avatarFileInput" style="padding: 10px 18px; background: linear-gradient(135deg, #f59e0b, #d97706); color: #000; font-weight: 800; border-radius: 8px; cursor: pointer; font-size: 0.85rem; display: inline-flex; align-items: center; gap: 8px; transition: var(--transition);">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                    <polyline points="17 8 12 3 7 8"></polyline>
+                    <line x1="12" y1="3" x2="12" y2="15"></line>
+                  </svg>
+                  Wybierz plik z komputera
+                </label>
+                <input type="file" id="avatarFileInput" accept="image/*" style="display: none;">
+
+                ${isCustomImage ? `
+                  <button type="button" id="btnRemoveAvatar" style="padding: 10px 16px; background: rgba(239, 68, 68, 0.15); border: 1px solid rgba(239, 68, 68, 0.4); color: #f87171; font-weight: 700; border-radius: 8px; cursor: pointer; font-size: 0.85rem; transition: var(--transition);">
+                    🗑️ Usuń zdjęcie
                   </button>
-                `).join('')}
+                ` : ''}
               </div>
+              <p style="font-size: 0.78rem; color: var(--text-muted); margin-top: 10px;">
+                Obsługiwane pliki: PNG, JPG, WEBP, GIF. Plik zostanie wgrany z Twojego komputera.
+              </p>
             </div>
           </div>
         `;
@@ -276,36 +296,6 @@ document.addEventListener('DOMContentLoaded', () => {
           </div>
         `;
         break;
-
-      case 'polaczone':
-        title = '🔗 Połączone Konta Social Media';
-        const socialPlatforms = [
-          { key: 'youtube', name: 'YouTube', icon: '🔴' },
-          { key: 'tiktok', name: 'TikTok', icon: '🎵' },
-          { key: 'instagram', name: 'Instagram', icon: '📸' },
-          { key: 'facebook', name: 'Facebook', icon: '📘' },
-          { key: 'twitch', name: 'Twitch', icon: '🟪' }
-        ];
-
-        html = `
-          <div style="display: flex; flex-direction: column; gap: 12px;" id="connected-accounts-list">
-            ${socialPlatforms.map(p => {
-              const isConnected = !!user.connectedAccounts[p.key];
-              return `
-                <div style="display: flex; align-items: center; justify-content: space-between; padding: 14px; background: rgba(15, 23, 42, 0.6); border: 1px solid var(--border-subtle); border-radius: 12px;">
-                  <div style="display: flex; align-items: center; gap: 12px;">
-                    <span style="font-size: 1.3rem;">${p.icon}</span>
-                    <span style="font-weight: 700; font-size: 0.95rem; color: #fff;">${p.name}</span>
-                  </div>
-                  <button class="btn-toggle-social ${isConnected ? 'connected' : ''}" data-social-key="${p.key}" style="padding: 8px 18px; border-radius: 8px; font-weight: 700; font-size: 0.85rem; cursor: pointer; transition: all 0.2s ease; ${isConnected ? 'background: rgba(239, 68, 68, 0.15); border: 1px solid rgba(239, 68, 68, 0.4); color: #f87171;' : 'background: rgba(245, 158, 11, 0.15); border: 1px solid rgba(245, 158, 11, 0.4); color: #f59e0b;'}">
-                    ${isConnected ? 'Odłącz' : 'Połącz'}
-                  </button>
-                </div>
-              `;
-            }).join('')}
-          </div>
-        `;
-        break;
     }
 
     if (modalTitle && modalContent && modalBackdrop) {
@@ -313,32 +303,46 @@ document.addEventListener('DOMContentLoaded', () => {
       modalContent.innerHTML = html;
       modalBackdrop.classList.add('active');
 
-      // Attach event listeners for Profil (Avatar selector)
+      // Attach event listeners for Profil (Custom Avatar file upload)
       if (actionType === 'profil') {
-        document.querySelectorAll('.btn-avatar-option').forEach(btn => {
-          btn.addEventListener('click', () => {
-            const selectedVal = btn.getAttribute('data-avatar-val');
-            const currentData = getApliHubUserData();
-            currentData.avatar = selectedVal;
-            currentData.selectedAvatar = selectedVal;
-            saveApliHubUserData(currentData);
-
-            document.querySelectorAll('.btn-avatar-option').forEach(b => {
-              b.style.background = 'rgba(30, 41, 59, 0.8)';
-              b.style.borderColor = 'var(--border-subtle)';
-              b.style.color = '#fff';
-            });
-
-            btn.style.background = 'linear-gradient(135deg, #f59e0b, #d97706)';
-            btn.style.borderColor = '#f59e0b';
-            btn.style.color = '#000';
-
-            const modalAvatarDisplay = document.getElementById('current-modal-avatar');
-            if (modalAvatarDisplay) modalAvatarDisplay.textContent = selectedVal;
-
-            showToast(`Ustawiono nowy avatar: ${selectedVal}`);
+        const fileInput = document.getElementById('avatarFileInput');
+        if (fileInput) {
+          fileInput.addEventListener('change', (e) => {
+            const file = e.target.files[0];
+            if (file) {
+              if (file.size > 5 * 1024 * 1024) {
+                showToast('❌ Plik jest za duży. Maksymalny rozmiar to 5 MB.');
+                return;
+              }
+              const reader = new FileReader();
+              reader.onload = function(evt) {
+                const dataUrl = evt.target.result;
+                const currentData = getApliHubUserData();
+                currentData.avatar = dataUrl;
+                currentData.selectedAvatar = dataUrl;
+                saveApliHubUserData(currentData);
+                updateHeaderUserInfo();
+                showToast('🎨 Avatar został pomyślnie wgrany!');
+                openProfileModal('profil');
+              };
+              reader.readAsDataURL(file);
+            }
           });
-        });
+        }
+
+        const btnRemoveAvatar = document.getElementById('btnRemoveAvatar');
+        if (btnRemoveAvatar) {
+          btnRemoveAvatar.addEventListener('click', () => {
+            const currentData = getApliHubUserData();
+            const defaultLetter = (currentData.name || 'O')[0].toUpperCase();
+            currentData.avatar = defaultLetter;
+            currentData.selectedAvatar = defaultLetter;
+            saveApliHubUserData(currentData);
+            updateHeaderUserInfo();
+            showToast('🗑️ Przywrócono domyślny avatar.');
+            openProfileModal('profil');
+          });
+        }
       }
 
       // Attach event listeners for Konto
@@ -452,38 +456,7 @@ document.addEventListener('DOMContentLoaded', () => {
             currentData.settings.emailNotifications = emailToggle.checked;
             saveApliHubUserData(currentData);
             showToast(emailToggle.checked ? 'Włączono powiadomienia e-mail' : 'Wyłączono powiadomienia e-mail');
-          });
-        }
-      }
-
-      // Attach event listeners for connected accounts buttons
-      if (actionType === 'polaczone') {
-        document.querySelectorAll('.btn-toggle-social').forEach(btn => {
-          btn.addEventListener('click', () => {
-            const key = btn.getAttribute('data-social-key');
-            const currentData = getApliHubUserData();
-            const currentState = !!currentData.connectedAccounts[key];
-            const newState = !currentState;
-
-            currentData.connectedAccounts[key] = newState;
-            saveApliHubUserData(currentData);
-
-            if (newState) {
-              btn.textContent = 'Odłącz';
-              btn.style.background = 'rgba(239, 68, 68, 0.15)';
-              btn.style.borderColor = 'rgba(239, 68, 68, 0.4)';
-              btn.style.color = '#f87171';
-              showToast(`Połączono konto ${key.toUpperCase()}`);
-            } else {
-              btn.textContent = 'Połącz';
-              btn.style.background = 'rgba(245, 158, 11, 0.15)';
-              btn.style.borderColor = 'rgba(245, 158, 11, 0.4)';
-              btn.style.color = '#f59e0b';
-              showToast(`Odłączono konto ${key.toUpperCase()}`);
-            }
-          });
-        });
-      }
+      // Attach event listeners for connected accounts buttons (removed)
     }
   }
 

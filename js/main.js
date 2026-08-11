@@ -194,13 +194,13 @@ document.addEventListener('DOMContentLoaded', () => {
     if (item.id === 'app-1' || item.name.includes('Algo Analyzer')) {
       if (isDevAuthorized) {
         buttonHtml = `
-          <a class="btn-download btn-installer-active" href="assets/installer/ApliHub_AlgoAnalyzer_Setup.exe" download="ApliHub_AlgoAnalyzer_Setup.exe" style="background: linear-gradient(135deg, #10b981, #059669); color: #fff; text-decoration: none; display: inline-flex; align-items: center; gap: 6px; padding: 7px 16px; border-radius: var(--radius-sm); font-weight: 700; font-size: 0.82rem; box-shadow: 0 0 12px rgba(16,185,129,0.3);">
+          <a class="btn-download" href="assets/installer/ApliHub_AlgoAnalyzer_Setup.exe" download="ApliHub_AlgoAnalyzer_Setup.exe" style="text-decoration: none;">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
               <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
               <polyline points="7 10 12 15 17 10"></polyline>
               <line x1="12" y1="15" x2="12" y2="3"></line>
             </svg>
-            Pobierz i Zainstaluj (.exe)
+            Pobierz
           </a>
         `;
       } else {
