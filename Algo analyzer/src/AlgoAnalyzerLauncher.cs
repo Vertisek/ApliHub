@@ -30,7 +30,6 @@ namespace ApliHub.AlgoAnalyzer
         private Button _btnLaunch;
         private Button _btnWeb;
         private Button _btnOpenFolder;
-        private NotifyIcon _trayIcon;
 
         public MainWindow()
         {
@@ -40,7 +39,7 @@ namespace ApliHub.AlgoAnalyzer
 
         private void InitializeComponent()
         {
-            this.Text = "ApliHub - Algo Analyzer Desktop v1.0";
+            this.Text = "ApliHub - Algo Analyzer Desktop";
             this.Size = new Size(520, 420);
             this.StartPosition = FormStartPosition.CenterScreen;
             this.FormBorderStyle = FormBorderStyle.FixedDialog;
@@ -61,9 +60,8 @@ namespace ApliHub.AlgoAnalyzer
             }
             else
             {
-                // Fallback to parent directories if running from subfolder
                 string parent1 = Path.GetDirectoryName(baseDir.TrimEnd(Path.DirectorySeparatorChar));
-                if (Directory.Exists(Path.Combine(parent1, "Algo analyzer")))
+                if (parent1 != null && Directory.Exists(Path.Combine(parent1, "Algo analyzer")))
                     _appDirectory = Path.Combine(parent1, "Algo analyzer");
                 else
                     _appDirectory = baseDir;
@@ -82,14 +80,14 @@ namespace ApliHub.AlgoAnalyzer
             };
 
             Label lblTitle = new Label();
-            lblTitle.Text = "⚡ ALGO ANALYZER DESKTOP";
+            lblTitle.Text = "ALGO ANALYZER DESKTOP";
             lblTitle.Font = new Font("Segoe UI", 14F, FontStyle.Bold);
             lblTitle.ForeColor = Color.FromArgb(245, 158, 11);
             lblTitle.Location = new Point(20, 15);
             lblTitle.AutoSize = true;
 
             Label lblSub = new Label();
-            lblSub.Text = "Autorskie narzędzie analityczne ApliHub dla Social Mediów";
+            lblSub.Text = "Autorskie narzedzie analityczne ApliHub dla Social Mediow";
             lblSub.Font = new Font("Segoe UI", 9F, FontStyle.Regular);
             lblSub.ForeColor = Color.FromArgb(156, 163, 175);
             lblSub.Location = new Point(22, 45);
@@ -112,8 +110,8 @@ namespace ApliHub.AlgoAnalyzer
             };
 
             Label lblDot = new Label();
-            lblDot.Text = "●";
-            lblDot.Font = new Font("Segoe UI", 12F, FontStyle.Bold);
+            lblDot.Text = "[OK]";
+            lblDot.Font = new Font("Segoe UI", 10F, FontStyle.Bold);
             lblDot.ForeColor = Color.FromArgb(34, 197, 94);
             lblDot.Location = new Point(15, 15);
             lblDot.AutoSize = true;
@@ -122,14 +120,14 @@ namespace ApliHub.AlgoAnalyzer
             _lblStatus.Text = "Silnik aplikacji aktywny. Gotowy do pracy.";
             _lblStatus.Font = new Font("Segoe UI", 10F, FontStyle.Bold);
             _lblStatus.ForeColor = Color.FromArgb(240, 240, 245);
-            _lblStatus.Location = new Point(35, 15);
+            _lblStatus.Location = new Point(55, 15);
             _lblStatus.AutoSize = true;
 
             Label lblPort = new Label();
-            lblPort.Text = "Lokalny port: " + _port + " | Status: Offline/Online Ready";
+            lblPort.Text = "Lokalny port: " + _port + " | Status: Gotowy";
             lblPort.Font = new Font("Segoe UI", 9F, FontStyle.Regular);
             lblPort.ForeColor = Color.FromArgb(156, 163, 175);
-            lblPort.Location = new Point(35, 42);
+            lblPort.Location = new Point(55, 42);
             lblPort.AutoSize = true;
 
             statusPanel.Controls.Add(lblDot);
@@ -139,7 +137,7 @@ namespace ApliHub.AlgoAnalyzer
 
             // Primary Launch Button
             _btnLaunch = new Button();
-            _btnLaunch.Text = "🚀 URUCHOM ALGO ANALYZER";
+            _btnLaunch.Text = "URUCHOM ALGO ANALYZER";
             _btnLaunch.Location = new Point(20, 205);
             _btnLaunch.Size = new Size(465, 48);
             _btnLaunch.FlatStyle = FlatStyle.Flat;
@@ -153,7 +151,7 @@ namespace ApliHub.AlgoAnalyzer
 
             // Secondary Buttons
             _btnWeb = new Button();
-            _btnWeb.Text = "🌐 Strona Główna ApliHub";
+            _btnWeb.Text = "Strona Glowna ApliHub";
             _btnWeb.Location = new Point(20, 268);
             _btnWeb.Size = new Size(225, 42);
             _btnWeb.FlatStyle = FlatStyle.Flat;
@@ -162,11 +160,13 @@ namespace ApliHub.AlgoAnalyzer
             _btnWeb.ForeColor = Color.White;
             _btnWeb.Font = new Font("Segoe UI", 9.5F, FontStyle.Regular);
             _btnWeb.Cursor = Cursors.Hand;
-            _btnWeb.Click += (s, e) => Process.Start("https://aplihub.pl");
+            _btnWeb.Click += (s, e) => {
+                try { Process.Start("https://aplihub.pl"); } catch { }
+            };
             this.Controls.Add(_btnWeb);
 
             _btnOpenFolder = new Button();
-            _btnOpenFolder.Text = "📁 Katalog Aplikacji";
+            _btnOpenFolder.Text = "Katalog Aplikacji";
             _btnOpenFolder.Location = new Point(260, 268);
             _btnOpenFolder.Size = new Size(225, 42);
             _btnOpenFolder.FlatStyle = FlatStyle.Flat;
@@ -176,14 +176,16 @@ namespace ApliHub.AlgoAnalyzer
             _btnOpenFolder.Font = new Font("Segoe UI", 9.5F, FontStyle.Regular);
             _btnOpenFolder.Cursor = Cursors.Hand;
             _btnOpenFolder.Click += (s, e) => {
-                if (Directory.Exists(_appDirectory)) Process.Start("explorer.exe", _appDirectory);
-                else Process.Start("explorer.exe", AppDomain.CurrentDomain.BaseDirectory);
+                try {
+                    if (Directory.Exists(_appDirectory)) Process.Start("explorer.exe", _appDirectory);
+                    else Process.Start("explorer.exe", AppDomain.CurrentDomain.BaseDirectory);
+                } catch { }
             };
             this.Controls.Add(_btnOpenFolder);
 
             // Footer
             Label lblFoot = new Label();
-            lblFoot.Text = "ApliHub © 2026. Wszelkie prawa zastrzeżone.";
+            lblFoot.Text = "ApliHub. Wszelkie prawa zastrzezone.";
             lblFoot.Font = new Font("Segoe UI", 8.5F, FontStyle.Regular);
             lblFoot.ForeColor = Color.FromArgb(100, 110, 130);
             lblFoot.Location = new Point(20, 335);
@@ -214,9 +216,9 @@ namespace ApliHub.AlgoAnalyzer
                 _serverThread.IsBackground = true;
                 _serverThread.Start();
             }
-            catch (Exception ex)
+            catch
             {
-                if (_lblStatus != null) _lblStatus.Text = "Tryb bezpośredni plikowy";
+                if (_lblStatus != null) _lblStatus.Text = "Tryb bezposredni plikowy";
             }
         }
 
@@ -229,12 +231,14 @@ namespace ApliHub.AlgoAnalyzer
 
                 string filePath = Path.Combine(_appDirectory, rawUrl.Replace('/', Path.DirectorySeparatorChar));
 
-                // If not found in appDir, try root
                 if (!File.Exists(filePath))
                 {
                     string rootPath = Path.GetDirectoryName(_appDirectory);
-                    string altPath = Path.Combine(rootPath, rawUrl.Replace('/', Path.DirectorySeparatorChar));
-                    if (File.Exists(altPath)) filePath = altPath;
+                    if (rootPath != null)
+                    {
+                        string altPath = Path.Combine(rootPath, rawUrl.Replace('/', Path.DirectorySeparatorChar));
+                        if (File.Exists(altPath)) filePath = altPath;
+                    }
                 }
 
                 if (File.Exists(filePath))
@@ -294,7 +298,7 @@ namespace ApliHub.AlgoAnalyzer
             }
             catch (Exception ex)
             {
-                MessageBox.Show("Błąd podczas uruchamiania: " + ex.Message, "Błąd", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show("Blad podczas uruchamiania: " + ex.Message, "Blad", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
 

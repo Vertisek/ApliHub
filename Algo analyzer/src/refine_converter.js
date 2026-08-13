@@ -1,10 +1,16 @@
-/* Fast Konwerter (ReTrap) - In-Browser Test Suite & Live Converter */
+const fs = require('fs');
+const path = require('path');
 
-var conversionState = 'idle';
-var activeDownloadBlobUrl = null;
-var activeDownloadFileName = '';
+const fastKonwDir = path.resolve(__dirname, '../../Fast Konwerter');
+const jsDir = path.join(fastKonwDir, 'js');
 
-document.addEventListener('DOMContentLoaded', function() {
+const jsContent = `/* Fast Konwerter (ReTrap) - In-Browser Test Suite & Live Converter */
+
+let conversionState = 'idle'; // 'idle' | 'converting' | 'completed' | 'error'
+let activeDownloadBlobUrl = null;
+let activeDownloadFileName = '';
+
+document.addEventListener('DOMContentLoaded', () => {
   initTabs();
   initStudioConverter();
   initExtensionSimulator();
@@ -16,17 +22,17 @@ document.addEventListener('DOMContentLoaded', function() {
 
 /* Tabs Switching */
 function initTabs() {
-  var tabBtns = document.querySelectorAll('.nav-tab-btn');
-  var tabViews = document.querySelectorAll('.tab-view');
+  const tabBtns = document.querySelectorAll('.nav-tab-btn');
+  const tabViews = document.querySelectorAll('.tab-view');
 
-  tabBtns.forEach(function(btn) {
-    btn.addEventListener('click', function() {
-      tabBtns.forEach(function(b) { b.classList.remove('active'); });
-      tabViews.forEach(function(v) { v.classList.remove('active'); });
+  tabBtns.forEach(btn => {
+    btn.addEventListener('click', () => {
+      tabBtns.forEach(b => b.classList.remove('active'));
+      tabViews.forEach(v => v.classList.remove('active'));
 
       btn.classList.add('active');
-      var targetId = btn.getAttribute('data-tab');
-      var targetView = document.getElementById(targetId);
+      const targetId = btn.getAttribute('data-tab');
+      const targetView = document.getElementById(targetId);
       if (targetView) targetView.classList.add('active');
     });
   });
@@ -34,10 +40,10 @@ function initTabs() {
 
 /* User State Sync */
 function syncUserState() {
-  var user = typeof getApliHubUserData === 'function' ? getApliHubUserData() : {};
-  var userPill = document.getElementById('user-pill-btn');
-  var userAvatar = document.getElementById('user-pill-avatar');
-  var userName = document.getElementById('user-pill-name');
+  const user = typeof getApliHubUserData === 'function' ? getApliHubUserData() : {};
+  const userPill = document.getElementById('user-pill-btn');
+  const userAvatar = document.getElementById('user-pill-avatar');
+  const userName = document.getElementById('user-pill-name');
 
   if (!user || user.isLoggedIn === false) {
     if (userName) userName.textContent = 'Zaloguj się';
@@ -52,22 +58,22 @@ function syncUserState() {
 
 /* Studio Converter Logic */
 function initStudioConverter() {
-  var urlInput = document.getElementById('yt-url-input');
-  var statusMsg = document.getElementById('studio-status-msg');
-  var formatSelect = document.getElementById('format-select-dropdown');
-  var btnAction = document.getElementById('btn-convert-action');
-  var progressWrap = document.getElementById('studio-progress-wrap');
-  var progressFill = document.getElementById('progress-fill-blue');
-  var progressPct = document.getElementById('progress-pct-text');
-  var progressStage = document.getElementById('progress-stage-text');
-  var errorBox = document.getElementById('studio-error-box');
+  const urlInput = document.getElementById('yt-url-input');
+  const statusMsg = document.getElementById('studio-status-msg');
+  const formatSelect = document.getElementById('format-select-dropdown');
+  const btnAction = document.getElementById('btn-convert-action');
+  const progressWrap = document.getElementById('studio-progress-wrap');
+  const progressFill = document.getElementById('progress-fill-blue');
+  const progressPct = document.getElementById('progress-pct-text');
+  const progressStage = document.getElementById('progress-stage-text');
+  const errorBox = document.getElementById('studio-error-box');
 
   if (!btnAction) return;
 
-  btnAction.addEventListener('click', function() {
+  btnAction.addEventListener('click', async () => {
     // If already completed, trigger download
     if (conversionState === 'completed' && activeDownloadBlobUrl) {
-      var a = document.createElement('a');
+      const a = document.createElement('a');
       a.href = activeDownloadBlobUrl;
       a.download = activeDownloadFileName;
       document.body.appendChild(a);
@@ -77,7 +83,7 @@ function initStudioConverter() {
       return;
     }
 
-    var inputUrl = urlInput ? urlInput.value.trim() : '';
+    const inputUrl = urlInput ? urlInput.value.trim() : '';
     if (!inputUrl) {
       if (errorBox) {
         errorBox.textContent = 'Proszę wkleić prawidłowy link do materiału wideo!';
@@ -96,42 +102,36 @@ function initStudioConverter() {
     btnAction.disabled = true;
     btnAction.textContent = 'Konwertowanie...';
 
-    var selectedFormat = formatSelect ? formatSelect.value : 'mp3';
+    const selectedFormat = formatSelect ? formatSelect.value : 'mp3';
 
-    var stages = [
+    const stages = [
       { pct: 25, stage: 'Pobieranie strumienia materiału...' },
       { pct: 60, stage: 'Przetwarzanie audio/wideo (' + selectedFormat.toUpperCase() + ')...' },
       { pct: 90, stage: 'Pakowanie i optymalizacja pliku...' },
       { pct: 100, stage: 'Konwersja zakończona sukcesem!' }
     ];
 
-    var currentStageIdx = 0;
-    var interval = setInterval(function() {
-      if (currentStageIdx < stages.length) {
-        var s = stages[currentStageIdx];
-        if (progressFill) progressFill.style.width = s.pct + '%';
-        if (progressPct) progressPct.textContent = s.pct + '%';
-        if (progressStage) progressStage.textContent = s.stage;
-        currentStageIdx++;
-      } else {
-        clearInterval(interval);
-        finishConversion(inputUrl, selectedFormat);
-      }
-    }, 450);
-  });
+    for (let i = 0; i < stages.length; i++) {
+      const s = stages[i];
+      if (progressFill) progressFill.style.width = s.pct + '%';
+      if (progressPct) progressPct.textContent = s.pct + '%';
+      if (progressStage) progressStage.textContent = s.stage;
+      await new Promise(r => setTimeout(r, 450));
+    }
 
-  function finishConversion(inputUrl, selectedFormat) {
-    var ext = 'mp3';
-    var mime = 'audio/mp3';
+    // Generate output file
+    let ext = 'mp3';
+    let mime = 'audio/mp3';
     if (selectedFormat === 'wav') { ext = 'wav'; mime = 'audio/wav'; }
     else if (selectedFormat.indexOf('mp4') !== -1 || selectedFormat === '1080p' || selectedFormat === '720p') { ext = 'mp4'; mime = 'video/mp4'; }
 
-    var rawTitle = inputUrl.indexOf('v=') !== -1 ? inputUrl.split('v=')[1].substring(0, 10) : 'material';
+    const rawTitle = inputUrl.indexOf('v=') !== -1 ? inputUrl.split('v=')[1].substring(0, 10) : 'material';
     activeDownloadFileName = 'ReTrap_' + rawTitle + '_' + selectedFormat + '.' + ext;
-    var fileContent = 'ReTrap Fast Konwerter\nFormat: ' + selectedFormat.toUpperCase() + '\nSource: ' + inputUrl + '\nGenerated by ApliHub Engine.';
-    var blob = new Blob([fileContent], { type: mime });
+    const fileContent = 'ReTrap Fast Konwerter\nFormat: ' + selectedFormat.toUpperCase() + '\nSource: ' + inputUrl + '\nGenerated by ApliHub Engine.';
+    const blob = new Blob([fileContent], { type: mime });
     activeDownloadBlobUrl = URL.createObjectURL(blob);
 
+    // Completed state
     conversionState = 'completed';
     btnAction.disabled = false;
     btnAction.textContent = 'Pobierz';
@@ -141,7 +141,8 @@ function initStudioConverter() {
       statusMsg.innerHTML = '<svg viewBox="0 0 24 24" width="16" height="16" stroke="#34d399" stroke-width="2.5" fill="none"><polyline points="20 6 9 17 4 12"></polyline></svg><span style="color: #34d399; font-weight: 700;">Gotowe! Kliknij Pobierz, aby zapisać plik.</span>';
     }
 
-    var autoLink = document.createElement('a');
+    // Auto-trigger first download
+    const autoLink = document.createElement('a');
     autoLink.href = activeDownloadBlobUrl;
     autoLink.download = activeDownloadFileName;
     document.body.appendChild(autoLink);
@@ -149,17 +150,17 @@ function initStudioConverter() {
     document.body.removeChild(autoLink);
 
     showToast('Pobrano plik: ' + activeDownloadFileName);
-  }
+  });
 }
 
 /* Simulator Multi-Platform View */
 function initExtensionSimulator() {
-  var contentEl = document.getElementById('sim-platform-content');
-  var navBtns = document.querySelectorAll('.sim-nav-btn');
-  var simModal = document.getElementById('sim-popup-modal');
-  var btnCloseSim = document.getElementById('sim-close-modal');
+  const contentEl = document.getElementById('sim-platform-content');
+  const navBtns = document.querySelectorAll('.sim-nav-btn');
+  const simModal = document.getElementById('sim-popup-modal');
+  const btnCloseSim = document.getElementById('sim-close-modal');
 
-  var currentPlatform = 'yt';
+  let currentPlatform = 'yt';
 
   function renderPlatformMock(p) {
     if (!contentEl) return;
@@ -213,6 +214,7 @@ function initExtensionSimulator() {
         '<div style="width: 180px; padding: 20px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 16px; border-left: 1px solid rgba(255,255,255,0.08);">' +
           '<div style="text-align: center; font-size: 12px; color: #aaa;">42.5K polubień</div>' +
           '<div style="text-align: center; font-size: 12px; color: #aaa;">1.2K komentarzy</div>' +
+          '<div style="text-align: center; font-size: 12px; color: #aaa;">Udostępnij</div>' +
           '<button id="sim-techno-btn-tt" style="background: #0e1118; color: #f1f5f9; border: 1px solid rgba(59, 130, 246, 0.45); padding: 8px 16px; border-radius: 8px; font-weight: 700; font-size: 12px; display: inline-flex; align-items: center; gap: 6px; cursor: pointer; box-shadow: 0 0 12px rgba(37,99,235,0.3); width: 100%; justify-content: center;">' +
             '<svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="#60a5fa" stroke-width="2.5">' +
               '<path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>' +
@@ -251,17 +253,17 @@ function initExtensionSimulator() {
       '</div>';
     }
 
-    var anyBtn = contentEl.querySelector('button[id^="sim-techno-btn"]');
+    const anyBtn = contentEl.querySelector('button[id^="sim-techno-btn"]');
     if (anyBtn && simModal) {
-      anyBtn.addEventListener('click', function() {
+      anyBtn.addEventListener('click', () => {
         simModal.style.display = 'flex';
       });
     }
   }
 
-  navBtns.forEach(function(btn) {
-    btn.addEventListener('click', function() {
-      navBtns.forEach(function(b) { b.classList.remove('active'); });
+  navBtns.forEach(btn => {
+    btn.addEventListener('click', () => {
+      navBtns.forEach(b => b.classList.remove('active'));
       btn.classList.add('active');
       currentPlatform = btn.getAttribute('data-platform');
       renderPlatformMock(currentPlatform);
@@ -271,20 +273,20 @@ function initExtensionSimulator() {
   renderPlatformMock('yt');
 
   // Modal option buttons handler
-  var modalOptions = document.querySelectorAll('.sim-modal-option');
-  modalOptions.forEach(function(opt) {
-    opt.addEventListener('click', function() {
-      var format = opt.getAttribute('data-format') || 'mp3';
+  const modalOptions = document.querySelectorAll('.sim-modal-option');
+  modalOptions.forEach(opt => {
+    opt.addEventListener('click', () => {
+      const format = opt.getAttribute('data-format') || 'mp3';
       if (simModal) simModal.style.display = 'none';
 
-      var ext = 'mp3';
-      var mime = 'audio/mp3';
+      let ext = 'mp3';
+      let mime = 'audio/mp3';
       if (format === 'wav') { ext = 'wav'; mime = 'audio/wav'; }
       else if (format.indexOf('mp4') !== -1 || format === '1080p' || format === '720p') { ext = 'mp4'; mime = 'video/mp4'; }
 
-      var fileName = 'ReTrap_Download_' + format + '.' + ext;
-      var blob = new Blob(['ReTrap Download - Format: ' + format], { type: mime });
-      var a = document.createElement('a');
+      const fileName = 'ReTrap_Download_' + format + '.' + ext;
+      const blob = new Blob(['ReTrap Download - Format: ' + format], { type: mime });
+      const a = document.createElement('a');
       a.href = URL.createObjectURL(blob);
       a.download = fileName;
       document.body.appendChild(a);
@@ -296,7 +298,7 @@ function initExtensionSimulator() {
   });
 
   if (btnCloseSim && simModal) {
-    btnCloseSim.addEventListener('click', function() {
+    btnCloseSim.addEventListener('click', () => {
       simModal.style.display = 'none';
     });
   }
@@ -304,25 +306,25 @@ function initExtensionSimulator() {
 
 /* Auth Module (Login & Register Modal) */
 function initAuthModule() {
-  var userPill = document.getElementById('user-pill-btn');
-  var authModal = document.getElementById('auth-modal-overlay');
-  var closeModalBtn = document.getElementById('auth-close-btn');
+  const userPill = document.getElementById('user-pill-btn');
+  const authModal = document.getElementById('auth-modal-overlay');
+  const closeModalBtn = document.getElementById('auth-close-btn');
 
-  var tabLogin = document.getElementById('auth-tab-login');
-  var tabReg = document.getElementById('auth-tab-reg');
-  var formLogin = document.getElementById('fast-login-form');
-  var formReg = document.getElementById('fast-reg-form');
+  const tabLogin = document.getElementById('auth-tab-login');
+  const tabReg = document.getElementById('auth-tab-reg');
+  const formLogin = document.getElementById('fast-login-form');
+  const formReg = document.getElementById('fast-reg-form');
 
   if (userPill) {
-    userPill.addEventListener('click', function() {
-      var user = typeof getApliHubUserData === 'function' ? getApliHubUserData() : {};
+    userPill.addEventListener('click', () => {
+      const user = typeof getApliHubUserData === 'function' ? getApliHubUserData() : {};
       if (!user || user.isLoggedIn === false) {
         if (authModal) authModal.classList.add('active');
       } else {
         if (confirm('Jesteś zalogowany jako ' + user.name + '. Czy chcesz się wylogować?')) {
           localStorage.setItem('aplihub_logged_out', 'true');
           if (typeof saveApliHubUserData === 'function') {
-            saveApliHubUserData({ isLoggedIn: false, name: 'Gość', email: '' });
+            saveApliHubUserData({ ...DEFAULT_USER_STORE, isLoggedIn: false, name: 'Gość', email: '' });
           }
           syncUserState();
           showToast('Wylogowano pomyślnie.');
@@ -332,13 +334,13 @@ function initAuthModule() {
   }
 
   if (closeModalBtn && authModal) {
-    closeModalBtn.addEventListener('click', function() {
+    closeModalBtn.addEventListener('click', () => {
       authModal.classList.remove('active');
     });
   }
 
   if (tabLogin && tabReg) {
-    tabLogin.addEventListener('click', function() {
+    tabLogin.addEventListener('click', () => {
       tabLogin.style.background = '#2563eb';
       tabLogin.style.color = '#fff';
       tabReg.style.background = 'transparent';
@@ -347,7 +349,7 @@ function initAuthModule() {
       if (formReg) formReg.style.display = 'none';
     });
 
-    tabReg.addEventListener('click', function() {
+    tabReg.addEventListener('click', () => {
       tabReg.style.background = '#2563eb';
       tabReg.style.color = '#fff';
       tabLogin.style.background = 'transparent';
@@ -358,11 +360,12 @@ function initAuthModule() {
   }
 
   if (formLogin) {
-    formLogin.addEventListener('submit', function(e) {
+    formLogin.addEventListener('submit', (e) => {
       e.preventDefault();
-      var email = document.getElementById('fast-login-email').value.trim();
+      const email = document.getElementById('fast-login-email').value.trim();
 
-      var newUser = {
+      const newUser = {
+        ...DEFAULT_USER_STORE,
         isLoggedIn: true,
         name: email.split('@')[0],
         email: email,
@@ -378,12 +381,13 @@ function initAuthModule() {
   }
 
   if (formReg) {
-    formReg.addEventListener('submit', function(e) {
+    formReg.addEventListener('submit', (e) => {
       e.preventDefault();
-      var user = document.getElementById('fast-reg-user').value.trim();
-      var email = document.getElementById('fast-reg-email').value.trim();
+      const user = document.getElementById('fast-reg-user').value.trim();
+      const email = document.getElementById('fast-reg-email').value.trim();
 
-      var newUser = {
+      const newUser = {
+        ...DEFAULT_USER_STORE,
         isLoggedIn: true,
         name: user,
         email: email,
@@ -400,15 +404,19 @@ function initAuthModule() {
 }
 
 function showToast(msg) {
-  var container = document.getElementById('toast-container');
+  const container = document.getElementById('toast-container');
   if (!container) return;
-  var toast = document.createElement('div');
+  const toast = document.createElement('div');
   toast.className = 'toast';
   toast.innerHTML = '<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="#60a5fa" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg><div>' + msg + '</div>';
   container.appendChild(toast);
-  setTimeout(function() {
+  setTimeout(() => {
     toast.style.opacity = '0';
     toast.style.transition = '0.3s';
-    setTimeout(function() { toast.remove(); }, 300);
+    setTimeout(() => toast.remove(), 300);
   }, 3500);
 }
+`;
+
+fs.writeFileSync(path.join(jsDir, 'converter-app.js'), jsContent, 'utf8');
+console.log('[SUCCESS] Refined Fast Konwerter js/converter-app.js without any emoji or syntax issues');

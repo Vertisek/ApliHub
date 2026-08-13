@@ -808,3 +808,107 @@ setupYouTubeNavigationListeners();
 setInterval(runUpdateLoop, 1000);
 runUpdateLoop();
 console.log("ReTrap: Skrypt content.js zainicjalizowany z obsługą nawigacji SPA YouTube.");
+
+
+// ==========================================================================
+// RETRAP MULTI-PLATFORM TECHNO BUTTON INJECTOR
+// ==========================================================================
+
+function createTechnoButton(platform) {
+  const btn = document.createElement('button');
+  btn.className = 'retrap-techno-btn retrap-techno-' + platform;
+  btn.setAttribute('data-retrap-injected', 'true');
+  btn.setAttribute('type', 'button');
+  btn.setAttribute('title', 'Pobierz przez ReTrap');
+
+  btn.innerHTML = `
+    <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="color: #60a5fa; flex-shrink: 0;">
+      <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+      <polyline points="7 10 12 15 17 10"></polyline>
+      <line x1="12" y1="15" x2="12" y2="3"></line>
+    </svg>
+    <span>Pobierz</span>
+  `;
+
+  btn.style.cssText = `
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    background: #0e1118;
+    color: #f1f5f9;
+    border: 1px solid rgba(59, 130, 246, 0.45);
+    padding: 8px 16px;
+    border-radius: 20px;
+    font-size: 13px;
+    font-weight: 700;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    cursor: pointer;
+    box-shadow: 0 0 12px rgba(37, 99, 235, 0.25);
+    transition: all 0.2s ease;
+    user-select: none;
+    z-index: 999;
+    margin: 0 4px;
+  `;
+
+  btn.addEventListener('mouseenter', () => {
+    btn.style.background = '#151b28';
+    btn.style.borderColor = '#3b82f6';
+    btn.style.boxShadow = '0 0 16px rgba(59, 130, 246, 0.5)';
+    btn.style.transform = 'translateY(-1px)';
+  });
+
+  btn.addEventListener('mouseleave', () => {
+    btn.style.background = '#0e1118';
+    btn.style.borderColor = 'rgba(59, 130, 246, 0.45)';
+    btn.style.boxShadow = '0 0 12px rgba(37, 99, 235, 0.25)';
+    btn.style.transform = 'none';
+  });
+
+  btn.addEventListener('click', (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    openReTrapModal();
+  });
+
+  return btn;
+}
+
+function injectTechnoButtons() {
+  const host = window.location.hostname.toLowerCase();
+
+  // 1. YouTube
+  if (host.includes('youtube.com') && window.location.href.includes('watch?v=')) {
+    const actionsContainer = document.querySelector('#actions-inner #menu ytd-menu-renderer, #top-level-buttons-computed');
+    if (actionsContainer && !actionsContainer.querySelector('[data-retrap-injected="true"]')) {
+      const btn = createTechnoButton('youtube');
+      actionsContainer.prepend(btn);
+    }
+  }
+
+  // 2. TikTok
+  if (host.includes('tiktok.com')) {
+    const actionBars = document.querySelectorAll('[data-e2e="feed-video-action-bar"], [class*="DivActionItemContainer"], [class*="ActionBarWrapper"]');
+    actionBars.forEach(bar => {
+      if (!bar.querySelector('[data-retrap-injected="true"]')) {
+        const btn = createTechnoButton('tiktok');
+        btn.style.borderRadius = '8px';
+        btn.style.padding = '6px 12px';
+        bar.appendChild(btn);
+      }
+    });
+  }
+
+  // 3. Instagram
+  if (host.includes('instagram.com')) {
+    const actionBars = document.querySelectorAll('section [role="button"], article section, [class*="x126k92a"]');
+    actionBars.forEach(bar => {
+      if (bar.tagName === 'SECTION' && !bar.querySelector('[data-retrap-injected="true"]')) {
+        const btn = createTechnoButton('instagram');
+        btn.style.padding = '6px 12px';
+        bar.appendChild(btn);
+      }
+    });
+  }
+}
+
+setInterval(injectTechnoButtons, 1200);

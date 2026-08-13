@@ -39,7 +39,7 @@ namespace ApliHub.FastKonwerter
 
         private void InitializeComponent()
         {
-            this.Text = "ApliHub - Fast Konwerter Desktop v1.2";
+            this.Text = "ApliHub - Fast Konwerter Desktop";
             this.Size = new Size(520, 430);
             this.StartPosition = FormStartPosition.CenterScreen;
             this.FormBorderStyle = FormBorderStyle.FixedDialog;
@@ -60,7 +60,7 @@ namespace ApliHub.FastKonwerter
             else
             {
                 string parent1 = Path.GetDirectoryName(baseDir.TrimEnd(Path.DirectorySeparatorChar));
-                if (Directory.Exists(Path.Combine(parent1, "Fast Konwerter")))
+                if (parent1 != null && Directory.Exists(Path.Combine(parent1, "Fast Konwerter")))
                     _appDirectory = Path.Combine(parent1, "Fast Konwerter");
                 else
                     _appDirectory = baseDir;
@@ -79,14 +79,14 @@ namespace ApliHub.FastKonwerter
             };
 
             Label lblTitle = new Label();
-            lblTitle.Text = "⚡ FAST KONWERTER (RETRAP)";
+            lblTitle.Text = "FAST KONWERTER (RETRAP)";
             lblTitle.Font = new Font("Segoe UI", 14F, FontStyle.Bold);
             lblTitle.ForeColor = Color.FromArgb(96, 165, 250);
             lblTitle.Location = new Point(20, 15);
             lblTitle.AutoSize = true;
 
             Label lblSub = new Label();
-            lblSub.Text = "Wtyczka i Konwerter YouTube / MP3 / WAV / MP4 (1080p, 720p)";
+            lblSub.Text = "Wtyczka i Konwerter YouTube, TikTok i Instagram (MP3/WAV/MP4)";
             lblSub.Font = new Font("Segoe UI", 9F, FontStyle.Regular);
             lblSub.ForeColor = Color.FromArgb(156, 163, 175);
             lblSub.Location = new Point(22, 45);
@@ -109,24 +109,24 @@ namespace ApliHub.FastKonwerter
             };
 
             Label lblDot = new Label();
-            lblDot.Text = "●";
-            lblDot.Font = new Font("Segoe UI", 12F, FontStyle.Bold);
+            lblDot.Text = "[OK]";
+            lblDot.Font = new Font("Segoe UI", 10F, FontStyle.Bold);
             lblDot.ForeColor = Color.FromArgb(59, 130, 246);
             lblDot.Location = new Point(15, 15);
             lblDot.AutoSize = true;
 
             _lblStatus = new Label();
-            _lblStatus.Text = "Moduł konwersji i asystent wtyczki gotowy.";
+            _lblStatus.Text = "Modul konwersji i asystent wtyczki gotowy.";
             _lblStatus.Font = new Font("Segoe UI", 10F, FontStyle.Bold);
             _lblStatus.ForeColor = Color.FromArgb(240, 240, 245);
-            _lblStatus.Location = new Point(35, 15);
+            _lblStatus.Location = new Point(55, 15);
             _lblStatus.AutoSize = true;
 
             Label lblPort = new Label();
-            lblPort.Text = "Kompatybilność: Chrome, Brave, Edge, Opera | Format V3 Web Store";
+            lblPort.Text = "Kompatybilnosc: Chrome, Brave, Edge, Opera | Format V3 Web Store";
             lblPort.Font = new Font("Segoe UI", 9F, FontStyle.Regular);
             lblPort.ForeColor = Color.FromArgb(156, 163, 175);
-            lblPort.Location = new Point(35, 42);
+            lblPort.Location = new Point(55, 42);
             lblPort.AutoSize = true;
 
             statusPanel.Controls.Add(lblDot);
@@ -136,7 +136,7 @@ namespace ApliHub.FastKonwerter
 
             // Primary Launch Button
             _btnLaunch = new Button();
-            _btnLaunch.Text = "🚀 URUCHOM KONWERTER W PRZEGLĄDARCE";
+            _btnLaunch.Text = "URUCHOM KONWERTER W PRZEGLADARCE";
             _btnLaunch.Location = new Point(20, 205);
             _btnLaunch.Size = new Size(465, 48);
             _btnLaunch.FlatStyle = FlatStyle.Flat;
@@ -150,7 +150,7 @@ namespace ApliHub.FastKonwerter
 
             // Secondary Action Buttons
             _btnInstallChrome = new Button();
-            _btnInstallChrome.Text = "🧩 Zainstaluj Wtyczkę w Chrome";
+            _btnInstallChrome.Text = "Zainstaluj Wtyczke w Chrome";
             _btnInstallChrome.Location = new Point(20, 268);
             _btnInstallChrome.Size = new Size(225, 42);
             _btnInstallChrome.FlatStyle = FlatStyle.Flat;
@@ -163,7 +163,7 @@ namespace ApliHub.FastKonwerter
             this.Controls.Add(_btnInstallChrome);
 
             _btnOpenFolder = new Button();
-            _btnOpenFolder.Text = "📁 Otwórz Folder Wtyczki";
+            _btnOpenFolder.Text = "Otwarz Folder Wtyczki";
             _btnOpenFolder.Location = new Point(260, 268);
             _btnOpenFolder.Size = new Size(225, 42);
             _btnOpenFolder.FlatStyle = FlatStyle.Flat;
@@ -173,14 +173,16 @@ namespace ApliHub.FastKonwerter
             _btnOpenFolder.Font = new Font("Segoe UI", 9.5F, FontStyle.Regular);
             _btnOpenFolder.Cursor = Cursors.Hand;
             _btnOpenFolder.Click += (s, e) => {
-                if (Directory.Exists(_appDirectory)) Process.Start("explorer.exe", _appDirectory);
-                else Process.Start("explorer.exe", AppDomain.CurrentDomain.BaseDirectory);
+                try {
+                    if (Directory.Exists(_appDirectory)) Process.Start("explorer.exe", _appDirectory);
+                    else Process.Start("explorer.exe", AppDomain.CurrentDomain.BaseDirectory);
+                } catch { }
             };
             this.Controls.Add(_btnOpenFolder);
 
             // Footer
             Label lblFoot = new Label();
-            lblFoot.Text = "ApliHub © 2026. Zgodne ze standardem Chrome Web Store Manifest V3.";
+            lblFoot.Text = "ApliHub. Zgodne ze standardem Chrome Web Store Manifest V3.";
             lblFoot.Font = new Font("Segoe UI", 8.5F, FontStyle.Regular);
             lblFoot.ForeColor = Color.FromArgb(100, 110, 130);
             lblFoot.Location = new Point(20, 335);
@@ -226,8 +228,11 @@ namespace ApliHub.FastKonwerter
                 if (!File.Exists(filePath))
                 {
                     string rootPath = Path.GetDirectoryName(_appDirectory);
-                    string altPath = Path.Combine(rootPath, rawUrl.Replace('/', Path.DirectorySeparatorChar));
-                    if (File.Exists(altPath)) filePath = altPath;
+                    if (rootPath != null)
+                    {
+                        string altPath = Path.Combine(rootPath, rawUrl.Replace('/', Path.DirectorySeparatorChar));
+                        if (File.Exists(altPath)) filePath = altPath;
+                    }
                 }
 
                 if (File.Exists(filePath))
@@ -243,6 +248,7 @@ namespace ApliHub.FastKonwerter
                         case ".png": mime = "image/png"; break;
                         case ".jpg": case ".jpeg": mime = "image/jpeg"; break;
                         case ".svg": mime = "image/svg+xml"; break;
+                        case ".woff2": mime = "font/woff2"; break;
                     }
 
                     ctx.Response.ContentType = mime;
@@ -286,7 +292,7 @@ namespace ApliHub.FastKonwerter
             }
             catch (Exception ex)
             {
-                MessageBox.Show("Błąd: " + ex.Message, "Fast Konwerter", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show("Blad: " + ex.Message, "Fast Konwerter", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
 

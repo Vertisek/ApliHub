@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Fast Konwerter (ReTrap) - Studio Konwersji YouTube & Wtyczka</title>
+  <title>Fast Konwerter (ReTrap) - Twój Szybki i Darmowy Konwerter</title>
   <link rel="stylesheet" href="css/converter.css">
   <link rel="icon" href="icon48.png" type="image/png">
 </head>
@@ -16,17 +16,14 @@
   <header class="top-nav">
     <div class="nav-container">
       <div class="brand-wrap" onclick="location.reload()">
-        <div class="brand-logo">⚡</div>
-        <div>
-          <span class="brand-name">FAST KONWERTER</span>
-          <span class="brand-tag">v1.2.0</span>
-        </div>
+        <img src="icon48.png" alt="ReTrap Logo" class="brand-logo-img">
+        <span class="brand-name">FAST KONWERTER</span>
       </div>
 
       <nav class="nav-tabs">
-        <button class="nav-tab-btn active" data-tab="tab-studio">⚡ Studio Konwersji</button>
-        <button class="nav-tab-btn" data-tab="tab-extension-sim">🧩 Symulator Wtyczki</button>
-        <button class="nav-tab-btn" data-tab="tab-webstore">📦 Chrome Web Store</button>
+        <button class="nav-tab-btn active" data-tab="tab-studio">Studio Konwersji</button>
+        <button class="nav-tab-btn" data-tab="tab-extension-sim">Symulator Wtyczki</button>
+        <button class="nav-tab-btn" data-tab="tab-webstore">Pobierz i Wgraj</button>
       </nav>
 
       <div class="user-pill" id="user-pill-btn">
@@ -42,160 +39,70 @@
     <!-- View 1: Studio Konwersji -->
     <div class="tab-view active" id="tab-studio">
       <div class="hero-box">
-        <h1>Szybka Konwersja Social Mediów</h1>
-        <p>Pobierz film lub piosenkę z YouTube do formatu MP3, WAV lub MP4 w krystalicznej jakości.</p>
+        <h1>Twój szybki i darmowy konwerter</h1>
+        <p>Wklej link z YouTube, TikToka lub Instagrama, wybierz format i pobierz gotowy plik.</p>
       </div>
 
-      <!-- URL Input Area -->
-      <div class="url-card">
-        <div class="url-input-group">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#60a5fa" stroke-width="2">
-            <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path>
-            <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path>
-          </svg>
-          <input type="text" id="yt-url-input" class="url-input" placeholder="Wklej link do wideo (np. https://www.youtube.com/watch?v=...)" value="https://www.youtube.com/watch?v=5qap5aO4i9A">
-          <button class="btn-fetch" id="btn-fetch-video">Wczytaj</button>
+      <!-- Studio Input Bar Box -->
+      <div class="studio-bar-container">
+        <div class="studio-input-bar">
+          <input type="text" id="yt-url-input" class="studio-url-input" placeholder="Wklej link do wideo (np. https://www.youtube.com/watch?v=...)" value="https://www.youtube.com/watch?v=5qap5aO4i9A">
+          
+          <div id="studio-status-msg" class="studio-status-msg">
+            <svg viewBox="0 0 24 24" width="16" height="16" stroke="#60a5fa" stroke-width="2.5" fill="none">
+              <circle cx="12" cy="12" r="10"></circle>
+              <polyline points="12 6 12 12 16 14"></polyline>
+            </svg>
+            <span>Konwersja w toku... proszę czekać.</span>
+          </div>
+
+          <select id="format-select-dropdown" class="format-select">
+            <option value="mp3">MP3 (320 kbps)</option>
+            <option value="wav">WAV (Studyjny Master)</option>
+            <option value="1080p">MP4 (1080p Full HD)</option>
+            <option value="720p">MP4 (720p HD)</option>
+          </select>
+
+          <button class="btn-techno-action" id="btn-convert-action">
+            Konwertuj
+          </button>
         </div>
 
-        <div class="quick-demos">
-          <span class="quick-label">⚡ Przetestuj gotowe wideo:</span>
-          <button class="chip-btn" data-demo-idx="0">🎵 Lofi Chill Beat</button>
-          <button class="chip-btn" data-demo-idx="1">🏙️ Cyberpunk Soundtrack</button>
-          <button class="chip-btn" data-demo-idx="2">🎙️ Tech AI Podcast</button>
-        </div>
-      </div>
-
-      <!-- Video Preview Card -->
-      <div class="video-preview-card">
-        <div class="video-thumb-wrap">
-          <img src="https://images.unsplash.com/photo-1518709268805-4e9042af9f23?w=500&auto=format&fit=crop&q=60" alt="Thumbnail" class="video-thumb-img" id="video-thumb-display">
-          <span class="video-duration" id="video-duration-display">3:45:00</span>
-        </div>
-        <div class="video-details">
-          <h3 class="video-title" id="video-title-display">Lofi Hip Hop Radio - Beats to Relax / Study to [2026 Edition]</h3>
-          <div class="video-meta">
-            <span id="video-author-display">Lofi Girl</span>
-            <span>•</span>
-            <span id="video-views-display">45.2M wyświetleń</span>
-            <span>•</span>
-            <span style="color: #10b981; font-weight: 700;">HD 1080p Dostępne</span>
+        <!-- Blue Progress Bar -->
+        <div class="studio-progress-wrap" id="studio-progress-wrap">
+          <div class="progress-info">
+            <span id="progress-stage-text">Przetwarzanie strumienia...</span>
+            <span id="progress-pct-text">0%</span>
+          </div>
+          <div class="progress-track">
+            <div class="progress-fill-blue" id="progress-fill-blue"></div>
           </div>
         </div>
-      </div>
 
-      <!-- Format Selection Cards -->
-      <div class="format-grid">
-        <!-- MP3 -->
-        <div class="format-card selected" data-format="mp3">
-          <div class="format-header">
-            <span class="format-name">🎵 MP3 (Audio)</span>
-            <span class="format-badge">320 kbps</span>
-          </div>
-          <p class="format-desc">Konwertuj do wysokiej jakości audio MP3. Idealne do smartfona, samochodu i playlist.</p>
-          <div class="format-radio"><span>●</span> Wybrano format</div>
+        <!-- Error box if failed -->
+        <div class="error-message-box" id="studio-error-box">
+          Nie udało się pobrać strumienia wideo. Sprawdź poprawność linku i spróbuj ponownie.
         </div>
-
-        <!-- WAV -->
-        <div class="format-card" data-format="wav">
-          <div class="format-header">
-            <span class="format-name">🎼 WAV (Master)</span>
-            <span class="format-badge">Lossless</span>
-          </div>
-          <p class="format-desc">Konwertuj do świetnej, bezstratnej jakości studyjnej audio WAV bez jakiejkolwiek kompresji.</p>
-          <div class="format-radio"><span>○</span> Wybierz format</div>
-        </div>
-
-        <!-- MP4 1080p -->
-        <div class="format-card" data-format="1080p">
-          <div class="format-header">
-            <span class="format-name">🎬 MP4 (1080p)</span>
-            <span class="format-badge">Full HD</span>
-          </div>
-          <p class="format-desc">Pobierz wideo w pełnej krystalicznej rozdzielczości 1080p 60fps z oryginalnym dźwiękiem.</p>
-          <div class="format-radio"><span>○</span> Wybierz format</div>
-        </div>
-
-        <!-- MP4 720p -->
-        <div class="format-card" data-format="720p">
-          <div class="format-header">
-            <span class="format-name">📱 MP4 (720p)</span>
-            <span class="format-badge">Fast HD</span>
-          </div>
-          <p class="format-desc">Zbalansowana jakość wideo HD przy mniejszym rozmiarze pliku. Błyskawiczne pobieranie.</p>
-          <div class="format-radio"><span>○</span> Wybierz format</div>
-        </div>
-      </div>
-
-      <!-- Action & Progress Area -->
-      <div class="action-box">
-        <button class="btn-convert-main" id="btn-convert-start">
-          <span>⚡</span> Rozpocznij Konwersję & Pobierz
-        </button>
-
-        <div class="progress-box" id="conversion-progress-box">
-          <div class="progress-header">
-            <span id="progress-status-title">Przetwarzanie strumienia...</span>
-            <span id="progress-pct-display">0%</span>
-          </div>
-          <div class="progress-bar-bg">
-            <div class="progress-bar-fill" id="progress-bar-fill"></div>
-          </div>
-          <div class="progress-stage" id="progress-stage-display">Inicjalizacja silnika ReTrap...</div>
-        </div>
-
-        <div class="result-box" id="conversion-result-box"></div>
       </div>
     </div>
 
-    <!-- View 2: YouTube Extension Simulator -->
+    <!-- View 2: YouTube & Socials Extension Simulator -->
     <div class="tab-view" id="tab-extension-sim">
       <div class="hero-box">
-        <h1>Symulator Wtyczki na YouTube</h1>
-        <p>Zobacz, jak wtyczka ReTrap integruje się bezpośrednio pod filmami na YouTube jednym kliknięciem.</p>
+        <h1>Symulator Wtyczki na Social Mediach</h1>
+        <p>Wybierz platformę i zobacz jak przyjemny przycisk techno integruje się bezpośrednio pod postami i filmami.</p>
       </div>
 
-      <!-- YouTube Mock UI -->
-      <div style="background: #0f0f11; border: 1px solid rgba(255,255,255,0.1); border-radius: 16px; overflow: hidden; box-shadow: 0 16px 40px rgba(0,0,0,0.6);">
-        <!-- Mock Top Bar -->
-        <div style="background: #0f0f0f; padding: 12px 20px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid rgba(255,255,255,0.06);">
-          <div style="display: flex; align-items: center; gap: 10px;">
-            <span style="color: #ff0000; font-size: 20px; font-weight: 900;">▶</span>
-            <span style="font-weight: 800; font-size: 16px; letter-spacing: -0.5px;">YouTube</span>
-          </div>
-          <div style="background: #1f1f1f; padding: 6px 16px; border-radius: 20px; font-size: 12px; color: #aaa; width: 300px;">Szukaj na YouTube...</div>
-          <div style="width: 28px; height: 28px; border-radius: 50%; background: #3b82f6; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 800;">O</div>
-        </div>
+      <!-- Platform Switcher -->
+      <div class="sim-platform-nav">
+        <button class="sim-nav-btn active" data-platform="yt">YouTube</button>
+        <button class="sim-nav-btn" data-platform="tt">TikTok</button>
+        <button class="sim-nav-btn" data-platform="ig">Instagram</button>
+      </div>
 
-        <!-- Mock Video Player Area -->
-        <div style="position: relative; width: 100%; height: 360px; background: #000; display: flex; align-items: center; justify-content: center;">
-          <img src="https://images.unsplash.com/photo-1518709268805-4e9042af9f23?w=1200&auto=format&fit=crop&q=80" style="width: 100%; height: 100%; object-fit: cover; opacity: 0.75;" alt="YouTube video frame">
-          <div style="position: absolute; width: 64px; height: 64px; background: rgba(0,0,0,0.7); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 24px; color: #fff; cursor: pointer;">▶</div>
-        </div>
-
-        <!-- Video Info & ReTrap Action Button Bar -->
-        <div style="padding: 20px;">
-          <h2 style="font-size: 20px; font-weight: 700; margin-bottom: 12px;">Lofi Hip Hop Radio - 24/7 Beats to Relax / Work [Official Stream]</h2>
-          
-          <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px; padding-bottom: 16px; border-bottom: 1px solid rgba(255,255,255,0.08);">
-            <div style="display: flex; align-items: center; gap: 12px;">
-              <div style="width: 42px; height: 42px; border-radius: 50%; background: #f59e0b; display: flex; align-items: center; justify-content: center; font-weight: 800;">LG</div>
-              <div>
-                <div style="font-weight: 700; font-size: 14px;">Lofi Girl ✓</div>
-                <div style="font-size: 12px; color: #888;">14.3M subskrybentów</div>
-              </div>
-              <button style="background: #fff; color: #000; border: none; padding: 8px 16px; border-radius: 20px; font-weight: 700; font-size: 13px; margin-left: 10px; cursor: pointer;">Subskrybuj</button>
-            </div>
-
-            <!-- Injected ReTrap Button -->
-            <div style="display: flex; gap: 10px; align-items: center;">
-              <button id="sim-btn-download" style="background: linear-gradient(135deg, #2563eb, #06b6d4); color: #fff; border: none; padding: 10px 20px; border-radius: 20px; font-weight: 800; font-size: 13px; display: flex; align-items: center; gap: 8px; cursor: pointer; box-shadow: 0 0 16px rgba(37,99,235,0.5); transition: transform 0.2s;">
-                <span>⚡</span> Pobierz (ReTrap)
-              </button>
-              <button style="background: rgba(255,255,255,0.1); color: #fff; border: none; padding: 8px 16px; border-radius: 20px; font-size: 13px; cursor: pointer;">👍 184K</button>
-              <button style="background: rgba(255,255,255,0.1); color: #fff; border: none; padding: 8px 16px; border-radius: 20px; font-size: 13px; cursor: pointer;">Udostępnij</button>
-            </div>
-          </div>
-        </div>
+      <!-- Mock Container -->
+      <div id="sim-platform-content" style="background: #0f0f11; border: 1px solid rgba(255,255,255,0.1); border-radius: 16px; overflow: hidden; box-shadow: 0 16px 40px rgba(0,0,0,0.6);">
+        <!-- Dynamically rendered by converter-app.js -->
       </div>
 
       <!-- Extension Popup Modal Mock -->
@@ -203,30 +110,30 @@
         <div style="background: #0f0f11; border: 1px solid rgba(255,255,255,0.1); box-shadow: 0 16px 40px rgba(0,0,0,0.8); border-radius: 16px; width: 90%; max-width: 440px; padding: 24px;">
           <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
             <div style="display: flex; align-items: center; gap: 10px;">
-              <span style="font-size: 22px;">⚡</span>
+              <img src="icon48.png" alt="ReTrap Logo" style="width: 24px; height: 24px; border-radius: 6px;">
               <span style="font-size: 18px; font-weight: 700; color: #fff;">ReTrap konwerter</span>
             </div>
             <button id="sim-close-modal" style="background: transparent; border: none; color: #888; font-size: 22px; cursor: pointer;">&times;</button>
           </div>
 
           <div style="display: flex; flex-direction: column; gap: 12px;">
-            <div style="background: #181920; border: 1px solid rgba(255,255,255,0.06); padding: 14px; border-radius: 10px; cursor: pointer;" onclick="alert('Pobieranie MP3 rozpoczęte!')">
-              <div style="font-weight: 700; color: #fff;">🎵 Pobierz jako MP3 (320 kbps)</div>
+            <div class="sim-modal-option" data-format="mp3" style="background: #181920; border: 1px solid rgba(255,255,255,0.06); padding: 14px; border-radius: 10px; cursor: pointer; transition: all 0.2s;">
+              <div style="font-weight: 700; color: #fff;">Pobierz jako MP3 (320 kbps)</div>
               <div style="font-size: 12px; color: #94a3b8; margin-top: 4px;">Konwertuj do wysokiej jakości audio mp3</div>
             </div>
 
-            <div style="background: #181920; border: 1px solid rgba(255,255,255,0.06); padding: 14px; border-radius: 10px; cursor: pointer;" onclick="alert('Pobieranie WAV rozpoczęte!')">
-              <div style="font-weight: 700; color: #fff;">🎼 Pobierz jako WAV (Lossless)</div>
-              <div style="font-size: 12px; color: #94a3b8; margin-top: 4px;">Konwertuj do świetnej jakości audio wav</div>
+            <div class="sim-modal-option" data-format="wav" style="background: #181920; border: 1px solid rgba(255,255,255,0.06); padding: 14px; border-radius: 10px; cursor: pointer; transition: all 0.2s;">
+              <div style="font-weight: 700; color: #fff;">Pobierz jako WAV (Studyjny Master)</div>
+              <div style="font-size: 12px; color: #94a3b8; margin-top: 4px;">Konwertuj do świetnej bezstratnej jakości audio wav</div>
             </div>
 
-            <div style="background: #181920; border: 1px solid rgba(255,255,255,0.06); padding: 14px; border-radius: 10px; cursor: pointer;" onclick="alert('Pobieranie MP4 1080p rozpoczęte!')">
-              <div style="font-weight: 700; color: #fff;">🎬 Pobierz MP4 1080p (Full HD)</div>
+            <div class="sim-modal-option" data-format="1080p" style="background: #181920; border: 1px solid rgba(255,255,255,0.06); padding: 14px; border-radius: 10px; cursor: pointer; transition: all 0.2s;">
+              <div style="font-weight: 700; color: #fff;">Pobierz MP4 1080p (Full HD)</div>
               <div style="font-size: 12px; color: #94a3b8; margin-top: 4px;">Pobierz wideo w wysokiej rozdzielczości 1080p</div>
             </div>
 
-            <div style="background: #181920; border: 1px solid rgba(255,255,255,0.06); padding: 14px; border-radius: 10px; cursor: pointer;" onclick="alert('Pobieranie MP4 720p rozpoczęte!')">
-              <div style="font-weight: 700; color: #fff;">📱 Pobierz MP4 720p (HD)</div>
+            <div class="sim-modal-option" data-format="720p" style="background: #181920; border: 1px solid rgba(255,255,255,0.06); padding: 14px; border-radius: 10px; cursor: pointer; transition: all 0.2s;">
+              <div style="font-weight: 700; color: #fff;">Pobierz MP4 720p (HD)</div>
               <div style="font-size: 12px; color: #94a3b8; margin-top: 4px;">Szybkie pobieranie wideo w rozdzielczości 720p</div>
             </div>
           </div>
@@ -234,38 +141,101 @@
       </div>
     </div>
 
-    <!-- View 3: Chrome Web Store Package Info -->
+    <!-- View 3: Chrome Web Store & Download Guide -->
     <div class="tab-view" id="tab-webstore">
       <div class="hero-box">
-        <h1>Paczka Rozszerzenia Chrome Web Store</h1>
-        <p>Rozszerzenie jest w 100% gotowe do publikacji w sklepie Google Chrome Web Store lub instalacji lokalnej.</p>
+        <h1>Pobierz i wgraj darmowy konwerter do swojej przeglądarki!</h1>
+        <p>Ułatw sobie pobieranie materiałów z sociali jedną instalacją.</p>
       </div>
 
-      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px;">
-        <div style="background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 24px;">
-          <h3 style="font-size: 18px; font-weight: 800; color: #60a5fa; margin-bottom: 12px;">📦 Pliki do Pobrania</h3>
-          <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 18px;">Pobierz oficjalną paczkę ZIP dla Chrome Web Store lub instalator EXE dla systemu Windows.</p>
-          
-          <div style="display: flex; flex-direction: column; gap: 12px;">
-            <a href="../assets/installer/Fast_Konwerter_Chrome_Extension.zip" download="Fast_Konwerter_Chrome_Extension.zip" style="display: flex; align-items: center; justify-content: center; gap: 8px; background: linear-gradient(135deg, #2563eb, #06b6d4); color: #fff; padding: 12px; border-radius: 8px; font-weight: 700; font-size: 13px; text-decoration: none;">
-              ⬇️ Pobierz Paczkę Web Store (.zip)
+      <div class="downloads-container">
+        <!-- Download Cards Row across full width -->
+        <div class="download-cards-row">
+          <!-- Card 1: EXE -->
+          <div class="download-card-box">
+            <div>
+              <h3>Plik Wykonywalny (.EXE)</h3>
+              <p>Automatyczny instalator dla systemu Windows. Błyskawiczna instalacja jednym kliknięciem.</p>
+            </div>
+            <a href="../assets/installer/ApliHub_FastKonwerter_Setup.exe" download="ApliHub_FastKonwerter_Setup.exe" class="btn-techno-action" style="text-decoration: none; width: 100%;">
+              Pobierz Instalator .EXE
             </a>
+          </div>
 
-            <a href="../assets/installer/ApliHub_FastKonwerter_Setup.exe" download="ApliHub_FastKonwerter_Setup.exe" style="display: flex; align-items: center; justify-content: center; gap: 8px; background: rgba(255,255,255,0.06); border: 1px solid var(--border); color: #fff; padding: 12px; border-radius: 8px; font-weight: 700; font-size: 13px; text-decoration: none;">
-              🖥️ Pobierz Instalator Desktop (.exe)
+          <!-- Card 2: ZIP -->
+          <div class="download-card-box">
+            <div>
+              <h3>Paczka Rozszerzenia (.ZIP)</h3>
+              <p>Oficjalna paczka rozszerzenia dla przeglądarek Google Chrome, Brave, Microsoft Edge oraz Opera.</p>
+            </div>
+            <a href="../assets/installer/Fast_Konwerter_Chrome_Extension.zip" download="Fast_Konwerter_Chrome_Extension.zip" class="btn-techno-action" style="text-decoration: none; width: 100%; background: linear-gradient(135deg, #0ea5e9, #0284c7);">
+              Pobierz Paczkę .ZIP
             </a>
           </div>
         </div>
 
-        <div style="background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 24px;">
-          <h3 style="font-size: 18px; font-weight: 800; color: #34d399; margin-bottom: 12px;">✓ Zgodność z Google Chrome V3</h3>
-          <ul style="list-style: none; display: flex; flex-direction: column; gap: 10px; font-size: 13px; color: #cbd5e1;">
-            <li>✓ <strong>Manifest V3:</strong> Pełna zgodność ze standardem Google 2026</li>
-            <li>✓ <strong>Uprawnienia:</strong> Tylko niezbędne (storage, downloads, youtube.com)</li>
-            <li>✓ <strong>Ikony:</strong> Kompletny zestaw 16x16, 48x48, 128x128</li>
-            <li>✓ <strong>Bezpieczeństwo:</strong> Brak zewnętrznych skryptów eval</li>
-          </ul>
+        <!-- Step-by-Step Installation Guide -->
+        <div class="guide-box">
+          <div class="guide-title">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#60a5fa" stroke-width="2.5">
+              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+              <polyline points="14 2 14 8 20 8"></polyline>
+              <line x1="16" y1="13" x2="8" y2="13"></line>
+              <line x1="16" y1="17" x2="8" y2="17"></line>
+              <polyline points="10 9 9 9 8 9"></polyline>
+            </svg>
+            <span>Instrukcja wgrania konwertera do przeglądarki</span>
+          </div>
+
+          <div class="guide-grid">
+            <!-- Col 1: Instrukcja EXE -->
+            <div class="guide-col">
+              <h4>Opcja 1: Instalacja z pliku .EXE</h4>
+              <ul class="guide-steps">
+                <li class="guide-step-item">
+                  <span class="step-number">1</span>
+                  <span>Pobierz plik <strong>ApliHub_FastKonwerter_Setup.exe</strong> za pomocą przycisku powyżej.</span>
+                </li>
+                <li class="guide-step-item">
+                  <span class="step-number">2</span>
+                  <span>Uruchom pobrany plik instalatora (kliknij dwukrotnie w plik .exe).</span>
+                </li>
+                <li class="guide-step-item">
+                  <span class="step-number">3</span>
+                  <span>Kliknij przycisk „Zainstaluj w Chrome” lub „Uruchom Konwerter”. Gotowe!</span>
+                </li>
+              </ul>
+            </div>
+
+            <!-- Col 2: Instrukcja ZIP -->
+            <div class="guide-col">
+              <h4>Opcja 2: Instalacja z paczki .ZIP (Chrome / Edge / Brave / Opera)</h4>
+              <ul class="guide-steps">
+                <li class="guide-step-item">
+                  <span class="step-number">1</span>
+                  <span>Pobierz paczkę <strong>Fast_Konwerter_Chrome_Extension.zip</strong> i rozpakuj ją do wybranego folderu.</span>
+                </li>
+                <li class="guide-step-item">
+                  <span class="step-number">2</span>
+                  <span>Wpisz w pasku adresu przeglądarki <code>chrome://extensions/</code> (lub <code>edge://extensions/</code>).</span>
+                </li>
+                <li class="guide-step-item">
+                  <span class="step-number">3</span>
+                  <span>Włącz przełącznik <strong>„Tryb programisty”</strong> (Developer mode) w prawym górnym rogu.</span>
+                </li>
+                <li class="guide-step-item">
+                  <span class="step-number">4</span>
+                  <span>Kliknij przycisk <strong>„Załaduj rozpakowane”</strong> (Load unpacked) i wskaż rozpakowany folder.</span>
+                </li>
+                <li class="guide-step-item">
+                  <span class="step-number">5</span>
+                  <span>Gotowe! Przycisk „Pobierz” pojawi się bezpośrednio na YouTube, TikToku i Instagramie.</span>
+                </li>
+              </ul>
+            </div>
+          </div>
         </div>
+
       </div>
     </div>
 
@@ -286,14 +256,14 @@
       <form id="fast-login-form" style="display: flex; flex-direction: column; gap: 12px;">
         <input type="email" id="fast-login-email" placeholder="Adres e-mail" required style="padding: 10px 14px; background: #0f1015; border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; color: #fff;">
         <input type="password" id="fast-login-pass" placeholder="Hasło" required style="padding: 10px 14px; background: #0f1015; border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; color: #fff;">
-        <button type="submit" style="background: #2563eb; color: #fff; padding: 12px; border: none; border-radius: 8px; font-weight: 700; cursor: pointer;">Zaloguj się →</button>
+        <button type="submit" style="background: #2563eb; color: #fff; padding: 12px; border: none; border-radius: 8px; font-weight: 700; cursor: pointer;">Zaloguj się</button>
       </form>
 
       <form id="fast-reg-form" style="display: none; flex-direction: column; gap: 12px;">
         <input type="text" id="fast-reg-user" placeholder="Nazwa użytkownika / Nick" required style="padding: 10px 14px; background: #0f1015; border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; color: #fff;">
         <input type="email" id="fast-reg-email" placeholder="Adres e-mail" required style="padding: 10px 14px; background: #0f1015; border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; color: #fff;">
         <input type="password" id="fast-reg-pass" placeholder="Hasło (min. 6 znaków)" minlength="6" required style="padding: 10px 14px; background: #0f1015; border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; color: #fff;">
-        <button type="submit" style="background: #2563eb; color: #fff; padding: 12px; border: none; border-radius: 8px; font-weight: 700; cursor: pointer;">Załóż darmowe konto →</button>
+        <button type="submit" style="background: #2563eb; color: #fff; padding: 12px; border: none; border-radius: 8px; font-weight: 700; cursor: pointer;">Załóż darmowe konto</button>
       </form>
     </div>
   </div>
