@@ -1472,12 +1472,76 @@
             </div>
         </div>
 
+        <!-- Modal: Logowanie & Rejestracja ApliHub (Tryb Testowy / Pełna Autoryzacja) -->
+        <div class="modal-card" id="modal-auth" style="max-width: 440px;">
+            <button class="modal-close-btn">&times;</button>
+            <div class="modal-title">
+                <span style="font-size: 1.3rem;">🔑</span>
+                <span id="algo-auth-title">Logowanie do ApliHub</span>
+            </div>
+            <div class="modal-subtitle" id="algo-auth-subtitle">Zaloguj się, aby zsynchronizować analizy i odblokować wszystkie algorytmy.</div>
+            <div class="modal-content">
+                
+                <!-- Auth Tabs Switcher -->
+                <div style="display: flex; gap: 8px; margin-bottom: 18px; background: rgba(0,0,0,0.4); padding: 4px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.06);">
+                    <button type="button" id="tab-algo-login" class="btn-auth-tab active" style="flex: 1; padding: 8px 12px; background: var(--color-yellow-main); color: #000; font-weight: 700; border: none; border-radius: 6px; cursor: pointer; font-size: 0.85rem; transition: 0.2s;">Zaloguj się</button>
+                    <button type="button" id="tab-algo-register" class="btn-auth-tab" style="flex: 1; padding: 8px 12px; background: transparent; color: #94a3b8; font-weight: 700; border: none; border-radius: 6px; cursor: pointer; font-size: 0.85rem; transition: 0.2s;">Zarejestruj się</button>
+                </div>
+
+                <!-- Form 1: Logowanie -->
+                <form id="form-algo-login" style="display: flex; flex-direction: column; gap: 14px;">
+                    <div class="form-group">
+                        <label class="form-label">Adres Email</label>
+                        <input type="email" id="algo-login-email" class="form-input" placeholder="np. jan@domena.pl" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Hasło</label>
+                        <input type="password" id="algo-login-password" class="form-input" placeholder="Wpisz swoje hasło" required>
+                    </div>
+                    <div id="algo-login-error" style="color: #ef4444; font-size: 0.82rem; font-weight: 600; display: none;"></div>
+                    <button type="submit" class="btn-yellow" style="width: 100%; margin-top: 4px;">Zaloguj się →</button>
+                </form>
+
+                <!-- Form 2: Rejestracja -->
+                <form id="form-algo-register" style="display: none; flex-direction: column; gap: 14px;">
+                    <div class="form-group">
+                        <label class="form-label">Nazwa Użytkownika / Nick</label>
+                        <input type="text" id="algo-reg-username" class="form-input" placeholder="np. Creator_Pro" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Adres Email</label>
+                        <input type="email" id="algo-reg-email" class="form-input" placeholder="np. twoj@email.pl" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Hasło</label>
+                        <input type="password" id="algo-reg-password" class="form-input" placeholder="Minimum 6 znaków" minlength="6" required>
+                    </div>
+                    <div id="algo-reg-error" style="color: #ef4444; font-size: 0.82rem; font-weight: 600; display: none;"></div>
+                    <button type="submit" class="btn-yellow" style="width: 100%; margin-top: 4px;">Załóż darmowe konto →</button>
+                </form>
+
+                <!-- OTP Verification Container -->
+                <div id="algo-otp-container" style="display: none; flex-direction: column; gap: 14px;">
+                    <div style="background: rgba(245,158,11,0.1); border: 1px solid rgba(245,158,11,0.3); border-radius: 8px; padding: 12px; font-size: 0.85rem; color: #f59e0b;">
+                        Wysłano 6-cyfrowy kod weryfikacyjny na podany adres e-mail. Wpisz go poniżej, aby aktywować konto.
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Kod z wiadomości E-mail</label>
+                        <input type="text" id="algo-otp-input" class="form-input" placeholder="123456" style="text-align: center; font-size: 1.2rem; letter-spacing: 4px;">
+                    </div>
+                    <button type="button" id="btn-algo-verify-otp" class="btn-yellow" style="width: 100%;">Zweryfikuj i Aktywuj Konto</button>
+                </div>
+
+            </div>
+        </div>
+
     </div>
 
     <!-- Toast Notifications Container -->
     <div class="toast-container" id="toast-container"></div>
 
     <!-- Main JavaScript Logic -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="../js/data.js"></script>
     <script src="js/i18n.js"></script>
     <script src="js/particles.js"></script>

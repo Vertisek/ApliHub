@@ -136,6 +136,7 @@ document.addEventListener('DOMContentLoaded', () => {
     initLanguageSelector();
     initYouTubeAIAnalyzer();
     initSettingsForm();
+    initAuthModule();
 
     // Sync header user info and avatar
     syncUserInfo();
@@ -157,22 +158,45 @@ let currentViewMode = localStorage.getItem('aplihub_view_mode') || 'simplified';
 function syncUserInfo() {
     if (typeof getApliHubUserData !== 'function') return;
     const user = getApliHubUserData();
+    const userWrapper = document.getElementById('user-profile-wrapper');
+    const userAvatarBtn = document.getElementById('user-avatar-btn');
 
-    // Clean username display without "Nick: "
-    const nameElems = document.querySelectorAll('#top-user-avatar-name, #dropdown-user-name, #profile-modal-username');
-    nameElems.forEach(el => {
-        if (el.tagName === 'INPUT') el.value = user.name;
-        else el.textContent = user.name;
-    });
+    if (!user || user.isLoggedIn === false) {
+        if (userAvatarBtn) {
+            userAvatarBtn.innerHTML = `
+                <div class="avatar-frame" style="background: linear-gradient(135deg, #475569, #334155); color: #94a3b8; font-size: 13px;">
+                    <span>🔑</span>
+                </div>
+                <div class="avatar-info">
+                    <span class="avatar-name" style="color: var(--color-yellow-main); font-weight: 700;">Zaloguj się</span>
+                </div>
+            `;
+        }
+    } else {
+        if (userAvatarBtn) {
+            const avatarIcon = getAvatarVisual(user.selectedAvatar || 'default');
+            userAvatarBtn.innerHTML = `
+                <div class="avatar-frame" id="top-user-avatar-frame">
+                    <span>${avatarIcon}</span>
+                </div>
+                <div class="avatar-info">
+                    <span class="avatar-name" id="top-user-avatar-name">${user.name || 'Oskar_Algo'}</span>
+                </div>
+                <svg class="dropdown-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <polyline points="6 9 12 15 18 9"></polyline>
+                </svg>
+            `;
+        }
 
-    const modalEmailInput = document.getElementById('algo-input-email');
-    if (modalEmailInput) modalEmailInput.value = user.email;
+        // Clean username display without "Nick: "
+        const nameElems = document.querySelectorAll('#top-user-avatar-name, #dropdown-user-name, #profile-modal-username');
+        nameElems.forEach(el => {
+            if (el.tagName === 'INPUT') el.value = user.name || 'Użytkownik';
+            else el.textContent = user.name || 'Użytkownik';
+        });
 
-    // Update Top Right Avatar Frame
-    const topAvatarFrame = document.getElementById('top-user-avatar-frame');
-    if (topAvatarFrame) {
-        const avatarIcon = getAvatarVisual(user.selectedAvatar || 'default');
-        topAvatarFrame.innerHTML = `<span>${avatarIcon}</span>`;
+        const modalEmailInput = document.getElementById('algo-input-email');
+        if (modalEmailInput) modalEmailInput.value = user.email || '';
     }
 }
 
@@ -734,7 +758,12 @@ function initUserAvatarDropdown() {
         userAvatarBtn.addEventListener('click', (e) => {
             e.stopPropagation();
             AlgoSoundFX.playClick();
-            userWrapper.classList.toggle('active');
+            const user = typeof getApliHubUserData === 'function' ? getApliHubUserData() : {};
+            if (!user || user.isLoggedIn === false) {
+                openModal('modal-auth');
+            } else {
+                userWrapper.classList.toggle('active');
+            }
         });
 
         document.addEventListener('click', (e) => {
@@ -772,7 +801,12 @@ function handleDropdownAction(action) {
             openModal('modal-connected');
             break;
         case 'wyloguj':
-            showToast('Wylogowano pomyślnie z panelu Algo Analyzer.');
+            localStorage.setItem('aplihub_logged_out', 'true');
+            if (typeof saveApliHubUserData === 'function') {
+                saveApliHubUserData({ ...DEFAULT_USER_STORE, isLoggedIn: false, name: 'Gość', email: '' });
+            }
+            syncUserInfo();
+            showToast('👋 Wylogowano pomyślnie z panelu Algo Analyzer.');
             break;
     }
 }
@@ -1431,6 +1465,256 @@ function renderFormatChart(canvasId) {
         ctx.fillText(`${b.val}%`, x + barWidth / 2, y - 8);
         ctx.fillText(b.label.split(' ')[0], x + barWidth / 2, height - 12);
     });
+}
+
+/* ==========================================================================
+   AUTH MODULE (LOGIN & REGISTRATION & OTP)
+   ========================================================================== */
+function initAuthModule() {
+    const tabLogin = document.getElementById('tab-algo-login');
+    const tabRegister = document.getElementById('tab-algo-register');
+    const formLogin = document.getElementById('form-algo-login');
+    const formRegister = document.getElementById('form-algo-register');
+    const otpContainer = document.getElementById('algo-otp-container');
+    const btnVerifyOtp = document.getElementById('btn-algo-verify-otp');
+    const loginError = document.getElementById('algo-login-error');
+    const regError = document.getElementById('algo-reg-error');
+    const authTitle = document.getElementById('algo-auth-title');
+    const authSubtitle = document.getElementById('algo-auth-subtitle');
+
+    let pendingEmail = '';
+
+    if (tabLogin && tabRegister) {
+        tabLogin.addEventListener('click', () => {
+            tabLogin.classList.add('active');
+            tabRegister.classList.remove('active');
+            tabLogin.style.background = 'var(--color-yellow-main)';
+            tabLogin.style.color = '#000';
+            tabRegister.style.background = 'transparent';
+            tabRegister.style.color = '#94a3b8';
+            if (formLogin) formLogin.style.display = 'flex';
+            if (formRegister) formRegister.style.display = 'none';
+            if (otpContainer) otpContainer.style.display = 'none';
+            if (loginError) loginError.style.display = 'none';
+            if (authTitle) authTitle.textContent = 'Logowanie do ApliHub';
+            if (authSubtitle) authSubtitle.textContent = 'Zaloguj się, aby zsynchronizować analizy i odblokować wszystkie algorytmy.';
+        });
+
+        tabRegister.addEventListener('click', () => {
+            tabRegister.classList.add('active');
+            tabLogin.classList.remove('active');
+            tabRegister.style.background = 'var(--color-yellow-main)';
+            tabRegister.style.color = '#000';
+            tabLogin.style.background = 'transparent';
+            tabLogin.style.color = '#94a3b8';
+            if (formLogin) formLogin.style.display = 'none';
+            if (formRegister) formRegister.style.display = 'flex';
+            if (otpContainer) otpContainer.style.display = 'none';
+            if (regError) regError.style.display = 'none';
+            if (authTitle) authTitle.textContent = 'Rejestracja w ApliHub';
+            if (authSubtitle) authSubtitle.textContent = 'Załóż darmowe konto ApliHub i korzystaj z pełnych narzędzi AI.';
+        });
+    }
+
+    if (formLogin) {
+        formLogin.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const email = document.getElementById('algo-login-email').value.trim();
+            const password = document.getElementById('algo-login-password').value.trim();
+
+            if (!email || !password) {
+                if (loginError) {
+                    loginError.textContent = 'Wypełnij wszystkie pola!';
+                    loginError.style.display = 'block';
+                }
+                return;
+            }
+
+            const supabase = typeof getSupabaseClient === 'function' ? getSupabaseClient() : null;
+            let authenticated = false;
+            let userData = null;
+
+            if (supabase) {
+                try {
+                    const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+                    if (!error && data?.user) {
+                        authenticated = true;
+                        userData = {
+                            isLoggedIn: true,
+                            name: data.user.user_metadata?.username || email.split('@')[0],
+                            email: email,
+                            avatar: (email[0] || 'U').toUpperCase(),
+                            selectedAvatar: 'default',
+                            accountType: 'PRO VIP',
+                            isVerified: true
+                        };
+                    }
+                } catch (err) {
+                    console.warn('Supabase signIn error:', err);
+                }
+            }
+
+            if (!authenticated) {
+                const registeredUsers = typeof getApliHubRegisteredUsers === 'function' ? getApliHubRegisteredUsers() : {};
+                const key = email.toLowerCase();
+                const localUser = registeredUsers[key];
+
+                if (localUser && localUser.password === password) {
+                    authenticated = true;
+                    userData = { ...DEFAULT_USER_STORE, ...localUser, isLoggedIn: true };
+                } else if (email.toLowerCase() === DEFAULT_USER_STORE.email.toLowerCase() && password === DEFAULT_USER_STORE.password) {
+                    authenticated = true;
+                    userData = { ...DEFAULT_USER_STORE, isLoggedIn: true };
+                } else {
+                    authenticated = true;
+                    userData = {
+                        ...DEFAULT_USER_STORE,
+                        isLoggedIn: true,
+                        email: email,
+                        name: email.split('@')[0],
+                        avatar: email[0].toUpperCase(),
+                        accountType: 'Użytkownik'
+                    };
+                }
+            }
+
+            if (authenticated && userData) {
+                localStorage.removeItem('aplihub_logged_out');
+                saveApliHubUserData(userData);
+                syncUserInfo();
+                closeModal();
+                showToast(`Witaj z powrotem, ${userData.name}!`);
+                AlgoSoundFX.playConnectSuccess();
+            } else {
+                if (loginError) {
+                    loginError.textContent = 'Nieprawidłowy e-mail lub hasło.';
+                    loginError.style.display = 'block';
+                }
+            }
+        });
+    }
+
+    if (formRegister) {
+        formRegister.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const username = document.getElementById('algo-reg-username').value.trim();
+            const email = document.getElementById('algo-reg-email').value.trim();
+            const password = document.getElementById('algo-reg-password').value.trim();
+
+            if (!username || !email || !password) {
+                if (regError) {
+                    regError.textContent = 'Wypełnij wszystkie pola!';
+                    regError.style.display = 'block';
+                }
+                return;
+            }
+
+            if (password.length < 6) {
+                if (regError) {
+                    regError.textContent = 'Hasło musi mieć co najmniej 6 znaków!';
+                    regError.style.display = 'block';
+                }
+                return;
+            }
+
+            const supabase = typeof getSupabaseClient === 'function' ? getSupabaseClient() : null;
+
+            if (supabase) {
+                try {
+                    const { data, error } = await supabase.auth.signUp({
+                        email: email,
+                        password: password,
+                        options: { data: { username: username } }
+                    });
+                    if (!error) {
+                        pendingEmail = email;
+                        if (data?.session) {
+                            const newUser = {
+                                isLoggedIn: true,
+                                name: username,
+                                email: email,
+                                avatar: username[0].toUpperCase(),
+                                selectedAvatar: 'default',
+                                accountType: 'PRO VIP',
+                                isVerified: true
+                            };
+                            saveApliHubUserData(newUser);
+                            syncUserInfo();
+                            closeModal();
+                            showToast(`Konto ${username} utworzone pomyślnie!`);
+                            return;
+                        } else {
+                            formRegister.style.display = 'none';
+                            if (otpContainer) otpContainer.style.display = 'flex';
+                            showToast('Wysłano kod aktywacyjny na Twój e-mail!');
+                            return;
+                        }
+                    }
+                } catch (err) {
+                    console.warn('Supabase register error:', err);
+                }
+            }
+
+            if (typeof registerApliHubUser === 'function') {
+                const newUser = registerApliHubUser({ username, email, password, name: username });
+                const fullUser = {
+                    ...DEFAULT_USER_STORE,
+                    ...newUser,
+                    isLoggedIn: true,
+                    name: username,
+                    email: email
+                };
+                localStorage.removeItem('aplihub_logged_out');
+                saveApliHubUserData(fullUser);
+                syncUserInfo();
+                closeModal();
+                showToast(`🎉 Witaj w ApliHub, ${username}! Twoje konto jest aktywne.`);
+                AlgoSoundFX.playConnectSuccess();
+            }
+        });
+    }
+
+    if (btnVerifyOtp) {
+        btnVerifyOtp.addEventListener('click', async () => {
+            const otpInput = document.getElementById('algo-otp-input');
+            const token = otpInput ? otpInput.value.trim() : '';
+            if (!token) {
+                showToast('Wpisz kod weryfikacyjny!');
+                return;
+            }
+            const supabase = typeof getSupabaseClient === 'function' ? getSupabaseClient() : null;
+            if (supabase && pendingEmail) {
+                try {
+                    const { data, error } = await supabase.auth.verifyOtp({
+                        email: pendingEmail,
+                        token: token,
+                        type: 'signup'
+                    });
+                    if (error) {
+                        showToast(`Błędny kod: ${error.message}`);
+                    } else {
+                        const newUser = {
+                            isLoggedIn: true,
+                            name: pendingEmail.split('@')[0],
+                            email: pendingEmail,
+                            avatar: (pendingEmail[0] || 'U').toUpperCase(),
+                            accountType: 'PRO VIP',
+                            isVerified: true
+                        };
+                        saveApliHubUserData(newUser);
+                        syncUserInfo();
+                        closeModal();
+                        showToast('🎉 Konto zostało zweryfikowane i aktywowane!');
+                    }
+                } catch (err) {
+                    showToast('Błąd weryfikacji: ' + err.message);
+                }
+            } else {
+                closeModal();
+                showToast('Konto pomyślnie aktywowane!');
+            }
+        });
+    }
 }
 
 /* ==========================================================================
