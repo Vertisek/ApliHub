@@ -780,16 +780,21 @@ input {
   position: absolute;
   right: 20px;
   top: 20px;
+  z-index: 10;
+  pointer-events: auto;
   background: transparent;
   border: none;
   color: var(--text-dim);
   font-size: 1.5rem;
   cursor: pointer;
   line-height: 1;
+  padding: 4px;
+  transition: var(--transition);
 }
 
 .btn-close-modal:hover {
   color: #fff;
+  transform: scale(1.15);
 }
 
 .modal-title {
@@ -799,6 +804,7 @@ input {
   display: flex;
   align-items: center;
   gap: 10px;
+  padding-right: 36px;
 }
 
 /* Toast Notification */

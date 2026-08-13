@@ -214,6 +214,29 @@ document.addEventListener('DOMContentLoaded', () => {
           </button>
         `;
       }
+    } else if (item.id === 'plug-2' || item.name.includes('Fast Konwerter')) {
+      if (isDevAuthorized) {
+        buttonHtml = `
+          <a class="btn-download" href="assets/installer/ApliHub_FastKonwerter_Setup.zip" download="ApliHub_FastKonwerter_Setup.zip" style="text-decoration: none;">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+              <polyline points="7 10 12 15 17 10"></polyline>
+              <line x1="12" y1="15" x2="12" y2="3"></line>
+            </svg>
+            Pobierz
+          </a>
+        `;
+      } else {
+        buttonHtml = `
+          <button class="btn-download btn-download-restricted" disabled style="opacity: 0.55; cursor: not-allowed; background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.1); color: #94a3b8; display: inline-flex; align-items: center; gap: 6px; padding: 7px 16px; border-radius: var(--radius-sm); font-weight: 600; font-size: 0.82rem;" title="Opcja pobierania dostępna wyłącznie dla konta deweloperskiego: vertis.biznes758@gmail.com">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+              <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+            </svg>
+            Pobieranie wyłączone
+          </button>
+        `;
+      }
     } else {
       buttonHtml = `
         <button class="btn-download" data-download-id="${item.id}" data-download-name="${item.name}">
@@ -554,7 +577,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
     document.getElementById('bug-report-form').addEventListener('submit', (e) => {
       e.preventDefault();
-      modalBackdrop.classList.remove('active');
+      if (typeof window.closeApliHubModal === 'function') {
+        window.closeApliHubModal();
+      } else {
+        modalBackdrop.classList.remove('active');
+      }
       showToast('Dziękujemy! Zgłoszenie błędu zostało wysłane.');
     });
   }
@@ -597,7 +624,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
     document.getElementById('proposal-report-form').addEventListener('submit', (e) => {
       e.preventDefault();
-      modalBackdrop.classList.remove('active');
+      if (typeof window.closeApliHubModal === 'function') {
+        window.closeApliHubModal();
+      } else {
+        modalBackdrop.classList.remove('active');
+      }
       showToast('Super! Twoja propozycja została przesłana do zespołu.');
     });
   }

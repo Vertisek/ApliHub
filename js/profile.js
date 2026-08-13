@@ -48,15 +48,53 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
 
-  // Toggle Dropdown or Open Login Modal
-  if (profileTrigger && profileContainer) {
-    profileTrigger.addEventListener('click', (e) => {
-      e.stopPropagation();
-      const user = getApliHubUserData();
-      if (!user || user.isLoggedIn === false) {
-        openLoginModal();
-      } else {
-        profileContainer.classList.toggle('open');
+  // Toggle Dropdown or Open Login Modal (with robust closest selector)
+  if (profileContainer) {
+    profileContainer.addEventListener('click', (e) => {
+      const trigger = e.target.closest('#profileTrigger');
+      if (trigger) {
+        e.stopPropagation();
+        const user = getApliHubUserData();
+        if (!user || user.isLoggedIn === false) {
+          openLoginModal();
+        } else {
+          profileContainer.classList.toggle('open');
+        }
+        return;
+      }
+
+      const actionItem = e.target.closest('[data-profile-action]');
+      if (actionItem) {
+        const action = actionItem.getAttribute('data-profile-action');
+        profileContainer.classList.remove('open');
+
+        if (action === 'wyloguj') {
+          const profileTriggerBtn = document.getElementById('profileTrigger');
+          const avatarCircle = profileTriggerBtn ? profileTriggerBtn.querySelector('.avatar-circle') : null;
+
+          if (avatarCircle) {
+            avatarCircle.classList.remove('avatar-glow-pop', 'avatar-logout-shrink');
+            void avatarCircle.offsetWidth; // Force reflow
+            avatarCircle.classList.add('avatar-logout-shrink');
+          }
+
+          setTimeout(() => {
+            localStorage.setItem('aplihub_logged_out', 'true');
+            localStorage.removeItem('aplihub_user');
+            localStorage.removeItem('aplihub_user_store');
+            localStorage.removeItem('aplihub_token');
+            sessionStorage.clear();
+
+            const loggedOutData = { ...DEFAULT_USER_STORE, isLoggedIn: false, name: 'Gość', email: '' };
+            saveApliHubUserData(loggedOutData);
+
+            showToast('👋 Zostałeś pomyślnie wylogowany. Do zobaczenia!');
+            updateHeaderUserInfo();
+          }, 200);
+          return;
+        }
+
+        openProfileModal(action);
       }
     });
 
@@ -67,45 +105,20 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  // Handle Profile Dropdown Items Click
-  document.querySelectorAll('[data-profile-action]').forEach(button => {
-    button.addEventListener('click', (e) => {
-      const action = button.getAttribute('data-profile-action');
-      if (profileContainer) profileContainer.classList.remove('open');
+  // Close Modal Events & Global Modal Close Handler
+  function closeModal() {
+    const backdrop = document.getElementById('modalBackdrop');
+    if (backdrop) {
+      backdrop.classList.remove('active');
+    }
+  }
+  window.closeApliHubModal = closeModal;
 
-      if (action === 'wyloguj') {
-        const profileTriggerBtn = document.getElementById('profileTrigger');
-        const avatarCircle = profileTriggerBtn ? profileTriggerBtn.querySelector('.avatar-circle') : null;
-
-        if (avatarCircle) {
-          avatarCircle.classList.remove('avatar-glow-pop', 'avatar-logout-shrink');
-          void avatarCircle.offsetWidth; // Force reflow
-          avatarCircle.classList.add('avatar-logout-shrink');
-        }
-
-        setTimeout(() => {
-          localStorage.setItem('aplihub_logged_out', 'true');
-          localStorage.removeItem('aplihub_user');
-          localStorage.removeItem('aplihub_user_store');
-          localStorage.removeItem('aplihub_token');
-          sessionStorage.clear();
-
-          const loggedOutData = { ...DEFAULT_USER_STORE, isLoggedIn: false, name: 'Gość', email: '' };
-          saveApliHubUserData(loggedOutData);
-
-          showToast('👋 Zostałeś pomyślnie wylogowany. Do zobaczenia!');
-          updateHeaderUserInfo();
-        }, 200);
-        return;
-      }
-
-      openProfileModal(action);
-    });
-  });
-
-  // Close Modal Events
   if (closeModalBtn) {
-    closeModalBtn.addEventListener('click', closeModal);
+    closeModalBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      closeModal();
+    });
   }
 
   let modalMouseDownTarget = null;
@@ -121,11 +134,13 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  function closeModal() {
-    if (modalBackdrop) {
-      modalBackdrop.classList.remove('active');
+  // Global Escape key listener to close active modals or profile dropdown
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') {
+      closeModal();
+      if (profileContainer) profileContainer.classList.remove('open');
     }
-  }
+  });
 
   function showToast(message) {
     const toastContainer = document.getElementById('toastContainer');
