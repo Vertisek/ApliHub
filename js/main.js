@@ -12,11 +12,11 @@ window.openLiveAppSandbox = function(appType, initialTab) {
   if (appType === 'algo' || appType === 'algo-demo') {
     // Only Algo Analyzer Simulator
     iframe.src = 'Algo analyzer/index.html?cb=' + Date.now();
-  } else if (appType === 'plikio-sim' || appType === 'plixy-sim' || appType === 'konwerter-sim') {
-    // Only Plikio Simulator (Jak działa?)
+  } else if (appType === 'plixy-sim' || appType === 'plixy-sim' || appType === 'konwerter-sim') {
+    // Only Plixy Simulator (Jak działa?)
     iframe.src = 'Fast Konwerter/index.html?tab=tab-extension-sim&cb=' + Date.now() + '#tab-extension-sim';
   } else {
-    // Only Plikio Studio & Download
+    // Only Plixy Studio & Download
     const tab = initialTab || 'tab-studio';
     iframe.src = 'Fast Konwerter/index.html?tab=' + tab + '&cb=' + Date.now() + '#' + tab;
   }
@@ -66,7 +66,7 @@ window.openAppLaunchModal = function(item) {
   if (!backdrop || !title || !content) return;
 
   const isAlgo = item.id === 'app-1' || item.name.includes('Algo Analyzer');
-  const isKonwerter = item.id === 'plug-2' || item.name.includes('Plikio') || item.name.includes('Fast Konwerter');
+  const isKonwerter = item.id === 'plug-2' || item.name.includes('Plixy') || item.name.includes('Fast Konwerter');
 
   title.innerHTML = `⚡ ${item.name} <span style="font-size: 0.8rem; opacity: 0.7;">(${item.version})</span>`;
 
@@ -79,7 +79,7 @@ window.openAppLaunchModal = function(item) {
     downloadLabel = 'Pobierz Instalator Algo Analyzer (.exe)';
   } else if (isKonwerter) {
     downloadUrl = 'assets/installer/ApliHub_FastKonwerter_Setup.exe';
-    downloadLabel = 'Pobierz Instalator Plikio (.exe)';
+    downloadLabel = 'Pobierz Instalator Plixy (.exe)';
     extDownloadHtml = `
       <a href="assets/installer/Fast_Konwerter_Chrome_Extension.zip" download="Fast_Konwerter_Chrome_Extension.zip" class="btn-download" style="text-decoration: none; justify-content: center; background: rgba(59, 130, 246, 0.2); color: #93c5fd; border: 1px solid rgba(59, 130, 246, 0.4); padding: 12px; border-radius: 8px;">
         📦 Pobierz Paczkę Chrome Web Store (.zip)
@@ -354,17 +354,16 @@ document.addEventListener('DOMContentLoaded', () => {
     card.className = 'card glowing-card';
 
     const isAlgo = item.id === 'app-1' || item.name.includes('Algo Analyzer');
-    const isPlikio = item.id === 'plug-2' || item.name.includes('Plikio') || item.name.includes('Fast Konwerter');
-    const isOfertomat = item.id === 'plug-3' || item.name.includes('Ofertomat');
-    const isTheme = item.id === 'plug-4' || item.name.includes('Theme');
+    const isPlixy = item.id === 'plug-2' || item.name.includes('Plixy') || item.name.includes('Fast Konwerter');
 
     let buttonHtml = '';
 
     if (isAlgo) {
+      // Algo Analyzer: Przetestuj next to Pobierz (No emoji)
       buttonHtml = `
         <div style="display: flex; gap: 8px; align-items: center; flex-wrap: wrap;">
-          <button class="btn-test-live" onclick="event.stopPropagation(); window.openLiveAppSandbox('algo-demo')" title="Przetestuj wygląd i działanie Algo Analyzer przed zakupem">
-            <span>🧪</span> Przetestuj
+          <button class="btn-test-live" onclick="event.stopPropagation(); window.openLiveAppSandbox('algo')" title="Przetestuj wygląd i działanie Algo Analyzer">
+            Przetestuj
           </button>
           <button class="btn-download btn-card-download" data-download-id="${item.id}" data-download-name="${item.name}" title="Pobierz instalator Algo Analyzer">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
@@ -376,13 +375,14 @@ document.addEventListener('DOMContentLoaded', () => {
           </button>
         </div>
       `;
-    } else if (isPlikio) {
+    } else if (isPlixy) {
+      // Plixy: Przetestuj next to Pobierz (No emoji)
       buttonHtml = `
         <div style="display: flex; gap: 8px; align-items: center; flex-wrap: wrap;">
-          <button class="btn-test-live" onclick="event.stopPropagation(); window.openLiveAppSandbox('plikio-sim')" title="Przetestuj symulator wtyczki i zobacz jak działa na Social Mediach">
-            <span>🧪</span> Przetestuj
+          <button class="btn-test-live" onclick="event.stopPropagation(); window.openLiveAppSandbox('plixy-sim')" title="Przetestuj symulator wtyczki i zobacz jak działa na Social Mediach">
+            Przetestuj
           </button>
-          <button class="btn-download" onclick="event.stopPropagation(); window.openLiveAppSandbox('konwerter')" title="Otwórz stronę Plikio, aby pobrać materiał z linku lub pobrać instalator">
+          <button class="btn-download" onclick="event.stopPropagation(); window.openLiveAppSandbox('konwerter')" title="Otwórz stronę Plixy, aby pobrać materiał z linku lub pobrać instalator">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
               <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
               <polyline points="7 10 12 15 17 10"></polyline>
@@ -393,20 +393,16 @@ document.addEventListener('DOMContentLoaded', () => {
         </div>
       `;
     } else {
+      // All other apps/plugins: ONLY Pobierz button (NO Przetestuj button)
       buttonHtml = `
-        <div style="display: flex; gap: 8px; align-items: center; flex-wrap: wrap;">
-          <button class="btn-test-live" onclick="event.stopPropagation(); window.openAppLaunchModal(APLIHUB_DATA.plugins.find(p => p.id === '${item.id}') || item)" title="Przetestuj wersję demonstracyjną">
-            <span>🧪</span> Przetestuj
-          </button>
-          <button class="btn-download btn-card-download" data-download-id="${item.id}" data-download-name="${item.name}">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
-              <polyline points="7 10 12 15 17 10"></polyline>
-              <line x1="12" y1="15" x2="12" y2="3"></line>
-            </svg>
-            Pobierz
-          </button>
-        </div>
+        <button class="btn-download btn-card-download" data-download-id="${item.id}" data-download-name="${item.name}">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+            <polyline points="7 10 12 15 17 10"></polyline>
+            <line x1="12" y1="15" x2="12" y2="3"></line>
+          </svg>
+          Pobierz
+        </button>
       `;
     }
 
@@ -550,7 +546,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
           <div>
             <h4 style="font-weight: 800; color: #fff; font-size: 1rem; margin-bottom: 6px;">1. Autorskie Oprogramowanie i Narzędzia</h4>
-            <p>Zarówno serwis ApliHub, jak i dedykowane narzędzia (m.in. Algo Analyzer, Plikio, Ofertomat, Theme Injector) są chronione prawem autorskim oraz międzynarodowymi konwencjami o ochronie własności intelektualnej.</p>
+            <p>Zarówno serwis ApliHub, jak i dedykowane narzędzia (m.in. Algo Analyzer, Plixy, Ofertomat, Theme Injector) są chronione prawem autorskim oraz międzynarodowymi konwencjami o ochronie własności intelektualnej.</p>
           </div>
 
           <div>
