@@ -949,3 +949,41 @@ body {
     from { opacity: 0; transform: translateX(20px); }
     to { opacity: 1; transform: translateX(0); }
 }
+
+
+/* ==========================================================================
+   BACK TO HUB BUTTON
+   ========================================================================== */
+.btn-back-hub {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: rgba(245, 158, 11, 0.12);
+    border: 1px solid rgba(245, 158, 11, 0.35);
+    color: #fbbf24;
+    padding: 8px 18px;
+    border-radius: 10px;
+    font-size: 13px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: var(--transition);
+}
+
+.btn-back-hub:hover {
+    background: linear-gradient(135deg, #f59e0b, #d97706);
+    color: #000;
+    border-color: #f59e0b;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 14px rgba(245, 158, 11, 0.3);
+}
+
+.avatar-frame.premium-ring {
+    border: 2px solid #f59e0b;
+    box-shadow: 0 0 12px rgba(245, 158, 11, 0.5);
+    animation: goldGlow 2.5s infinite alternate;
+}
+
+@keyframes goldGlow {
+    from { box-shadow: 0 0 6px rgba(245, 158, 11, 0.3); }
+    to { box-shadow: 0 0 16px rgba(245, 158, 11, 0.7); }
+}

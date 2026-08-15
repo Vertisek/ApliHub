@@ -1,3 +1,10 @@
+window.handleBackToHub = function() {
+  if (window.parent && window.parent !== window && typeof window.parent.closeSandboxApp === 'function') {
+    window.parent.closeSandboxApp();
+  } else {
+    window.location.href = '../index.html';
+  }
+};
 /* ==========================================================================
    Algo Analyzer - Application Core & Social Algorithm Trends Intelligence
    ========================================================================== */
@@ -171,7 +178,7 @@ function syncUserInfo() {
                     <span>🔑</span>
                 </div>
                 <div class="avatar-info">
-                    <span class="avatar-name" style="color: var(--color-yellow-main); font-weight: 700;">Zaloguj się</span>
+                    <span class="avatar-name" style="color: #fbbf24; font-weight: 700;">Oskar_Algo</span>
                 </div>
             `;
         }

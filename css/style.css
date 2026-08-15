@@ -940,19 +940,25 @@ input {
   left: 0;
   width: 100vw;
   height: 100vh;
-  background: #090a0f;
-  z-index: 99999;
+  background: #070a12;
+  z-index: 999999;
   display: none;
-  flex-direction: column;
   opacity: 0;
   pointer-events: none;
-  transition: opacity 0.25s ease;
+  transition: opacity 0.2s ease;
 }
 
 .app-test-sandbox.active {
-  display: flex;
+  display: block;
   opacity: 1;
   pointer-events: auto;
+}
+
+.app-test-sandbox iframe {
+  width: 100vw;
+  height: 100vh;
+  border: none;
+  display: block;
 }
 
 .sandbox-header {

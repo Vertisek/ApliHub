@@ -1,3 +1,10 @@
+window.handleBackToHub = function() {
+  if (window.parent && window.parent !== window && typeof window.parent.closeSandboxApp === 'function') {
+    window.parent.closeSandboxApp();
+  } else {
+    window.location.href = '../index.html';
+  }
+};
 /* Plikio (ReTrap) - In-Browser Test Suite & Live Converter */
 
 var conversionState = 'idle';
