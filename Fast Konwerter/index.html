@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Plixy - Twój Szybki i Darmowy Konwerter</title>
-  <link rel="stylesheet" href="css/converter.css?v=1786800121983">
+  <link rel="stylesheet" href="css/converter.css?v=1786800373709">
   <link rel="icon" href="icon48.png" type="image/png">
 </head>
 <body>
@@ -13,11 +13,22 @@
   <div class="glow-spot-2"></div>
 
   <!-- Top Nav Bar -->
+  <!-- Top Nav Bar -->
   <header class="top-nav">
     <div class="nav-container">
-      <div class="brand-wrap" onclick="location.reload()">
-        <img src="icon48.png" alt="ReTrap Logo" class="brand-logo-img">
-        <span class="brand-name">PLIXY</span>
+      <div style="display: flex; align-items: center; gap: 14px;">
+        <button type="button" class="btn-back-hub" id="btnBackToHub" onclick="handleBackToHub()" title="Wróć do strony głównej ApliHub">
+          <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5">
+            <line x1="19" y1="12" x2="5" y2="12"></line>
+            <polyline points="12 19 5 12 12 5"></polyline>
+          </svg>
+          <span>Wróć do ApliHub</span>
+        </button>
+
+        <div class="brand-wrap" onclick="location.reload()" style="cursor: pointer;">
+          <img src="icon48.png" alt="Plixy Logo" class="brand-logo-img">
+          <span class="brand-name">PLIXY</span>
+        </div>
       </div>
 
       <nav class="nav-tabs">
@@ -25,15 +36,7 @@
         <button class="nav-tab-btn" data-tab="tab-extension-sim">Jak działa?</button>
         <button class="nav-tab-btn" data-tab="tab-webstore">Pobierz i Wgraj</button>
       </nav>
-
-      <button type="button" class="btn-back-hub" id="btnBackToHub" onclick="handleBackToHub()" title="Wróć do strony głównej ApliHub">
-          <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5">
-            <line x1="19" y1="12" x2="5" y2="12"></line>
-            <polyline points="12 19 5 12 12 5"></polyline>
-          </svg>
-          <span>← Wróć do ApliHub</span>
-        </button>
-      </div>
+    </div>
   </header>
 
   <!-- Main Views Container -->
@@ -274,6 +277,6 @@
   <div class="toast-container" id="toast-container"></div>
 
   <script src="../js/data.js"></script>
-  <script src="js/converter-app.js?v=1786800121983"></script>
+  <script src="js/converter-app.js?v=1786800373709"></script>
 </body>
 </html>
