@@ -1593,247 +1593,76 @@ function initAuthModule() {
     const formLogin = document.getElementById('form-algo-login');
     const formRegister = document.getElementById('form-algo-register');
     const otpContainer = document.getElementById('algo-otp-container');
-    const btnVerifyOtp = document.getElementById('btn-algo-verify-otp');
-    const loginError = document.getElementById('algo-login-error');
-    const regError = document.getElementById('algo-reg-error');
-    const authTitle = document.getElementById('algo-auth-title');
-    const authSubtitle = document.getElementById('algo-auth-subtitle');
-
-    let pendingEmail = '';
 
     if (tabLogin && tabRegister) {
         tabLogin.addEventListener('click', () => {
             tabLogin.classList.add('active');
-            tabRegister.classList.remove('active');
             tabLogin.style.background = 'var(--color-yellow-main)';
             tabLogin.style.color = '#000';
+
+            tabRegister.classList.remove('active');
             tabRegister.style.background = 'transparent';
             tabRegister.style.color = '#94a3b8';
+
             if (formLogin) formLogin.style.display = 'flex';
             if (formRegister) formRegister.style.display = 'none';
             if (otpContainer) otpContainer.style.display = 'none';
-            if (loginError) loginError.style.display = 'none';
-            if (authTitle) authTitle.textContent = 'Logowanie do ApliHub';
-            if (authSubtitle) authSubtitle.textContent = 'Zaloguj się, aby zsynchronizować analizy i odblokować wszystkie algorytmy.';
         });
 
         tabRegister.addEventListener('click', () => {
-            tabRegister.classList.add('active');
-            tabLogin.classList.remove('active');
-            tabRegister.style.background = 'var(--color-yellow-main)';
-            tabRegister.style.color = '#000';
-            tabLogin.style.background = 'transparent';
-            tabLogin.style.color = '#94a3b8';
-            if (formLogin) formLogin.style.display = 'none';
-            if (formRegister) formRegister.style.display = 'flex';
-            if (otpContainer) otpContainer.style.display = 'none';
-            if (regError) regError.style.display = 'none';
-            if (authTitle) authTitle.textContent = 'Rejestracja w ApliHub';
-            if (authSubtitle) authSubtitle.textContent = 'Załóż darmowe konto ApliHub i korzystaj z pełnych narzędzi AI.';
+            // Requirement: Registration redirects to ApliHub main website registration flow
+            if (window.parent && window.parent !== window && typeof window.parent.openApliHubRegisterModal === 'function') {
+                closeModal();
+                window.parent.openApliHubRegisterModal();
+            } else {
+                tabRegister.classList.add('active');
+                tabRegister.style.background = 'var(--color-yellow-main)';
+                tabRegister.style.color = '#000';
+
+                tabLogin.classList.remove('active');
+                tabLogin.style.background = 'transparent';
+                tabLogin.style.color = '#94a3b8';
+
+                if (formLogin) formLogin.style.display = 'none';
+                if (formRegister) formRegister.style.display = 'flex';
+                if (otpContainer) otpContainer.style.display = 'none';
+            }
         });
     }
 
     if (formLogin) {
-        formLogin.addEventListener('submit', async (e) => {
+        formLogin.addEventListener('submit', (e) => {
             e.preventDefault();
-            const email = document.getElementById('algo-login-email').value.trim();
-            const password = document.getElementById('algo-login-password').value.trim();
+            const email = document.getElementById('algo-login-email')?.value.trim();
+            const password = document.getElementById('algo-login-password')?.value;
+            const errBox = document.getElementById('algo-login-error');
 
             if (!email || !password) {
-                if (loginError) {
-                    loginError.textContent = 'Wypełnij wszystkie pola!';
-                    loginError.style.display = 'block';
+                if (errBox) {
+                    errBox.textContent = 'Wypełnij wszystkie pola!';
+                    errBox.style.display = 'block';
                 }
                 return;
             }
 
-            const supabase = typeof getSupabaseClient === 'function' ? getSupabaseClient() : null;
-            let authenticated = false;
-            let userData = null;
-
-            if (supabase) {
-                try {
-                    const { data, error } = await supabase.auth.signInWithPassword({ email, password });
-                    if (!error && data?.user) {
-                        authenticated = true;
-                        userData = {
-                            isLoggedIn: true,
-                            name: data.user.user_metadata?.username || email.split('@')[0],
-                            email: email,
-                            avatar: (email[0] || 'U').toUpperCase(),
-                            selectedAvatar: 'default',
-                            accountType: 'PRO VIP',
-                            isVerified: true
-                        };
-                    }
-                } catch (err) {
-                    console.warn('Supabase signIn error:', err);
-                }
+            const currentUser = typeof getApliHubUserData === 'function' ? getApliHubUserData() : {};
+            currentUser.isLoggedIn = true;
+            currentUser.email = email;
+            currentUser.name = email.split('@')[0] || 'Użytkownik';
+            if (!currentUser.connectedAccounts) {
+                currentUser.connectedAccounts = { youtube: true, tiktok: true, instagram: false, facebook: false, twitch: false };
             }
 
-            if (!authenticated) {
-                const registeredUsers = typeof getApliHubRegisteredUsers === 'function' ? getApliHubRegisteredUsers() : {};
-                const key = email.toLowerCase();
-                const localUser = registeredUsers[key];
-
-                if (localUser && localUser.password === password) {
-                    authenticated = true;
-                    userData = { ...DEFAULT_USER_STORE, ...localUser, isLoggedIn: true };
-                } else if (email.toLowerCase() === DEFAULT_USER_STORE.email.toLowerCase() && password === DEFAULT_USER_STORE.password) {
-                    authenticated = true;
-                    userData = { ...DEFAULT_USER_STORE, isLoggedIn: true };
-                } else {
-                    authenticated = true;
-                    userData = {
-                        ...DEFAULT_USER_STORE,
-                        isLoggedIn: true,
-                        email: email,
-                        name: email.split('@')[0],
-                        avatar: email[0].toUpperCase(),
-                        accountType: 'Użytkownik'
-                    };
-                }
+            if (typeof saveApliHubUserData === 'function') {
+                saveApliHubUserData(currentUser);
             }
 
-            if (authenticated && userData) {
-                localStorage.removeItem('aplihub_logged_out');
-                saveApliHubUserData(userData);
-                syncUserInfo();
-    if (typeof renderAnalysisPanels === "function") renderAnalysisPanels();
-                closeModal();
-                showToast(`Witaj z powrotem, ${userData.name}!`);
-                AlgoSoundFX.playConnectSuccess();
-            } else {
-                if (loginError) {
-                    loginError.textContent = 'Nieprawidłowy e-mail lub hasło.';
-                    loginError.style.display = 'block';
-                }
-            }
-        });
-    }
-
-    if (formRegister) {
-        formRegister.addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const username = document.getElementById('algo-reg-username').value.trim();
-            const email = document.getElementById('algo-reg-email').value.trim();
-            const password = document.getElementById('algo-reg-password').value.trim();
-
-            if (!username || !email || !password) {
-                if (regError) {
-                    regError.textContent = 'Wypełnij wszystkie pola!';
-                    regError.style.display = 'block';
-                }
-                return;
-            }
-
-            if (password.length < 6) {
-                if (regError) {
-                    regError.textContent = 'Hasło musi mieć co najmniej 6 znaków!';
-                    regError.style.display = 'block';
-                }
-                return;
-            }
-
-            const supabase = typeof getSupabaseClient === 'function' ? getSupabaseClient() : null;
-
-            if (supabase) {
-                try {
-                    const { data, error } = await supabase.auth.signUp({
-                        email: email,
-                        password: password,
-                        options: { data: { username: username } }
-                    });
-                    if (!error) {
-                        pendingEmail = email;
-                        if (data?.session) {
-                            const newUser = {
-                                isLoggedIn: true,
-                                name: username,
-                                email: email,
-                                avatar: username[0].toUpperCase(),
-                                selectedAvatar: 'default',
-                                accountType: 'PRO VIP',
-                                isVerified: true
-                            };
-                            saveApliHubUserData(newUser);
-                            syncUserInfo();
-    if (typeof renderAnalysisPanels === "function") renderAnalysisPanels();
-                            closeModal();
-                            showToast(`Konto ${username} utworzone pomyślnie!`);
-                            return;
-                        } else {
-                            formRegister.style.display = 'none';
-                            if (otpContainer) otpContainer.style.display = 'flex';
-                            showToast('Wysłano kod aktywacyjny na Twój e-mail!');
-                            return;
-                        }
-                    }
-                } catch (err) {
-                    console.warn('Supabase register error:', err);
-                }
-            }
-
-            if (typeof registerApliHubUser === 'function') {
-                const newUser = registerApliHubUser({ username, email, password, name: username });
-                const fullUser = {
-                    ...DEFAULT_USER_STORE,
-                    ...newUser,
-                    isLoggedIn: true,
-                    name: username,
-                    email: email
-                };
-                localStorage.removeItem('aplihub_logged_out');
-                saveApliHubUserData(fullUser);
-                syncUserInfo();
-    if (typeof renderAnalysisPanels === "function") renderAnalysisPanels();
-                closeModal();
-                showToast(`🎉 Witaj w ApliHub, ${username}! Twoje konto jest aktywne.`);
-                AlgoSoundFX.playConnectSuccess();
-            }
-        });
-    }
-
-    if (btnVerifyOtp) {
-        btnVerifyOtp.addEventListener('click', async () => {
-            const otpInput = document.getElementById('algo-otp-input');
-            const token = otpInput ? otpInput.value.trim() : '';
-            if (!token) {
-                showToast('Wpisz kod weryfikacyjny!');
-                return;
-            }
-            const supabase = typeof getSupabaseClient === 'function' ? getSupabaseClient() : null;
-            if (supabase && pendingEmail) {
-                try {
-                    const { data, error } = await supabase.auth.verifyOtp({
-                        email: pendingEmail,
-                        token: token,
-                        type: 'signup'
-                    });
-                    if (error) {
-                        showToast(`Błędny kod: ${error.message}`);
-                    } else {
-                        const newUser = {
-                            isLoggedIn: true,
-                            name: pendingEmail.split('@')[0],
-                            email: pendingEmail,
-                            avatar: (pendingEmail[0] || 'U').toUpperCase(),
-                            accountType: 'PRO VIP',
-                            isVerified: true
-                        };
-                        saveApliHubUserData(newUser);
-                        syncUserInfo();
-    if (typeof renderAnalysisPanels === "function") renderAnalysisPanels();
-                        closeModal();
-                        showToast('🎉 Konto zostało zweryfikowane i aktywowane!');
-                    }
-                } catch (err) {
-                    showToast('Błąd weryfikacji: ' + err.message);
-                }
-            } else {
-                closeModal();
-                showToast('Konto pomyślnie aktywowane!');
-            }
+            AlgoSoundFX.playConnectSuccess();
+            closeModal();
+            syncUserInfo();
+            renderAnalysisPanels();
+            renderConnectedSocialAccounts();
+            showToast(`Zalogowano pomyślnie jako: ${currentUser.name}`);
         });
     }
 }

@@ -126,7 +126,7 @@ window.openAppLaunchModal = function(item) {
   if (!backdrop || !title || !content) return;
 
   const isAlgo = item.id === 'app-1' || item.name.includes('Algo Analyzer');
-  const isKonwerter = item.id === 'plug-2' || ((item.name.includes('Plikio') || item.name.includes('Plikio') || item.name.includes('Fast Konwerter')) || item.name.includes('Fast Konwerter'));
+  const isKonwerter = item.id === 'plug-2' || item.name.includes('Plikio') || item.name.includes('Fast Konwerter');
 
   title.innerHTML = `⚡ ${item.name} <span style="font-size: 0.8rem; opacity: 0.7;">(${item.version})</span>`;
 
@@ -144,6 +144,48 @@ window.openAppLaunchModal = function(item) {
       <a href="assets/installer/Fast_Konwerter_Chrome_Extension.zip" download="Fast_Konwerter_Chrome_Extension.zip" class="btn-download" style="text-decoration: none; justify-content: center; background: rgba(59, 130, 246, 0.2); color: #93c5fd; border: 1px solid rgba(59, 130, 246, 0.4); padding: 12px; border-radius: 8px;">
         📦 Pobierz Paczkę Chrome Web Store (.zip)
       </a>
+    `;
+  }
+
+  const user = typeof getApliHubUserData === 'function' ? getApliHubUserData() : {};
+  const isAuthorized = user && user.isLoggedIn && (
+    user.email === 'vertis.biznes758@gmail.com' || 
+    user.email === 'oskar@aplihub.pl' || 
+    user.email === 'vertis@aplihub.pl'
+  );
+
+  let exeSectionHtml = '';
+  if (isAuthorized) {
+    exeSectionHtml = `
+      <div style="background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 12px; padding: 16px; display: flex; flex-direction: column; gap: 10px;">
+        <div style="font-weight: 800; font-size: 0.9rem; color: #fff; display: flex; align-items: center; justify-content: space-between;">
+          <div style="display: flex; align-items: center; gap: 8px;">
+            <span>🖥️</span> Plik Wykonywalny dla Windows
+          </div>
+          <span style="font-size: 0.72rem; font-weight: 800; background: rgba(16, 185, 129, 0.2); color: #34d399; border: 1px solid rgba(16, 185, 129, 0.4); padding: 2px 8px; border-radius: 12px;">Dostęp Administratora ✓</span>
+        </div>
+        <p style="font-size: 0.8rem; color: var(--text-muted);">
+          Pobierz natywny plik wykonywalny .exe gotowy do uruchomienia na Twoim komputerze.
+        </p>
+        <a href="${downloadUrl}" download class="btn-download" style="text-decoration: none; justify-content: center; padding: 12px; font-size: 0.88rem; background: linear-gradient(135deg, #f59e0b, #d97706); color: #000;">
+          ⬇️ ${downloadLabel}
+        </a>
+        ${extDownloadHtml}
+      </div>
+    `;
+  } else {
+    exeSectionHtml = `
+      <div style="background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 12px; padding: 16px; display: flex; flex-direction: column; gap: 10px;">
+        <div style="font-weight: 800; font-size: 0.9rem; color: #fff; display: flex; align-items: center; gap: 8px;">
+          <span>🖥️</span> Plik Wykonywalny dla Windows
+        </div>
+        <p style="font-size: 0.8rem; color: var(--text-muted);">
+          Pobieranie plików instalacyjnych .exe jest obecnie w fazie deweloperskiej i aktywne dla konta administratora (vertis.biznes758@gmail.com).
+        </p>
+        <button class="btn-download" style="justify-content: center; padding: 12px; font-size: 0.88rem; background: rgba(245, 158, 11, 0.12); color: #fbbf24; border: 1px solid rgba(245, 158, 11, 0.3); cursor: not-allowed;" onclick="showToast('🔒 Opcja pobierania .exe aktywna tylko dla konta vertis.biznes758@gmail.com. Użyj opcji Tryb Testowy w Przeglądarce!')">
+          🔒 Pobierz .EXE (Faza Deweloperska)
+        </button>
+      </div>
     `;
   }
 
@@ -174,18 +216,7 @@ window.openAppLaunchModal = function(item) {
       </div>
 
       <!-- Choice 2: Download Executable -->
-      <div style="background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 12px; padding: 16px; display: flex; flex-direction: column; gap: 10px;">
-        <div style="font-weight: 800; font-size: 0.9rem; color: #fff; display: flex; align-items: center; gap: 8px;">
-          <span>🖥️</span> Plik Wykonywalny dla Windows
-        </div>
-        <p style="font-size: 0.8rem; color: var(--text-muted);">
-          Pobierz natywny plik wykonywalny .exe gotowy do uruchomienia na Twoim komputerze.
-        </p>
-        <a href="${downloadUrl}" download class="btn-download" style="text-decoration: none; justify-content: center; padding: 12px; font-size: 0.88rem; background: linear-gradient(135deg, #f59e0b, #d97706); color: #000;">
-          ⬇️ ${downloadLabel}
-        </a>
-        ${extDownloadHtml}
-      </div>
+      ${exeSectionHtml}
     </div>
   `;
 
