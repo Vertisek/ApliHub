@@ -172,7 +172,7 @@ const APLIHUB_DATA = {
   plugins: [
     {
       id: "plug-2",
-      name: "Plixy",
+      name: "Plikio",
       category: "Multimedia",
       badge: "Popularne",
       icon: "⚡",
