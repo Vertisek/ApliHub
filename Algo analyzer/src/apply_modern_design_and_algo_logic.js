@@ -1,4 +1,33 @@
-/* ==========================================================================
+const fs = require('fs');
+const path = require('path');
+
+const algoDir = path.resolve(__dirname, '../');
+const htmlPath = path.resolve(algoDir, 'index.html');
+const cssPath = path.resolve(algoDir, 'css/style.css');
+const jsPath = path.resolve(algoDir, 'js/app.js');
+
+console.log('Applying modern pleasant design and connected accounts logic to Algo Analyzer...');
+
+// 1. UPDATE index.html
+let html = fs.readFileSync(htmlPath, 'utf8');
+
+// Update Google Fonts to Plus Jakarta Sans + Inter
+html = html.replace(
+  /<link href="https:\/\/fonts\.googleapis\.com\/css2\?family=Inter.*?display=swap" rel="stylesheet">/,
+  `<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">`
+);
+
+// Update title
+html = html.replace(
+  /<title>Algo Analyzer \/\/ Social Media Algorithm Intelligence \(ApliHub\)<\/title>/,
+  `<title>Algo Analyzer — Zaawansowana Analityka Social Media (ApliHub)</title>`
+);
+
+fs.writeFileSync(htmlPath, html, 'utf8');
+console.log('[1/3] Updated Algo Analyzer index.html');
+
+// 2. UPDATE css/style.css
+const modernCss = `/* ==========================================================================
    Algo Analyzer - Modern Sleek & Pleasant SaaS Analytics Theme
    ========================================================================== */
 
@@ -368,191 +397,53 @@ body {
     font-weight: 500;
 }
 
+/* Sidebar Navigation Buttons */
+.sidebar-tabs {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
 
-/* ==========================================================================
-   VIBRANT & DISTINCT SOCIAL MEDIA TABS (YOUTUBE, TIKTOK, INSTAGRAM, ETC.)
-   ========================================================================== */
 .tab-btn {
     display: flex;
     align-items: center;
     gap: 12px;
-    padding: 12px 16px;
+    padding: 11px 14px;
+    background: transparent;
+    border: 1px solid transparent;
     border-radius: 12px;
+    color: var(--color-text-muted);
     font-size: 14px;
-    font-weight: 700;
+    font-weight: 600;
     cursor: pointer;
     transition: var(--transition);
     text-align: left;
     width: 100%;
-    margin-bottom: 3px;
-    border: 1px solid transparent;
 }
 
-/* Tab 1: YouTube - Warm Radiant Red */
-.tab-btn[data-target="tab-youtube"] {
-    background: rgba(239, 68, 68, 0.08);
-    border-color: rgba(239, 68, 68, 0.22);
-    color: #fca5a5;
-}
-.tab-btn[data-target="tab-youtube"] svg {
-    stroke: #ef4444;
-    filter: drop-shadow(0 0 4px rgba(239, 68, 68, 0.4));
-}
-.tab-btn[data-target="tab-youtube"]:hover {
-    background: rgba(239, 68, 68, 0.16);
-    border-color: rgba(239, 68, 68, 0.5);
-    color: #ffffff;
-    transform: translateX(4px);
-    box-shadow: 0 4px 14px rgba(239, 68, 68, 0.2);
-}
-.tab-btn[data-target="tab-youtube"].active {
-    background: linear-gradient(135deg, rgba(239, 68, 68, 0.28), rgba(185, 28, 28, 0.35));
-    border-color: #ef4444;
-    color: #ffffff;
-    box-shadow: 0 4px 18px rgba(239, 68, 68, 0.35);
-}
-.tab-btn[data-target="tab-youtube"].active svg {
-    stroke: #ff4d4d;
-    fill: rgba(239, 68, 68, 0.2);
+.tab-btn svg {
+    width: 18px;
+    height: 18px;
+    stroke: var(--color-text-dim);
+    transition: var(--transition);
 }
 
-/* Tab 2: TikTok - Vibrant Electric Cyan */
-.tab-btn[data-target="tab-tiktok"] {
-    background: rgba(6, 182, 212, 0.08);
-    border-color: rgba(6, 182, 212, 0.22);
-    color: #67e8f9;
-}
-.tab-btn[data-target="tab-tiktok"] svg {
-    stroke: #06b6d4;
-    filter: drop-shadow(0 0 4px rgba(6, 182, 212, 0.4));
-}
-.tab-btn[data-target="tab-tiktok"]:hover {
-    background: rgba(6, 182, 212, 0.16);
-    border-color: rgba(6, 182, 212, 0.5);
-    color: #ffffff;
-    transform: translateX(4px);
-    box-shadow: 0 4px 14px rgba(6, 182, 212, 0.2);
-}
-.tab-btn[data-target="tab-tiktok"].active {
-    background: linear-gradient(135deg, rgba(6, 182, 212, 0.28), rgba(14, 116, 144, 0.35));
-    border-color: #06b6d4;
-    color: #ffffff;
-    box-shadow: 0 4px 18px rgba(6, 182, 212, 0.35);
-}
-.tab-btn[data-target="tab-tiktok"].active svg {
-    stroke: #22d3ee;
-    fill: rgba(6, 182, 212, 0.2);
+.tab-btn:hover {
+    background: rgba(255, 255, 255, 0.04);
+    color: var(--color-text-primary);
 }
 
-/* Tab 3: Instagram - Rich Radiant Magenta / Pink */
-.tab-btn[data-target="tab-instagram"] {
-    background: rgba(236, 72, 153, 0.08);
-    border-color: rgba(236, 72, 153, 0.22);
-    color: #f472b6;
-}
-.tab-btn[data-target="tab-instagram"] svg {
-    stroke: #ec4899;
-    filter: drop-shadow(0 0 4px rgba(236, 72, 153, 0.4));
-}
-.tab-btn[data-target="tab-instagram"]:hover {
-    background: rgba(236, 72, 153, 0.16);
-    border-color: rgba(236, 72, 153, 0.5);
-    color: #ffffff;
-    transform: translateX(4px);
-    box-shadow: 0 4px 14px rgba(236, 72, 153, 0.2);
-}
-.tab-btn[data-target="tab-instagram"].active {
-    background: linear-gradient(135deg, rgba(236, 72, 153, 0.28), rgba(190, 24, 93, 0.35));
-    border-color: #ec4899;
-    color: #ffffff;
-    box-shadow: 0 4px 18px rgba(236, 72, 153, 0.35);
-}
-.tab-btn[data-target="tab-instagram"].active svg {
-    stroke: #f472b6;
-    fill: rgba(236, 72, 153, 0.2);
+.tab-btn:hover svg {
+    stroke: var(--color-yellow-main);
 }
 
-/* Tab 4: Facebook - Royal Blue */
-.tab-btn[data-target="tab-facebook"] {
-    background: rgba(59, 130, 246, 0.08);
-    border-color: rgba(59, 130, 246, 0.22);
-    color: #93c5fd;
-}
-.tab-btn[data-target="tab-facebook"] svg {
-    stroke: #3b82f6;
-    filter: drop-shadow(0 0 4px rgba(59, 130, 246, 0.4));
-}
-.tab-btn[data-target="tab-facebook"]:hover {
-    background: rgba(59, 130, 246, 0.16);
-    border-color: rgba(59, 130, 246, 0.5);
-    color: #ffffff;
-    transform: translateX(4px);
-    box-shadow: 0 4px 14px rgba(59, 130, 246, 0.2);
-}
-.tab-btn[data-target="tab-facebook"].active {
-    background: linear-gradient(135deg, rgba(59, 130, 246, 0.28), rgba(29, 78, 216, 0.35));
-    border-color: #3b82f6;
-    color: #ffffff;
-    box-shadow: 0 4px 18px rgba(59, 130, 246, 0.35);
-}
-.tab-btn[data-target="tab-facebook"].active svg {
-    stroke: #60a5fa;
-    fill: rgba(59, 130, 246, 0.2);
+.tab-btn.active {
+    background: rgba(245, 158, 11, 0.12);
+    border-color: rgba(245, 158, 11, 0.3);
+    color: #fbbf24;
 }
 
-/* Tab 5: Twitch - Vibrant Purple */
-.tab-btn[data-target="tab-twitch"] {
-    background: rgba(168, 85, 247, 0.08);
-    border-color: rgba(168, 85, 247, 0.22);
-    color: #d8b4fe;
-}
-.tab-btn[data-target="tab-twitch"] svg {
-    stroke: #a855f7;
-    filter: drop-shadow(0 0 4px rgba(168, 85, 247, 0.4));
-}
-.tab-btn[data-target="tab-twitch"]:hover {
-    background: rgba(168, 85, 247, 0.16);
-    border-color: rgba(168, 85, 247, 0.5);
-    color: #ffffff;
-    transform: translateX(4px);
-    box-shadow: 0 4px 14px rgba(168, 85, 247, 0.2);
-}
-.tab-btn[data-target="tab-twitch"].active {
-    background: linear-gradient(135deg, rgba(168, 85, 247, 0.28), rgba(126, 34, 206, 0.35));
-    border-color: #a855f7;
-    color: #ffffff;
-    box-shadow: 0 4px 18px rgba(168, 85, 247, 0.35);
-}
-.tab-btn[data-target="tab-twitch"].active svg {
-    stroke: #c084fc;
-    fill: rgba(168, 85, 247, 0.2);
-}
-
-/* Tab 6: Analiza - Warm Amber / Gold */
-.tab-btn[data-target="tab-analiza"] {
-    background: rgba(245, 158, 11, 0.08);
-    border-color: rgba(245, 158, 11, 0.22);
-    color: #fcd34d;
-    margin-top: 8px;
-}
-.tab-btn[data-target="tab-analiza"] svg {
-    stroke: #f59e0b;
-    filter: drop-shadow(0 0 4px rgba(245, 158, 11, 0.4));
-}
-.tab-btn[data-target="tab-analiza"]:hover {
-    background: rgba(245, 158, 11, 0.16);
-    border-color: rgba(245, 158, 11, 0.5);
-    color: #ffffff;
-    transform: translateX(4px);
-    box-shadow: 0 4px 14px rgba(245, 158, 11, 0.2);
-}
-.tab-btn[data-target="tab-analiza"].active {
-    background: linear-gradient(135deg, rgba(245, 158, 11, 0.28), rgba(180, 83, 9, 0.35));
-    border-color: #f59e0b;
-    color: #ffffff;
-    box-shadow: 0 4px 18px rgba(245, 158, 11, 0.35);
-}
-.tab-btn[data-target="tab-analiza"].active svg {
+.tab-btn.active svg {
     stroke: #fbbf24;
 }
 
@@ -1046,3 +937,9 @@ body {
     from { opacity: 0; transform: translateX(20px); }
     to { opacity: 1; transform: translateX(0); }
 }
+`;
+
+fs.writeFileSync(cssPath, modernCss, 'utf8');
+console.log('[2/3] Updated Algo Analyzer css/style.css with modern pleasant SaaS styling');
+
+console.log('Now updating app.js...');

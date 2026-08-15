@@ -4,7 +4,7 @@
    ========================================================================== */
 window.currentSandboxApp = 'algo';
 
-window.openLiveAppSandbox = function(appType) {
+window.openLiveAppSandbox = function(appType, initialTab) {
   const sandbox = document.getElementById('appTestSandbox');
   const iframe = document.getElementById('sandboxIframe');
   const title = document.getElementById('sandboxAppTitle');
@@ -18,9 +18,9 @@ window.openLiveAppSandbox = function(appType) {
 
   window.currentSandboxApp = appType;
 
-  if (appType === 'algo' || appType === 'app-1') {
-    iframe.src = 'Algo analyzer/index.html';
-    if (title) title.textContent = 'Algo Analyzer v1.0.0 (ApliHub Social Intelligence)';
+  if (appType === 'algo' || appType === 'app-1' || appType === 'algo-demo') {
+    iframe.src = 'Algo analyzer/index.html?cb=' + Date.now();
+    if (title) title.textContent = 'Algo Analyzer v1.0.0 (Wersja Poglądowa / Test Działania)';
     if (icon) {
       icon.textContent = '📊';
       icon.style.background = 'linear-gradient(135deg, #f59e0b, #d97706)';
@@ -36,16 +36,51 @@ window.openLiveAppSandbox = function(appType) {
         a.click();
       };
     }
-  } else {
-    iframe.src = 'Fast Konwerter/index.html';
-    if (title) title.textContent = 'Fast Konwerter v1.2.0 (ReTrap YouTube Studio & Extension)';
+  } else if (appType === 'konwerter-sim' || appType === 'plixy-sim') {
+    // Plixy Extension Simulator Mode (Jak działa?)
+    iframe.src = 'Fast Konwerter/index.html?tab=tab-extension-sim&cb=' + Date.now() + '#tab-extension-sim';
+    iframe.onload = function() {
+      try {
+        if (iframe.contentWindow && typeof iframe.contentWindow.switchTab === 'function') {
+          iframe.contentWindow.switchTab('tab-extension-sim');
+        }
+      } catch (e) {}
+    };
+    if (title) title.textContent = 'Plixy v1.2.0 (Symulator Wtyczki - Test Działania)';
     if (icon) {
       icon.textContent = '⚡';
       icon.style.background = 'linear-gradient(135deg, #2563eb, #06b6d4)';
     }
     if (btnAlgo) btnAlgo.classList.remove('active');
     if (btnKonw) btnKonw.classList.add('active');
-    if (dlText) dlText.textContent = 'Pobierz .EXE (Fast Konwerter)';
+    if (dlText) dlText.textContent = 'Pobierz .EXE (Plixy)';
+    if (dlBtn) {
+      dlBtn.onclick = () => {
+        const a = document.createElement('a');
+        a.href = 'assets/installer/ApliHub_FastKonwerter_Setup.exe';
+        a.download = 'ApliHub_FastKonwerter_Setup.exe';
+        a.click();
+      };
+    }
+  } else {
+    // Plixy Full Hub / Converter Studio & Download Page
+    const targetTab = initialTab || 'tab-studio';
+    iframe.src = 'Fast Konwerter/index.html?tab=' + targetTab + '&cb=' + Date.now() + '#' + targetTab;
+    iframe.onload = function() {
+      try {
+        if (iframe.contentWindow && typeof iframe.contentWindow.switchTab === 'function') {
+          iframe.contentWindow.switchTab(targetTab);
+        }
+      } catch (e) {}
+    };
+    if (title) title.textContent = 'Plixy v1.2.0 (Studio Konwersji & Pobieranie Plików)';
+    if (icon) {
+      icon.textContent = '⚡';
+      icon.style.background = 'linear-gradient(135deg, #2563eb, #06b6d4)';
+    }
+    if (btnAlgo) btnAlgo.classList.remove('active');
+    if (btnKonw) btnKonw.classList.add('active');
+    if (dlText) dlText.textContent = 'Pobierz .EXE (Plixy)';
     if (dlBtn) {
       dlBtn.onclick = () => {
         const a = document.createElement('a');
@@ -91,7 +126,7 @@ window.openAppLaunchModal = function(item) {
   if (!backdrop || !title || !content) return;
 
   const isAlgo = item.id === 'app-1' || item.name.includes('Algo Analyzer');
-  const isKonwerter = item.id === 'plug-2' || item.name.includes('Fast Konwerter');
+  const isKonwerter = item.id === 'plug-2' || ((item.name.includes('Plixy') || item.name.includes('Plikio') || item.name.includes('Fast Konwerter')) || item.name.includes('Fast Konwerter'));
 
   title.innerHTML = `⚡ ${item.name} <span style="font-size: 0.8rem; opacity: 0.7;">(${item.version})</span>`;
 
@@ -104,7 +139,7 @@ window.openAppLaunchModal = function(item) {
     downloadLabel = 'Pobierz Instalator Algo Analyzer (.exe)';
   } else if (isKonwerter) {
     downloadUrl = 'assets/installer/ApliHub_FastKonwerter_Setup.exe';
-    downloadLabel = 'Pobierz Instalator Fast Konwerter (.exe)';
+    downloadLabel = 'Pobierz Instalator Plixy (.exe)';
     extDownloadHtml = `
       <a href="assets/installer/Fast_Konwerter_Chrome_Extension.zip" download="Fast_Konwerter_Chrome_Extension.zip" class="btn-download" style="text-decoration: none; justify-content: center; background: rgba(59, 130, 246, 0.2); color: #93c5fd; border: 1px solid rgba(59, 130, 246, 0.4); padding: 12px; border-radius: 8px;">
         📦 Pobierz Paczkę Chrome Web Store (.zip)
@@ -342,29 +377,67 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   // Create Tool Card HTML Element
+  // Create Tool Card HTML Element with distinct Przetestuj & Pobierz actions
   function createToolCard(item) {
     const card = document.createElement('div');
     card.className = 'card glowing-card';
 
     const isAlgo = item.id === 'app-1' || item.name.includes('Algo Analyzer');
-    const isKonwerter = item.id === 'plug-2' || item.name.includes('Fast Konwerter');
-    const appTypeKey = isAlgo ? 'algo' : (isKonwerter ? 'konwerter' : 'app');
+    const isPlixy = item.id === 'plug-2' || item.name.includes('Plixy') || item.name.includes('Fast Konwerter');
+    const isOfertomat = item.id === 'plug-3' || item.name.includes('Ofertomat');
+    const isTheme = item.id === 'plug-4' || item.name.includes('Theme');
 
-    let buttonHtml = `
-      <div style="display: flex; gap: 8px; align-items: center; flex-wrap: wrap;">
-        <button class="btn-test-live" onclick="event.stopPropagation(); window.openLiveAppSandbox('${appTypeKey}')" title="Uruchom aplikację w przeglądarce bez instalacji">
-          <span>🧪</span> Testuj
-        </button>
-        <button class="btn-download btn-card-download" data-download-id="${item.id}" data-download-name="${item.name}">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
-            <polyline points="7 10 12 15 17 10"></polyline>
-            <line x1="12" y1="15" x2="12" y2="3"></line>
-          </svg>
-          Pobierz
-        </button>
-      </div>
-    `;
+    let buttonHtml = '';
+
+    if (isAlgo) {
+      buttonHtml = `
+        <div style="display: flex; gap: 8px; align-items: center; flex-wrap: wrap;">
+          <button class="btn-test-live" onclick="event.stopPropagation(); window.openLiveAppSandbox('algo-demo')" title="Przetestuj wygląd i działanie Algo Analyzer przed zakupem">
+            <span>🧪</span> Przetestuj
+          </button>
+          <button class="btn-download btn-card-download" data-download-id="${item.id}" data-download-name="${item.name}" title="Pobierz instalator Algo Analyzer">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+              <polyline points="7 10 12 15 17 10"></polyline>
+              <line x1="12" y1="15" x2="12" y2="3"></line>
+            </svg>
+            Pobierz
+          </button>
+        </div>
+      `;
+    } else if (isPlixy) {
+      buttonHtml = `
+        <div style="display: flex; gap: 8px; align-items: center; flex-wrap: wrap;">
+          <button class="btn-test-live" onclick="event.stopPropagation(); window.openLiveAppSandbox('plixy-sim')" title="Przetestuj symulator wtyczki i zobacz jak działa na Social Mediach">
+            <span>🧪</span> Przetestuj
+          </button>
+          <button class="btn-download" onclick="event.stopPropagation(); window.openLiveAppSandbox('konwerter')" title="Otwórz stronę Plixy, aby pobrać materiał z linku lub pobrać instalator">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+              <polyline points="7 10 12 15 17 10"></polyline>
+              <line x1="12" y1="15" x2="12" y2="3"></line>
+            </svg>
+            Pobierz
+          </button>
+        </div>
+      `;
+    } else {
+      buttonHtml = `
+        <div style="display: flex; gap: 8px; align-items: center; flex-wrap: wrap;">
+          <button class="btn-test-live" onclick="event.stopPropagation(); window.openAppLaunchModal(APLIHUB_DATA.plugins.find(p => p.id === '${item.id}') || item)" title="Przetestuj wersję demonstracyjną">
+            <span>🧪</span> Przetestuj
+          </button>
+          <button class="btn-download btn-card-download" data-download-id="${item.id}" data-download-name="${item.name}">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+              <polyline points="7 10 12 15 17 10"></polyline>
+              <line x1="12" y1="15" x2="12" y2="3"></line>
+            </svg>
+            Pobierz
+          </button>
+        </div>
+      `;
+    }
 
     card.innerHTML = `
       <div>
@@ -390,7 +463,7 @@ document.addEventListener('DOMContentLoaded', () => {
       </div>
     `;
 
-    // Sound FX 2 on card hover
+    // Sound FX on card hover
     card.addEventListener('mouseenter', () => SoundFX.playCardHover());
 
     const downloadBtn = card.querySelector('.btn-card-download');
@@ -506,7 +579,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
           <div>
             <h4 style="font-weight: 800; color: #fff; font-size: 1rem; margin-bottom: 6px;">1. Autorskie Oprogramowanie i Narzędzia</h4>
-            <p>Zarówno serwis ApliHub, jak i dedykowane narzędzia (m.in. Algo Analyzer, Fast Konwerter, Ofertomat, Theme Injector) są chronione prawem autorskim oraz międzynarodowymi konwencjami o ochronie własności intelektualnej.</p>
+            <p>Zarówno serwis ApliHub, jak i dedykowane narzędzia (m.in. Algo Analyzer, Plixy, Ofertomat, Theme Injector) są chronione prawem autorskim oraz międzynarodowymi konwencjami o ochronie własności intelektualnej.</p>
           </div>
 
           <div>

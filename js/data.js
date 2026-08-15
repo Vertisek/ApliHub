@@ -26,6 +26,13 @@ const DEFAULT_USER_STORE = {
   accountType: "PRO VIP",
   isVerified: false,
   joinedDate: "01.08.2026 r.",
+  connectedAccounts: {
+    youtube: false,
+    tiktok: false,
+    instagram: false,
+    facebook: false,
+    twitch: false
+  },
   settings: {
     darkMode: true,
     soundEnabled: true,
@@ -165,11 +172,11 @@ const APLIHUB_DATA = {
   plugins: [
     {
       id: "plug-2",
-      name: "Fast Konwerter",
+      name: "Plixy",
       category: "Multimedia",
       badge: "Popularne",
       icon: "⚡",
-      desc: "Prosty w obsłudze konwerter do social mediów. Pobierz film lub piosenkę z YouTube, TikToka albo Instagrama do pliku WAV, MP4 LUB MP3 jednym kliknięciem.",
+      desc: "Prosty w obsłudze konwerter do social mediów. Pobierz film lub piosenkę z YouTube, TikToka, Facebooka albo Instagrama do pliku WAV, MP4 LUB MP3 jednym kliknięciem.",
       version: "v1.2.0",
       size: "3.5 MB",
       downloads: "32,500",
