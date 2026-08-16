@@ -718,14 +718,10 @@ function initSidebarNavigation() {
    USER AVATAR DROPDOWN & MENU OPTIONS
    ========================================================================== */
 function initUserAvatarDropdown() {
-    const userWrapper = document.getElementById('user-profile-wrapper');
-    const userAvatarBtn = document.getElementById('user-avatar-btn');
-
-    if (userAvatarBtn && userWrapper) {
-        userAvatarBtn.addEventListener('click', (e) => {
-            e.stopPropagation();
-            AlgoSoundFX.playClick();
-            const user = typeof getApliHubUserData === 'function' ? getApliHubUserData() : {};
+    const avatarBtn = document.getElementById('user-avatar-btn');
+    const dropdownMenu = document.getElementById('user-dropdown-menu');
+    if (!avatarBtn || !dropdownMenu) return;
+    const user = typeof getApliHubUserData === 'function' ? getApliHubUserData() : {};
             if (!user || user.isLoggedIn === false) {
                 openModal('modal-auth');
             } else {

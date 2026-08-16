@@ -79,6 +79,7 @@ body {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  position: relative;
 }
 
 .brand-wrap {
@@ -105,6 +106,9 @@ body {
 }
 
 .nav-tabs {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
   display: flex;
   gap: 6px;
   background: rgba(255, 255, 255, 0.04);
