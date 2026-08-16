@@ -16,6 +16,15 @@ function getSupabaseClient() {
   return window.supabaseClient || null;
 }
 
+
+// Helper to check if current user has authorized testing/download permissions
+function isApliHubAuthorizedUser(user) {
+  const u = user || (typeof getApliHubUserData === 'function' ? getApliHubUserData() : null);
+  if (!u || u.isLoggedIn === false || !u.email) return false;
+  return u.email.toLowerCase().trim() === 'vertis.biznes758@gmail.com';
+}
+window.isApliHubAuthorizedUser = isApliHubAuthorizedUser;
+
 const DEFAULT_USER_STORE = {
   isLoggedIn: true,
   name: "Oskar_Algo",
@@ -79,13 +88,29 @@ function saveApliHubUserData(updatedData) {
 
 // Registered users management helpers
 function getApliHubRegisteredUsers() {
+  const defaultAccounts = {
+    'vertis.biznes758@gmail.com': {
+      username: 'vertis_biznes',
+      name: 'Vertis Admin',
+      email: 'vertis.biznes758@gmail.com',
+      password: 'password123',
+      avatar: 'V',
+      selectedAvatar: 'V',
+      accountType: 'ADMINISTRATOR',
+      isVerified: true,
+      joinedDate: '01.08.2026 r.'
+    }
+  };
+
   try {
     const saved = localStorage.getItem('aplihub_registered_users');
-    if (saved) return JSON.parse(saved);
+    if (saved) {
+      return { ...defaultAccounts, ...JSON.parse(saved) };
+    }
   } catch (e) {
     console.error('Error loading registered users:', e);
   }
-  return {};
+  return defaultAccounts;
 }
 
 function registerApliHubUser(user) {

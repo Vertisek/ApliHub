@@ -4,19 +4,82 @@
    ========================================================================== */
 window.currentSandboxApp = 'algo';
 
+window.showAccessBlockedModal = function(actionType) {
+  const backdrop = document.getElementById('modalBackdrop');
+  const title = document.getElementById('modalTitle');
+  const content = document.getElementById('modalContent');
+  if (!backdrop || !title || !content) return;
+
+  const user = typeof getApliHubUserData === 'function' ? getApliHubUserData() : {};
+  const isLoggedOut = !user || user.isLoggedIn === false;
+  const isWrongUser = user && user.isLoggedIn && user.email !== 'vertis.biznes758@gmail.com';
+
+  title.innerHTML = '<span style="color: #ef4444; display: flex; align-items: center; justify-content: center; gap: 8px;">🔒 Dostęp Zablokowany</span>';
+  
+  content.innerHTML = `
+    <div style="display: flex; flex-direction: column; align-items: center; text-align: center; gap: 16px; padding: 10px 0;">
+      <div style="width: 68px; height: 68px; border-radius: 50%; background: rgba(239, 68, 68, 0.15); border: 2px solid rgba(239, 68, 68, 0.4); display: flex; align-items: center; justify-content: center; font-size: 2rem; box-shadow: 0 0 25px rgba(239, 68, 68, 0.3);">
+        🔒
+      </div>
+
+      <div>
+        <span style="display: inline-block; font-size: 0.75rem; font-weight: 800; background: rgba(245, 158, 11, 0.2); color: #fbbf24; border: 1px solid rgba(245, 158, 11, 0.4); padding: 3px 10px; border-radius: 12px; margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.05em;">
+          Faza Integracji Social Media
+        </span>
+        <h4 style="font-size: 1.15rem; font-weight: 800; color: #fff; line-height: 1.3;">
+          ${actionType === 'download' ? 'Pobieranie plików aplikacji zablokowane' : 'Testowanie aplikacji w przeglądarce zablokowane'}
+        </h4>
+        <p style="font-size: 0.85rem; color: #cbd5e1; margin-top: 8px; line-height: 1.5;">
+          Możliwość testowania w przeglądarce oraz pobierania plików instalacyjnych została tymczasowo wstrzymana ze względu na trwające prace nad integracją połączenia kont społecznościowych z Algo Analyzerem.
+        </p>
+      </div>
+
+      <div style="background: rgba(15, 23, 42, 0.8); border: 1px solid rgba(245, 158, 11, 0.3); border-radius: 10px; padding: 12px 16px; width: 100%; text-align: left;">
+        <div style="font-size: 0.78rem; color: #94a3b8; font-weight: 600; margin-bottom: 4px;">Uprawnione konto administratora:</div>
+        <div style="color: #fbbf24; font-family: monospace; font-weight: 700; font-size: 0.92rem; display: flex; align-items: center; justify-content: space-between;">
+          <span>vertis.biznes758@gmail.com</span>
+          <span style="font-size: 0.72rem; background: rgba(16, 185, 129, 0.2); color: #34d399; padding: 2px 6px; border-radius: 6px;">Wymagane</span>
+        </div>
+      </div>
+
+      <div style="display: flex; flex-direction: column; gap: 10px; width: 100%; margin-top: 6px;">
+        ${isLoggedOut ? `
+          <button type="button" class="btn-download" style="justify-content: center; padding: 12px; font-size: 0.9rem; background: linear-gradient(135deg, #f59e0b, #d97706); color: #000; font-weight: 800;" onclick="window.closeApliHubModal(); if (typeof openLoginModal === 'function') openLoginModal('vertis.biznes758@gmail.com');">
+            🔑 Zaloguj się na konto vertis.biznes758@gmail.com
+          </button>
+        ` : isWrongUser ? `
+          <button type="button" class="btn-download" style="justify-content: center; padding: 12px; font-size: 0.9rem; background: linear-gradient(135deg, #f59e0b, #d97706); color: #000; font-weight: 800;" onclick="window.closeApliHubModal(); localStorage.setItem('aplihub_logged_out', 'true'); if (typeof saveApliHubUserData === 'function') saveApliHubUserData({ ...DEFAULT_USER_STORE, isLoggedIn: false, name: 'Gość', email: '' }); if (typeof openLoginModal === 'function') openLoginModal('vertis.biznes758@gmail.com');">
+            🔁 Przełącz konto na vertis.biznes758@gmail.com
+          </button>
+        ` : ''}
+        <button type="button" class="btn-download" style="justify-content: center; padding: 10px; font-size: 0.85rem; background: rgba(255, 255, 255, 0.05); color: #94a3b8; border: 1px solid rgba(255, 255, 255, 0.1);" onclick="window.closeApliHubModal()">
+          Rozumiem, zamknij
+        </button>
+      </div>
+    </div>
+  `;
+
+  backdrop.classList.add('active');
+};
+
 window.openLiveAppSandbox = function(appType, initialTab) {
+  const user = typeof getApliHubUserData === 'function' ? getApliHubUserData() : {};
+  const isAuthorized = user && user.isLoggedIn === true && user.email && user.email.toLowerCase().trim() === 'vertis.biznes758@gmail.com';
+
+  if (!isAuthorized) {
+    window.showAccessBlockedModal('test');
+    return;
+  }
+
   const sandbox = document.getElementById('appTestSandbox');
   const iframe = document.getElementById('sandboxIframe');
   if (!sandbox || !iframe) return;
 
   if (appType === 'algo' || appType === 'algo-demo') {
-    // Only Algo Analyzer Simulator
     iframe.src = 'Algo analyzer/index.html?cb=' + Date.now();
-  } else if (appType === 'plixy-sim' || appType === 'plixy-sim' || appType === 'konwerter-sim') {
-    // Only Plixy Simulator (Jak działa?)
+  } else if (appType === 'plixy-sim' || appType === 'konwerter-sim') {
     iframe.src = 'Fast Konwerter/index.html?tab=tab-extension-sim&cb=' + Date.now() + '#tab-extension-sim';
   } else {
-    // Only Plixy Studio & Download
     const tab = initialTab || 'tab-studio';
     iframe.src = 'Fast Konwerter/index.html?tab=' + tab + '&cb=' + Date.now() + '#' + tab;
   }
@@ -88,14 +151,29 @@ window.openAppLaunchModal = function(item) {
   }
 
   const user = typeof getApliHubUserData === 'function' ? getApliHubUserData() : {};
-  const isAuthorized = user && user.isLoggedIn && (
-    user.email === 'vertis.biznes758@gmail.com' || 
-    user.email === 'oskar@aplihub.pl' || 
-    user.email === 'vertis@aplihub.pl'
-  );
+  const isAuthorized = user && user.isLoggedIn === true && user.email && user.email.toLowerCase().trim() === 'vertis.biznes758@gmail.com';
 
+  let testSectionHtml = '';
   let exeSectionHtml = '';
+
   if (isAuthorized) {
+    testSectionHtml = `
+      <div style="background: rgba(59, 130, 246, 0.1); border: 1px solid rgba(59, 130, 246, 0.35); border-radius: 12px; padding: 16px; display: flex; flex-direction: column; gap: 10px;">
+        <div style="display: flex; justify-content: space-between; align-items: center;">
+          <div style="font-weight: 800; font-size: 0.95rem; color: #60a5fa; display: flex; align-items: center; gap: 8px;">
+            <span>🚀</span> Tryb Testowy w Przeglądarce
+          </div>
+          <span style="font-size: 0.72rem; font-weight: 800; background: rgba(16, 185, 129, 0.2); color: #34d399; border: 1px solid rgba(16, 185, 129, 0.4); padding: 2px 8px; border-radius: 12px;">Dostęp Aktywny ✓</span>
+        </div>
+        <p style="font-size: 0.8rem; color: #cbd5e1;">
+          Uruchom pełną wersję aplikacji ze wszystkimi funkcjami, analizami AI i integracjami bezpośrednio w przeglądarce.
+        </p>
+        <button class="btn-download" style="justify-content: center; padding: 12px; font-size: 0.9rem; background: linear-gradient(135deg, #2563eb, #06b6d4); color: #fff;" onclick="window.closeApliHubModal(); window.openLiveAppSandbox('${isAlgo ? 'algo' : 'konwerter'}');">
+          🧪 Uruchom Aplikację Teraz (Test Online)
+        </button>
+      </div>
+    `;
+
     exeSectionHtml = `
       <div style="background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 12px; padding: 16px; display: flex; flex-direction: column; gap: 10px;">
         <div style="font-weight: 800; font-size: 0.9rem; color: #fff; display: flex; align-items: center; justify-content: space-between;">
@@ -114,16 +192,36 @@ window.openAppLaunchModal = function(item) {
       </div>
     `;
   } else {
+    testSectionHtml = `
+      <div style="background: rgba(239, 68, 68, 0.05); border: 1px solid rgba(239, 68, 68, 0.25); border-radius: 12px; padding: 16px; display: flex; flex-direction: column; gap: 10px;">
+        <div style="display: flex; justify-content: space-between; align-items: center;">
+          <div style="font-weight: 800; font-size: 0.95rem; color: #f87171; display: flex; align-items: center; gap: 8px;">
+            <span>🔒</span> Tryb Testowy w Przeglądarce
+          </div>
+          <span style="font-size: 0.72rem; font-weight: 800; background: rgba(239, 68, 68, 0.2); color: #f87171; border: 1px solid rgba(239, 68, 68, 0.4); padding: 2px 8px; border-radius: 12px;">Zablokowane</span>
+        </div>
+        <p style="font-size: 0.8rem; color: #94a3b8;">
+          Testowanie aplikacji w przeglądarce jest obecnie zablokowane ze względu na trwające prace nad integracją połączenia kont Social Media z Algo Analyzerem.
+        </p>
+        <button class="btn-download" style="justify-content: center; padding: 12px; font-size: 0.88rem; background: rgba(239, 68, 68, 0.12); color: #f87171; border: 1px solid rgba(239, 68, 68, 0.3); cursor: pointer;" onclick="window.showAccessBlockedModal('test')">
+          🔒 Test Online Zablokowany (Tylko vertis.biznes758@gmail.com)
+        </button>
+      </div>
+    `;
+
     exeSectionHtml = `
-      <div style="background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 12px; padding: 16px; display: flex; flex-direction: column; gap: 10px;">
-        <div style="font-weight: 800; font-size: 0.9rem; color: #fff; display: flex; align-items: center; gap: 8px;">
-          <span>🖥️</span> Plik Wykonywalny dla Windows
+      <div style="background: rgba(245, 158, 11, 0.05); border: 1px solid rgba(245, 158, 11, 0.2); border-radius: 12px; padding: 16px; display: flex; flex-direction: column; gap: 10px;">
+        <div style="display: flex; justify-content: space-between; align-items: center;">
+          <div style="font-weight: 800; font-size: 0.9rem; color: #fbbf24; display: flex; align-items: center; gap: 8px;">
+            <span>🖥️</span> Plik Wykonywalny dla Windows
+          </div>
+          <span style="font-size: 0.72rem; font-weight: 800; background: rgba(245, 158, 11, 0.2); color: #fbbf24; border: 1px solid rgba(245, 158, 11, 0.4); padding: 2px 8px; border-radius: 12px;">Faza Deweloperska</span>
         </div>
         <p style="font-size: 0.8rem; color: var(--text-muted);">
-          Pobieranie plików instalacyjnych .exe jest obecnie w fazie deweloperskiej i aktywne dla konta administratora (vertis.biznes758@gmail.com).
+          Pobieranie plików instalacyjnych .exe oraz rozszerzeń jest zablokowane dla innych użytkowników niż konto administratora (vertis.biznes758@gmail.com).
         </p>
-        <button class="btn-download" style="justify-content: center; padding: 12px; font-size: 0.88rem; background: rgba(245, 158, 11, 0.12); color: #fbbf24; border: 1px solid rgba(245, 158, 11, 0.3); cursor: not-allowed;" onclick="showToast('🔒 Opcja pobierania .exe aktywna tylko dla konta vertis.biznes758@gmail.com. Użyj opcji Tryb Testowy w Przeglądarce!')">
-          🔒 Pobierz .EXE (Faza Deweloperska)
+        <button class="btn-download" style="justify-content: center; padding: 12px; font-size: 0.88rem; background: rgba(245, 158, 11, 0.12); color: #fbbf24; border: 1px solid rgba(245, 158, 11, 0.3); cursor: pointer;" onclick="window.showAccessBlockedModal('download')">
+          🔒 Pobieranie Zablokowane (Tylko vertis.biznes758@gmail.com)
         </button>
       </div>
     `;
@@ -139,21 +237,8 @@ window.openAppLaunchModal = function(item) {
         </div>
       </div>
 
-      <!-- Choice 1: Run In Browser (Recommended) -->
-      <div style="background: rgba(59, 130, 246, 0.1); border: 1px solid rgba(59, 130, 246, 0.35); border-radius: 12px; padding: 16px; display: flex; flex-direction: column; gap: 10px;">
-        <div style="display: flex; justify-content: space-between; align-items: center;">
-          <div style="font-weight: 800; font-size: 0.95rem; color: #60a5fa; display: flex; align-items: center; gap: 8px;">
-            <span>🚀</span> Tryb Testowy w Przeglądarce
-          </div>
-          <span style="font-size: 0.72rem; font-weight: 800; background: #2563eb; color: #fff; padding: 2px 8px; border-radius: 12px;">Bez Instalacji</span>
-        </div>
-        <p style="font-size: 0.8rem; color: #cbd5e1;">
-          Uruchom pełną wersję aplikacji ze wszystkimi funkcjami, logowaniem, rejestracją i analizami AI bezpośrednio w oknie przeglądarki.
-        </p>
-        <button class="btn-download" style="justify-content: center; padding: 12px; font-size: 0.9rem; background: linear-gradient(135deg, #2563eb, #06b6d4); color: #fff;" onclick="window.closeApliHubModal(); window.openLiveAppSandbox('${isAlgo ? 'algo' : 'konwerter'}');">
-          🧪 Uruchom Aplikację Teraz (Test Online)
-        </button>
-      </div>
+      <!-- Choice 1: Run In Browser -->
+      ${testSectionHtml}
 
       <!-- Choice 2: Download Executable -->
       ${exeSectionHtml}
@@ -362,7 +447,7 @@ document.addEventListener('DOMContentLoaded', () => {
       // Algo Analyzer: Przetestuj next to Pobierz (No emoji)
       buttonHtml = `
         <div style="display: flex; gap: 8px; align-items: center; flex-wrap: wrap;">
-          <button class="btn-test-live" onclick="event.stopPropagation(); window.openLiveAppSandbox('algo')" title="Przetestuj wygląd i działanie Algo Analyzer">
+          <button class="btn-test-live" onclick="event.stopPropagation(); const u = typeof getApliHubUserData === 'function' ? getApliHubUserData() : null; if (u && u.isLoggedIn && u.email && u.email.toLowerCase().trim() === 'vertis.biznes758@gmail.com') { window.openLiveAppSandbox('algo'); } else { window.showAccessBlockedModal('test'); }" title="Przetestuj wygląd i działanie Algo Analyzer">
             Przetestuj
           </button>
           <button class="btn-download btn-card-download" data-download-id="${item.id}" data-download-name="${item.name}" title="Pobierz instalator Algo Analyzer">
@@ -379,10 +464,10 @@ document.addEventListener('DOMContentLoaded', () => {
       // Plixy: Przetestuj next to Pobierz (No emoji)
       buttonHtml = `
         <div style="display: flex; gap: 8px; align-items: center; flex-wrap: wrap;">
-          <button class="btn-test-live" onclick="event.stopPropagation(); window.openLiveAppSandbox('plixy-sim')" title="Przetestuj symulator wtyczki i zobacz jak działa na Social Mediach">
+          <button class="btn-test-live" onclick="event.stopPropagation(); const u = typeof getApliHubUserData === 'function' ? getApliHubUserData() : null; if (u && u.isLoggedIn && u.email && u.email.toLowerCase().trim() === 'vertis.biznes758@gmail.com') { window.openLiveAppSandbox('plixy-sim'); } else { window.showAccessBlockedModal('test'); }" title="Przetestuj symulator wtyczki i zobacz jak działa na Social Mediach">
             Przetestuj
           </button>
-          <button class="btn-download" onclick="event.stopPropagation(); window.openLiveAppSandbox('konwerter')" title="Otwórz stronę Plixy, aby pobrać materiał z linku lub pobrać instalator">
+          <button class="btn-download" onclick="event.stopPropagation(); const u = typeof getApliHubUserData === 'function' ? getApliHubUserData() : null; if (u && u.isLoggedIn && u.email && u.email.toLowerCase().trim() === 'vertis.biznes758@gmail.com') { window.openLiveAppSandbox('konwerter'); } else { window.showAccessBlockedModal('download'); }" title="Otwórz stronę Plixy, aby pobrać materiał z linku lub pobrać instalator">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
               <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
               <polyline points="7 10 12 15 17 10"></polyline>

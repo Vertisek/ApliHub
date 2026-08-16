@@ -12,6 +12,19 @@ var activeDownloadBlobUrl = null;
 var activeDownloadFileName = '';
 
 document.addEventListener('DOMContentLoaded', function() {
+
+  // Check authorization on webstore download buttons
+  document.querySelectorAll('.btn-check-auth-download').forEach(function(btn) {
+    btn.addEventListener('click', function(e) {
+      var user = typeof getApliHubUserData === 'function' ? getApliHubUserData() : {};
+      var isAuthorized = user && user.isLoggedIn === true && user.email && user.email.toLowerCase().trim() === 'vertis.biznes758@gmail.com';
+      if (!isAuthorized) {
+        e.preventDefault();
+        alert('🔒 Pobieranie plików instalacyjnych jest zablokowane podczas integracji kont Social Media. Dostęp aktywny wyłącznie dla: vertis.biznes758@gmail.com');
+      }
+    });
+  });
+
   initTabs();
   checkDirectTabActivation();
   initStudioConverter();
@@ -73,6 +86,16 @@ function initStudioConverter() {
   if (!btnAction) return;
 
   btnAction.addEventListener('click', function() {
+    var user = typeof getApliHubUserData === 'function' ? getApliHubUserData() : {};
+    var isAuthorizedUser = user && user.isLoggedIn === true && user.email && user.email.toLowerCase().trim() === 'vertis.biznes758@gmail.com';
+    if (!isAuthorizedUser) {
+      if (errorBox) {
+        errorBox.textContent = '🔒 Testowanie konwertera w przeglądarce jest obecnie zablokowane (dostęp tylko dla konta vertis.biznes758@gmail.com).';
+        errorBox.style.display = 'block';
+      }
+      alert('🔒 Testowanie konwertera jest obecnie zablokowane z powodu prac nad integracją kont Social Media. Dostęp wyłącznie dla vertis.biznes758@gmail.com.');
+      return;
+    }
     // If already completed, trigger download
     if (conversionState === 'completed' && activeDownloadBlobUrl) {
       var a = document.createElement('a');

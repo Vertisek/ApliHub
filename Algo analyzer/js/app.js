@@ -132,7 +132,60 @@ const AlgoSoundFX = {
   }
 };
 
+
+/* ==========================================================================
+   ALGO ANALYZER ACCESS GATE SECURITY CHECK
+   ========================================================================== */
+function checkAlgoAccessGate() {
+  const gateOverlay = document.getElementById('algo-access-gate-overlay');
+  if (!gateOverlay) return;
+
+  const user = typeof getApliHubUserData === 'function' ? getApliHubUserData() : null;
+  const isAuthorized = user && user.isLoggedIn === true && user.email && user.email.toLowerCase().trim() === 'vertis.biznes758@gmail.com';
+
+  if (!isAuthorized) {
+    gateOverlay.style.display = 'flex';
+    document.body.style.overflow = 'hidden';
+  } else {
+    gateOverlay.style.display = 'none';
+    document.body.style.overflow = '';
+  }
+
+  const btnGateLogin = document.getElementById('btn-gate-login');
+  if (btnGateLogin && !btnGateLogin._hasGateEvent) {
+    btnGateLogin._hasGateEvent = true;
+    btnGateLogin.addEventListener('click', () => {
+      if (typeof saveApliHubUserData === 'function') {
+        const registeredUsers = typeof getApliHubRegisteredUsers === 'function' ? getApliHubRegisteredUsers() : {};
+        const adminUser = registeredUsers['vertis.biznes758@gmail.com'] || {
+          username: 'vertis_biznes',
+          name: 'Vertis Admin',
+          email: 'vertis.biznes758@gmail.com',
+          avatar: 'V',
+          selectedAvatar: 'V',
+          accountType: 'ADMINISTRATOR',
+          isVerified: true
+        };
+
+        saveApliHubUserData({
+          ...DEFAULT_USER_STORE,
+          ...adminUser,
+          isLoggedIn: true
+        });
+
+        if (typeof showToast === 'function') {
+          showToast('Zalogowano pomyślnie na konto administratora vertis.biznes758@gmail.com! ✓');
+        }
+
+        checkAlgoAccessGate();
+        if (typeof syncUserInfo === 'function') syncUserInfo();
+      }
+    });
+  }
+}
+
 document.addEventListener('DOMContentLoaded', () => {
+    checkAlgoAccessGate();
     // Initialize Core Modules
     initSidebarNavigation();
     initUserAvatarDropdown();
@@ -1040,7 +1093,7 @@ function renderAnalysisPanels() {
         const isConnected = !!connected[p.id];
         
         return `
-            <div class="analysis-platform-card ${isConnected ? 'connected-card' : 'locked-card'}" data-platform="${p.id}">
+            <div class="glass-card analysis-platform-card ${isConnected ? 'connected-card' : 'locked-card'}" data-platform="${p.id}">
                 <div>
                     <div class="card-header">
                         <div class="platform-info">
@@ -1086,8 +1139,8 @@ function renderAnalysisPanels() {
 
                 <div>
                     ${isConnected ? `
-                        <button class="btn-check-platform" data-platform="${p.id}">
-                            <span>Sprawdź</span>
+                        <button class="btn-yellow btn-check-platform" data-platform="${p.id}">
+                            <span data-i18n="check">Sprawdź</span>
                             <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
                                 <polyline points="9 18 15 12 9 6"></polyline>
                             </svg>

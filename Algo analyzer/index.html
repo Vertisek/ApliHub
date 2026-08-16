@@ -9,10 +9,10 @@
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&family=Orbitron:wght@600;700;800;900&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     
     <!-- Main Style -->
-    <link rel="stylesheet" href="css/style.css?v=1786800591096">
+    <link rel="stylesheet" href="css/style.css?v=1786877852777">
 </head>
 
 <body>
@@ -114,7 +114,6 @@
                         </div>
                         <div class="logo-text">
                             <span class="logo-title">ALGO ANALYZER</span>
-                            <span class="logo-subtitle">ApliHub Suite</span>
                         </div>
                     </div>
                 </div>
@@ -1485,8 +1484,44 @@
     <script src="../js/data.js"></script>
     <script src="js/i18n.js"></script>
     <script src="js/particles.js"></script>
-    <script src="js/youtubeAnalytics.js?v=1786799136761"></script>
-    <script src="js/app.js?v=1786800591096"></script>
+    <script src="js/youtubeAnalytics.js?v=1786877852777"></script>
+    <script src="js/app.js?v=1786877852777"></script>
+
+    <!-- Dedicated Access Gate Overlay for Unauthorized Users -->
+    <div id="algo-access-gate-overlay" style="display: none; position: fixed; inset: 0; z-index: 999999; background: rgba(3, 7, 18, 0.95); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); align-items: center; justify-content: center; padding: 20px;">
+      <div style="background: rgba(15, 23, 42, 0.9); border: 1px solid rgba(239, 68, 68, 0.35); border-radius: 20px; max-width: 480px; width: 100%; padding: 32px 24px; text-align: center; display: flex; flex-direction: column; align-items: center; gap: 16px; box-shadow: 0 25px 60px rgba(0, 0, 0, 0.8), 0 0 40px rgba(239, 68, 68, 0.15);">
+        <div style="width: 72px; height: 72px; border-radius: 50%; background: rgba(239, 68, 68, 0.15); border: 2px solid rgba(239, 68, 68, 0.4); display: flex; align-items: center; justify-content: center; font-size: 2.2rem; box-shadow: 0 0 30px rgba(239, 68, 68, 0.3);">
+          🔒
+        </div>
+        <div>
+          <span style="display: inline-block; font-size: 0.75rem; font-weight: 800; background: rgba(245, 158, 11, 0.2); color: #fbbf24; border: 1px solid rgba(245, 158, 11, 0.4); padding: 3px 12px; border-radius: 12px; margin-bottom: 10px; text-transform: uppercase; letter-spacing: 0.05em;">
+            Faza Integracji Social Media
+          </span>
+          <h3 style="font-size: 1.3rem; font-weight: 800; color: #fff; margin-bottom: 8px;">Dostęp do Algo Analyzer Zablokowany</h3>
+          <p style="font-size: 0.88rem; color: #cbd5e1; line-height: 1.5;">
+            Aplikacja Algo Analyzer jest obecnie w trakcie prac nad integracją i łączeniem kont społecznościowych. Dostęp do testowania i analizy posiadają wyłącznie autoryzowane konta administratora.
+          </p>
+        </div>
+
+        <div style="background: rgba(3, 7, 18, 0.7); border: 1px solid rgba(245, 158, 11, 0.3); border-radius: 12px; padding: 12px 16px; width: 100%; text-align: left;">
+          <div style="font-size: 0.78rem; color: #94a3b8; font-weight: 600; margin-bottom: 4px;">Wymagane konto z uprawnieniami:</div>
+          <div style="color: #fbbf24; font-family: monospace; font-weight: 800; font-size: 0.95rem; display: flex; align-items: center; justify-content: space-between;">
+            <span>vertis.biznes758@gmail.com</span>
+            <span style="font-size: 0.72rem; background: rgba(16, 185, 129, 0.2); color: #34d399; padding: 2px 6px; border-radius: 6px;">ADMIN</span>
+          </div>
+        </div>
+
+        <div style="display: flex; flex-direction: column; gap: 10px; width: 100%; margin-top: 6px;">
+          <button type="button" id="btn-gate-login" style="width: 100%; padding: 13px; background: linear-gradient(135deg, #f59e0b, #d97706); color: #000; font-weight: 800; border: none; border-radius: 12px; font-size: 0.92rem; cursor: pointer; transition: all 0.2s ease;">
+            🔑 Zaloguj jako vertis.biznes758@gmail.com
+          </button>
+          <button type="button" onclick="window.handleBackToHub()" style="width: 100%; padding: 11px; background: rgba(255, 255, 255, 0.05); color: #94a3b8; border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 12px; font-size: 0.88rem; cursor: pointer;">
+            ← Wróć do ApliHub
+          </button>
+        </div>
+      </div>
+    </div>
+
 </body>
 
 </html>
