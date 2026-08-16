@@ -720,21 +720,18 @@ function initSidebarNavigation() {
 function initUserAvatarDropdown() {
     const avatarBtn = document.getElementById('user-avatar-btn');
     const dropdownMenu = document.getElementById('user-dropdown-menu');
-    if (!avatarBtn || !dropdownMenu) return;
-    const user = typeof getApliHubUserData === 'function' ? getApliHubUserData() : {};
-            if (!user || user.isLoggedIn === false) {
-                openModal('modal-auth');
-            } else {
-                userWrapper.classList.toggle('active');
-            }
-        });
+    const userWrapper = document.getElementById('user-profile-wrapper');
+    if (!avatarBtn || !dropdownMenu || !userWrapper) return;
 
-        document.addEventListener('click', (e) => {
-            if (!userWrapper.contains(e.target)) {
-                userWrapper.classList.remove('active');
-            }
-        });
-    }
+    avatarBtn.addEventListener('click', () => {
+        userWrapper.classList.toggle('active');
+    });
+
+    document.addEventListener('click', (e) => {
+        if (!userWrapper.contains(e.target)) {
+            userWrapper.classList.remove('active');
+        }
+    });
 
     const dropdownItems = document.querySelectorAll('.dropdown-item');
     dropdownItems.forEach(item => {
