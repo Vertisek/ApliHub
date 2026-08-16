@@ -1,9 +1,9 @@
-window.handleBackToHub = function() {
-  if (window.parent && window.parent !== window && typeof window.parent.closeSandboxApp === 'function') {
-    window.parent.closeSandboxApp();
-  } else {
-    window.location.href = '../index.html';
-  }
+window.handleBackToHub = function () {
+    if (window.parent && window.parent !== window && typeof window.parent.closeSandboxApp === 'function') {
+        window.parent.closeSandboxApp();
+    } else {
+        window.location.href = '../index.html';
+    }
 };
 /* ==========================================================================
    Algo Analyzer - Application Core & Social Algorithm Trends Intelligence
@@ -13,123 +13,123 @@ window.handleBackToHub = function() {
    WEB AUDIO SOUND FX ENGINE FOR ALGO ANALYZER
    ========================================================================== */
 const AlgoSoundFX = {
-  ctx: null,
-  init() {
-    if (!this.ctx && (window.AudioContext || window.webkitAudioContext)) {
-      this.ctx = new (window.AudioContext || window.webkitAudioContext)();
+    ctx: null,
+    init() {
+        if (!this.ctx && (window.AudioContext || window.webkitAudioContext)) {
+            this.ctx = new (window.AudioContext || window.webkitAudioContext)();
+        }
+    },
+    getSettings() {
+        const user = typeof getApliHubUserData === 'function' ? getApliHubUserData() : {};
+        return {
+            enabled: user.settings?.soundEnabled ?? true,
+            volume: (user.settings?.soundVolume ?? 50) / 100
+        };
+    },
+    playTabSwitch() {
+        const { enabled, volume } = this.getSettings();
+        if (!enabled || volume <= 0) return;
+        try {
+            this.init();
+            if (!this.ctx) return;
+            if (this.ctx.state === 'suspended') this.ctx.resume();
+
+            const osc = this.ctx.createOscillator();
+            const gain = this.ctx.createGain();
+            const now = this.ctx.currentTime;
+
+            osc.type = 'sine';
+            osc.frequency.setValueAtTime(520, now);
+            osc.frequency.exponentialRampToValueAtTime(880, now + 0.04);
+
+            gain.gain.setValueAtTime(volume * 0.05, now);
+            gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.04);
+
+            osc.connect(gain);
+            gain.connect(this.ctx.destination);
+
+            osc.start(now);
+            osc.stop(now + 0.04);
+        } catch (e) { }
+    },
+    playClick() {
+        const { enabled, volume } = this.getSettings();
+        if (!enabled || volume <= 0) return;
+        try {
+            this.init();
+            if (!this.ctx) return;
+            if (this.ctx.state === 'suspended') this.ctx.resume();
+
+            const osc = this.ctx.createOscillator();
+            const gain = this.ctx.createGain();
+            const now = this.ctx.currentTime;
+
+            osc.type = 'triangle';
+            osc.frequency.setValueAtTime(320, now);
+            osc.frequency.exponentialRampToValueAtTime(160, now + 0.03);
+
+            gain.gain.setValueAtTime(volume * 0.06, now);
+            gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.03);
+
+            osc.connect(gain);
+            gain.connect(this.ctx.destination);
+
+            osc.start(now);
+            osc.stop(now + 0.03);
+        } catch (e) { }
+    },
+    playModalOpen() {
+        const { enabled, volume } = this.getSettings();
+        if (!enabled || volume <= 0) return;
+        try {
+            this.init();
+            if (!this.ctx) return;
+            if (this.ctx.state === 'suspended') this.ctx.resume();
+
+            const now = this.ctx.currentTime;
+            [440, 554.37, 659.25].forEach((freq, idx) => {
+                const osc = this.ctx.createOscillator();
+                const gain = this.ctx.createGain();
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(freq, now + idx * 0.03);
+
+                gain.gain.setValueAtTime(volume * 0.04, now + idx * 0.03);
+                gain.gain.exponentialRampToValueAtTime(0.0001, now + idx * 0.03 + 0.08);
+
+                osc.connect(gain);
+                gain.connect(this.ctx.destination);
+
+                osc.start(now + idx * 0.03);
+                osc.stop(now + idx * 0.03 + 0.08);
+            });
+        } catch (e) { }
+    },
+    playConnectSuccess() {
+        const { enabled, volume } = this.getSettings();
+        if (!enabled || volume <= 0) return;
+        try {
+            this.init();
+            if (!this.ctx) return;
+            if (this.ctx.state === 'suspended') this.ctx.resume();
+
+            const now = this.ctx.currentTime;
+            [523.25, 659.25, 783.99, 1046.50].forEach((freq, idx) => {
+                const osc = this.ctx.createOscillator();
+                const gain = this.ctx.createGain();
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(freq, now + idx * 0.04);
+
+                gain.gain.setValueAtTime(volume * 0.05, now + idx * 0.04);
+                gain.gain.exponentialRampToValueAtTime(0.0001, now + idx * 0.04 + 0.12);
+
+                osc.connect(gain);
+                gain.connect(this.ctx.destination);
+
+                osc.start(now + idx * 0.04);
+                osc.stop(now + idx * 0.04 + 0.12);
+            });
+        } catch (e) { }
     }
-  },
-  getSettings() {
-    const user = typeof getApliHubUserData === 'function' ? getApliHubUserData() : {};
-    return {
-      enabled: user.settings?.soundEnabled ?? true,
-      volume: (user.settings?.soundVolume ?? 50) / 100
-    };
-  },
-  playTabSwitch() {
-    const { enabled, volume } = this.getSettings();
-    if (!enabled || volume <= 0) return;
-    try {
-      this.init();
-      if (!this.ctx) return;
-      if (this.ctx.state === 'suspended') this.ctx.resume();
-
-      const osc = this.ctx.createOscillator();
-      const gain = this.ctx.createGain();
-      const now = this.ctx.currentTime;
-
-      osc.type = 'sine';
-      osc.frequency.setValueAtTime(520, now);
-      osc.frequency.exponentialRampToValueAtTime(880, now + 0.04);
-
-      gain.gain.setValueAtTime(volume * 0.05, now);
-      gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.04);
-
-      osc.connect(gain);
-      gain.connect(this.ctx.destination);
-
-      osc.start(now);
-      osc.stop(now + 0.04);
-    } catch (e) {}
-  },
-  playClick() {
-    const { enabled, volume } = this.getSettings();
-    if (!enabled || volume <= 0) return;
-    try {
-      this.init();
-      if (!this.ctx) return;
-      if (this.ctx.state === 'suspended') this.ctx.resume();
-
-      const osc = this.ctx.createOscillator();
-      const gain = this.ctx.createGain();
-      const now = this.ctx.currentTime;
-
-      osc.type = 'triangle';
-      osc.frequency.setValueAtTime(320, now);
-      osc.frequency.exponentialRampToValueAtTime(160, now + 0.03);
-
-      gain.gain.setValueAtTime(volume * 0.06, now);
-      gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.03);
-
-      osc.connect(gain);
-      gain.connect(this.ctx.destination);
-
-      osc.start(now);
-      osc.stop(now + 0.03);
-    } catch (e) {}
-  },
-  playModalOpen() {
-    const { enabled, volume } = this.getSettings();
-    if (!enabled || volume <= 0) return;
-    try {
-      this.init();
-      if (!this.ctx) return;
-      if (this.ctx.state === 'suspended') this.ctx.resume();
-
-      const now = this.ctx.currentTime;
-      [440, 554.37, 659.25].forEach((freq, idx) => {
-        const osc = this.ctx.createOscillator();
-        const gain = this.ctx.createGain();
-        osc.type = 'sine';
-        osc.frequency.setValueAtTime(freq, now + idx * 0.03);
-
-        gain.gain.setValueAtTime(volume * 0.04, now + idx * 0.03);
-        gain.gain.exponentialRampToValueAtTime(0.0001, now + idx * 0.03 + 0.08);
-
-        osc.connect(gain);
-        gain.connect(this.ctx.destination);
-
-        osc.start(now + idx * 0.03);
-        osc.stop(now + idx * 0.03 + 0.08);
-      });
-    } catch (e) {}
-  },
-  playConnectSuccess() {
-    const { enabled, volume } = this.getSettings();
-    if (!enabled || volume <= 0) return;
-    try {
-      this.init();
-      if (!this.ctx) return;
-      if (this.ctx.state === 'suspended') this.ctx.resume();
-
-      const now = this.ctx.currentTime;
-      [523.25, 659.25, 783.99, 1046.50].forEach((freq, idx) => {
-        const osc = this.ctx.createOscillator();
-        const gain = this.ctx.createGain();
-        osc.type = 'sine';
-        osc.frequency.setValueAtTime(freq, now + idx * 0.04);
-
-        gain.gain.setValueAtTime(volume * 0.05, now + idx * 0.04);
-        gain.gain.exponentialRampToValueAtTime(0.0001, now + idx * 0.04 + 0.12);
-
-        osc.connect(gain);
-        gain.connect(this.ctx.destination);
-
-        osc.start(now + idx * 0.04);
-        osc.stop(now + idx * 0.04 + 0.12);
-      });
-    } catch (e) {}
-  }
 };
 
 
@@ -151,10 +151,10 @@ document.addEventListener('DOMContentLoaded', () => {
     if (typeof renderAnalysisPanels === "function") renderAnalysisPanels();
     window.addEventListener('aplihub_user_updated', syncUserInfo);
     window.addEventListener('language_changed', updateUILanguage);
-    
+
     // Render trend hubs for all 5 social tabs (YouTube, TikTok, Instagram, Facebook, Twitch)
     renderSocialTrendHubs();
-            renderAnalysisPanels();
+    renderAnalysisPanels();
     renderAnalysisPanels();
 
     // Initial UI translation update
@@ -766,7 +766,7 @@ function handleDropdownAction(action) {
                 saveApliHubUserData({ ...DEFAULT_USER_STORE, isLoggedIn: false, name: 'Gość', email: '' });
             }
             syncUserInfo();
-    if (typeof renderAnalysisPanels === "function") renderAnalysisPanels();
+            if (typeof renderAnalysisPanels === "function") renderAnalysisPanels();
             showToast('👋 Wylogowano pomyślnie z panelu Algo Analyzer.');
             break;
     }
@@ -780,7 +780,7 @@ function renderSocialAvatarsPicker() {
     if (!picker || typeof getApliHubUserData !== 'function') return;
 
     const user = getApliHubUserData();
-    
+
     // Collect connected social avatars + default avatar
     const available = [
         { key: 'default', label: 'Domyślny Avatar', icon: 'O' }
@@ -860,7 +860,7 @@ function initAccountCredentialsForm() {
    ========================================================================== */
 function initSettingsForm() {
     const user = typeof getApliHubUserData === 'function' ? getApliHubUserData() : {};
-    
+
     // Sound enabled toggle
     const soundToggle = document.getElementById('setting-sound-enabled');
     if (soundToggle) {
@@ -910,7 +910,7 @@ function initSettingsForm() {
                     localStorage.setItem('aplihub_plan_mode', chosen);
                     AlgoSoundFX.playClick();
                     renderSocialTrendHubs();
-            renderAnalysisPanels();
+                    renderAnalysisPanels();
                     showToast(`Przełączono tryb na: ${chosen === 'plan_a' ? 'Plan A (Jedna Zakładka Startowa)' : 'Plan B (Karty wewnątrz zakładek)'}`);
                 }
             });
@@ -1032,7 +1032,7 @@ function renderAnalysisPanels() {
 
     grid.innerHTML = platforms.map(p => {
         const isConnected = !!connected[p.id];
-        
+
         return `
             <div class="glass-card analysis-platform-card ${isConnected ? 'connected-card' : 'locked-card'}" data-platform="${p.id}">
                 <div>
@@ -1164,7 +1164,7 @@ function initPlatformCards() {
         btn.addEventListener('click', () => {
             periodBtns.forEach(b => b.classList.remove('active'));
             btn.classList.add('active');
-            
+
             const detailedContainer = document.getElementById('detailed-analysis-view');
             if (detailedContainer) {
                 detailedContainer.classList.add('updating-fade');
@@ -1189,7 +1189,7 @@ function openPlatformDetail(platformKey) {
         setTimeout(() => detailedContainer.classList.remove('updating-fade'), 300);
 
         renderPlatformDetail(platformKey);
-        
+
         requestAnimationFrame(() => {
             setTimeout(() => {
                 renderPlatformDetail(platformKey);
@@ -1699,7 +1699,7 @@ function openModal(modalId) {
     }
 }
 
-window.closeModal = function() {
+window.closeModal = function () {
     const overlay = document.getElementById('modal-overlay');
     if (overlay) overlay.classList.remove('active');
 };
@@ -1857,3 +1857,373 @@ function renderYouTubeAIResults(output) {
     }
 }
 
+/* ==========================================================================
+   TWITCH OAUTH 2.0 (IMPLICIT GRANT FLOW) & HELIX API INTEGRATION
+   Hosted for GitHub Pages: https://vertisek.github.io/ApliHub/
+   ========================================================================== */
+
+const TWITCH_CONFIG = {
+    // Default Twitch Client ID (configurable via localStorage or prompt)
+    CLIENT_ID: localStorage.getItem('twitch_client_id') || 'gp762nuuoqcoxypju8c569th9wz7q5',
+    // Redirect URI matching GitHub Pages hosting and local development
+    REDIRECT_URI: (function () {
+        if (typeof window !== 'undefined') {
+            if (window.location.hostname.includes('github.io')) {
+                return 'https://vertisek.github.io/ApliHub/Algo%20analyzer/index.html';
+            }
+            return window.location.origin + window.location.pathname;
+        }
+        return 'https://vertisek.github.io/ApliHub/Algo%20analyzer/index.html';
+    })(),
+    SCOPES: [
+        'user:read:email',
+        'user:read:broadcast',
+        'channel:read:subscriptions',
+        'channel:read:stream_key'
+    ].join(' ')
+};
+
+/**
+ * Initiates Twitch OAuth Implicit Flow login redirect
+ */
+function loginWithTwitch(customClientId) {
+    const clientId = customClientId || localStorage.getItem('twitch_client_id') || TWITCH_CONFIG.CLIENT_ID;
+    if (!clientId) {
+        promptTwitchClientId();
+        return;
+    }
+
+    localStorage.setItem('twitch_client_id', clientId);
+
+    const redirectUri = TWITCH_CONFIG.REDIRECT_URI;
+    const authUrl = 'https://id.twitch.tv/oauth2/authorize' +
+        '?client_id=' + encodeURIComponent(clientId) +
+        '&redirect_uri=' + encodeURIComponent(redirectUri) +
+        '&response_type=token' +
+        '&scope=' + encodeURIComponent(TWITCH_CONFIG.SCOPES) +
+        '&force_verify=true';
+
+    window.location.href = authUrl;
+}
+window.loginWithTwitch = loginWithTwitch;
+
+/**
+ * Parses access_token from URL hash after Twitch OAuth redirect, saves it to localStorage,
+ * and loads Twitch stats automatically
+ */
+function handleTwitchOAuthCallback() {
+    const hash = window.location.hash;
+    if (!hash || !hash.includes('access_token')) return;
+
+    const cleanHash = hash.replace(/^#/, '');
+    const params = new URLSearchParams(cleanHash.startsWith('?') ? cleanHash : '?' + cleanHash);
+    const token = params.get('access_token');
+
+    if (token) {
+        localStorage.setItem('twitch_token', token);
+        localStorage.setItem('twitch_access_token', token);
+
+        // Mark Twitch as connected in user store
+        const user = typeof getApliHubUserData === 'function' ? getApliHubUserData() : {};
+        if (!user.connectedAccounts) user.connectedAccounts = {};
+        user.connectedAccounts.twitch = true;
+        if (typeof saveApliHubUserData === 'function') saveApliHubUserData(user);
+
+        // Clean up hash from browser address bar without reloading
+        if (window.history && window.history.replaceState) {
+            window.history.replaceState(null, null, window.location.pathname + window.location.search);
+        }
+
+        if (typeof showToast === 'function') {
+            showToast('🎉 Pomyślnie połączono konto Twitch! Pobieranie statystyk Helix API...');
+        }
+
+        // Fetch Helix statistics
+        fetchTwitchChannelStats();
+        if (typeof renderAnalysisPanels === 'function') renderAnalysisPanels();
+        if (typeof renderConnectedSocialAccounts === 'function') renderConnectedSocialAccounts();
+    }
+}
+
+/**
+ * Fetches comprehensive channel stats from Twitch Helix API
+ * (User info, channel metadata, followers count, live stream status, recent videos)
+ */
+async function fetchTwitchChannelStats() {
+    const token = localStorage.getItem('twitch_token') || localStorage.getItem('twitch_access_token');
+    const clientId = localStorage.getItem('twitch_client_id') || TWITCH_CONFIG.CLIENT_ID;
+
+    if (!token) {
+        console.warn('Brak aktywnego tokenu Twitch w localStorage.');
+        renderTwitchLiveDashboard(null);
+        return null;
+    }
+
+    try {
+        const headers = {
+            'Authorization': 'Bearer ' + token,
+            'Client-Id': clientId
+        };
+
+        // 1. Get Authenticated User Info
+        const userRes = await fetch('https://api.twitch.tv/helix/users', { headers });
+        if (!userRes.ok) {
+            if (userRes.status === 401) {
+                console.warn('Twitch token wygasł lub jest nieprawidłowy.');
+                localStorage.removeItem('twitch_token');
+                localStorage.removeItem('twitch_access_token');
+            }
+            throw new Error('Twitch API user info error: ' + userRes.statusText);
+        }
+        const userDataJson = await userRes.json();
+        const user = userDataJson.data && userDataJson.data[0];
+        if (!user) throw new Error('Nie znaleziono danych użytkownika Twitch.');
+
+        const userId = user.id;
+
+        // 2. Get Channel Info (title, game category, language)
+        let channelInfo = {};
+        try {
+            const channelRes = await fetch('https://api.twitch.tv/helix/channels?broadcaster_id=' + encodeURIComponent(userId), { headers });
+            if (channelRes.ok) {
+                const channelData = await channelRes.json();
+                channelInfo = (channelData.data && channelData.data[0]) || {};
+            }
+        } catch (e) {
+            console.warn('Błąd pobierania danych kanału Twitch:', e);
+        }
+
+        // 3. Get Followers Count
+        let followersCount = user.view_count || 0;
+        try {
+            const followersRes = await fetch('https://api.twitch.tv/helix/channels/followers?broadcaster_id=' + encodeURIComponent(userId), { headers });
+            if (followersRes.ok) {
+                const followersData = await followersRes.json();
+                followersCount = followersData.total ?? followersCount;
+            }
+        } catch (e) {
+            console.warn('Błąd pobierania liczby obserwujących Twitch:', e);
+        }
+
+        // 4. Get Current Live Stream Status
+        let streamInfo = null;
+        try {
+            const streamRes = await fetch('https://api.twitch.tv/helix/streams?user_id=' + encodeURIComponent(userId), { headers });
+            if (streamRes.ok) {
+                const streamData = await streamRes.json();
+                streamInfo = (streamData.data && streamData.data[0]) || null;
+            }
+        } catch (e) {
+            console.warn('Błąd pobierania statusu transmisji Twitch:', e);
+        }
+
+        // 5. Get Recent Videos / VODs
+        let recentVideos = [];
+        try {
+            const videosRes = await fetch('https://api.twitch.tv/helix/videos?user_id=' + encodeURIComponent(userId) + '&first=5', { headers });
+            if (videosRes.ok) {
+                const videosData = await videosRes.json();
+                recentVideos = videosData.data || [];
+            }
+        } catch (e) {
+            console.warn('Błąd pobierania wideo Twitch:', e);
+        }
+
+        const statsResult = {
+            success: true,
+            user: {
+                id: user.id,
+                login: user.login,
+                displayName: user.display_name,
+                avatar: user.profile_image_url,
+                description: user.description,
+                broadcasterType: user.broadcaster_type || 'Affiliate / Partner',
+                viewCount: user.view_count
+            },
+            channel: {
+                title: channelInfo.title || 'Brak tytułu',
+                gameName: channelInfo.game_name || 'Just Chatting',
+                language: channelInfo.broadcaster_language || 'pl'
+            },
+            followers: followersCount,
+            isLive: !!streamInfo,
+            liveViewers: streamInfo ? streamInfo.viewer_count : 0,
+            videos: recentVideos,
+            updatedAt: new Date().toISOString()
+        };
+
+        // Save stats to localStorage
+        localStorage.setItem('twitch_stats_data', JSON.stringify(statsResult));
+
+        // Update Twitch tab UI with real live stats
+        renderTwitchLiveDashboard(statsResult);
+
+        return statsResult;
+    } catch (err) {
+        console.error('Błąd pobierania statystyk Twitch Helix API:', err);
+        return null;
+    }
+}
+window.fetchTwitchChannelStats = fetchTwitchChannelStats;
+
+/**
+ * Renders Twitch channel stats dashboard inside #tab-twitch
+ */
+function renderTwitchLiveDashboard(stats) {
+    const twitchTab = document.getElementById('tab-twitch');
+    if (!twitchTab) return;
+
+    let card = document.getElementById('twitch-live-stats-card');
+    if (!card) {
+        const wrapper = document.createElement('div');
+        wrapper.id = 'twitch-live-stats-card';
+        wrapper.className = 'glass-card';
+        wrapper.style.cssText = 'margin-bottom: 30px; padding: 24px; border: 1px solid rgba(145, 70, 255, 0.4); background: linear-gradient(135deg, rgba(145, 70, 255, 0.08), rgba(0, 0, 0, 0.4));';
+        const pageHeader = twitchTab.querySelector('.page-header');
+        if (pageHeader && pageHeader.nextSibling) {
+            twitchTab.insertBefore(wrapper, pageHeader.nextSibling);
+        } else {
+            twitchTab.insertAdjacentElement('afterbegin', wrapper);
+        }
+        card = wrapper;
+    }
+
+    if (!stats || !stats.user) {
+        const savedStatsStr = localStorage.getItem('twitch_stats_data');
+        if (savedStatsStr) {
+            try {
+                const parsed = JSON.parse(savedStatsStr);
+                if (parsed && parsed.user) {
+                    renderTwitchLiveDashboard(parsed);
+                    return;
+                }
+            } catch (e) {}
+        }
+
+        card.innerHTML = `
+            <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px;">
+                <div style="display: flex; align-items: center; gap: 14px;">
+                    <div style="width: 48px; height: 48px; border-radius: 12px; background: rgba(145, 70, 255, 0.2); display: flex; align-items: center; justify-content: center; font-size: 24px; border: 1px solid rgba(145, 70, 255, 0.4);">
+                        🟪
+                    </div>
+                    <div>
+                        <h3 style="font-size: 16px; font-weight: 800; color: #fff; margin-bottom: 4px;">Integracja Twitch Helix API</h3>
+                        <p style="font-size: 13px; color: var(--color-text-muted);">Połącz swoje konto Twitch przez OAuth 2.0 (Implicit Flow), aby pobierać statystyki na żywo.</p>
+                    </div>
+                </div>
+                <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+                    <button class="btn-yellow" style="background: linear-gradient(135deg, #9146ff, #772ce8); color: #fff; border: none; padding: 10px 18px; border-radius: 8px; font-weight: 700; cursor: pointer; display: inline-flex; align-items: center; gap: 8px;" onclick="window.loginWithTwitch()">
+                        <span>🟪</span> Zaloguj przez Twitch OAuth
+                    </button>
+                    <button class="btn-back" onclick="window.promptTwitchClientId()" style="padding: 10px 14px; font-size: 12px;">
+                        ⚙️ Client ID
+                    </button>
+                </div>
+            </div>
+        `;
+        return;
+    }
+
+    const u = stats.user;
+    const c = stats.channel;
+
+    card.innerHTML = `
+        <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px; margin-bottom: 20px; padding-bottom: 16px; border-bottom: 1px solid rgba(255,255,255,0.08);">
+            <div style="display: flex; align-items: center; gap: 16px;">
+                <img src="${u.avatar || 'icon48.png'}" alt="${u.displayName}" style="width: 54px; height: 54px; border-radius: 50%; border: 2px solid #9146ff; object-fit: cover; box-shadow: 0 0 16px rgba(145, 70, 255, 0.5);">
+                <div>
+                    <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
+                        <h3 style="font-size: 18px; font-weight: 800; color: #fff;">${u.displayName}</h3>
+                        ${stats.isLive ? `
+                            <span style="background: #ef4444; color: #fff; font-size: 10px; font-weight: 800; padding: 3px 8px; border-radius: 999px; display: inline-flex; align-items: center; gap: 4px;">
+                                🔴 LIVE (${Number(stats.liveViewers).toLocaleString()} widzów)
+                            </span>
+                        ` : `
+                            <span style="background: rgba(145, 70, 255, 0.2); color: #c084fc; font-size: 11px; font-weight: 700; padding: 3px 8px; border-radius: 999px; border: 1px solid rgba(145, 70, 255, 0.35);">
+                                OFFLINE
+                            </span>
+                        `}
+                    </div>
+                    <p style="font-size: 12px; color: var(--color-text-muted); font-family: var(--font-mono); margin-top: 2px;">twitch.tv/${u.login} • ${c.gameName || 'Twitch Streamer'}</p>
+                </div>
+            </div>
+            <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
+                <button class="btn-yellow" style="background: rgba(145, 70, 255, 0.2); color: #c084fc; border: 1px solid rgba(145, 70, 255, 0.4); padding: 8px 14px; border-radius: 8px; font-weight: 700; cursor: pointer; font-size: 12px;" onclick="window.fetchTwitchChannelStats()">
+                    🔄 Odśwież Helix API
+                </button>
+                <button class="btn-back" style="padding: 8px 12px; font-size: 12px; color: #f87171; border-color: rgba(239,68,68,0.3);" onclick="window.disconnectTwitchAccount()">
+                    Rozłącz
+                </button>
+            </div>
+        </div>
+
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 14px;">
+            <div style="background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.06); padding: 14px; border-radius: 10px;">
+                <div style="font-size: 11px; color: var(--color-text-muted); font-weight: 600; text-transform: uppercase;">Obserwujący (Followers)</div>
+                <div style="font-size: 20px; font-weight: 800; color: #fff; font-family: var(--font-mono); margin-top: 4px;">${Number(stats.followers).toLocaleString()}</div>
+            </div>
+            <div style="background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.06); padding: 14px; border-radius: 10px;">
+                <div style="font-size: 11px; color: var(--color-text-muted); font-weight: 600; text-transform: uppercase;">Kategoria / Gra</div>
+                <div style="font-size: 15px; font-weight: 700; color: #c084fc; margin-top: 6px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;" title="${c.gameName}">${c.gameName}</div>
+            </div>
+            <div style="background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.06); padding: 14px; border-radius: 10px;">
+                <div style="font-size: 11px; color: var(--color-text-muted); font-weight: 600; text-transform: uppercase;">Status Transmisji</div>
+                <div style="font-size: 15px; font-weight: 700; color: ${stats.isLive ? '#34d399' : '#94a3b8'}; margin-top: 6px;">${stats.isLive ? `Na Żywo (${stats.liveViewers})` : 'Offline'}</div>
+            </div>
+            <div style="background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.06); padding: 14px; border-radius: 10px;">
+                <div style="font-size: 11px; color: var(--color-text-muted); font-weight: 600; text-transform: uppercase;">Typ Konta</div>
+                <div style="font-size: 15px; font-weight: 700; color: #fbbf24; margin-top: 6px; text-transform: capitalize;">${u.broadcasterType || 'Standard'}</div>
+            </div>
+        </div>
+    `;
+}
+window.renderTwitchLiveDashboard = renderTwitchLiveDashboard;
+
+function promptTwitchClientId() {
+    const current = localStorage.getItem('twitch_client_id') || TWITCH_CONFIG.CLIENT_ID;
+    const input = prompt('Podaj Twitch Client ID (z Twitch Developer Console):', current);
+    if (input && input.trim()) {
+        localStorage.setItem('twitch_client_id', input.trim());
+        if (typeof showToast === 'function') {
+            showToast('✓ Zapisano Twitch Client ID: ' + input.trim());
+        }
+        loginWithTwitch(input.trim());
+    }
+}
+window.promptTwitchClientId = promptTwitchClientId;
+
+function disconnectTwitchAccount() {
+    localStorage.removeItem('twitch_token');
+    localStorage.removeItem('twitch_access_token');
+    localStorage.removeItem('twitch_stats_data');
+
+    const user = typeof getApliHubUserData === 'function' ? getApliHubUserData() : {};
+    if (user.connectedAccounts) {
+        user.connectedAccounts.twitch = false;
+        if (typeof saveApliHubUserData === 'function') saveApliHubUserData(user);
+    }
+
+    renderTwitchLiveDashboard(null);
+    if (typeof renderAnalysisPanels === 'function') renderAnalysisPanels();
+    if (typeof renderConnectedSocialAccounts === 'function') renderConnectedSocialAccounts();
+    if (typeof showToast === 'function') {
+        showToast('Odłączono konto Twitch.');
+    }
+}
+window.disconnectTwitchAccount = disconnectTwitchAccount;
+
+// Initialize Twitch OAuth callback handler on load
+handleTwitchOAuthCallback();
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', () => {
+        renderTwitchLiveDashboard();
+        if (localStorage.getItem('twitch_token')) {
+            fetchTwitchChannelStats();
+        }
+    });
+} else {
+    renderTwitchLiveDashboard();
+    if (localStorage.getItem('twitch_token')) {
+        fetchTwitchChannelStats();
+    }
+}
