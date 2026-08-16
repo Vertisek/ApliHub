@@ -2097,7 +2097,7 @@ function renderTwitchLiveDashboard(stats) {
                     renderTwitchLiveDashboard(parsed);
                     return;
                 }
-            } catch (e) {}
+            } catch (e) { }
         }
 
         card.innerHTML = `
@@ -2226,4 +2226,102 @@ if (document.readyState === 'loading') {
     if (localStorage.getItem('twitch_token')) {
         fetchTwitchChannelStats();
     }
+}
+const TWITCH_CLIENT_ID = 'TUTAJ_WKLEJ_SWOJ_CLIENT_ID';
+const TWITCH_REDIRECT_URI = 'https://vertisek.github.io/ApliHub/callback.html';
+const TWITCH_SCOPES = 'user:read:broadcast channel:read:subscriptions';
+
+// Konfiguracja linku logowania
+const authUrl = `https://id.twitch.tv/oauth2/authorize?client_id=${TWITCH_CLIENT_ID}&redirect_uri=${encodeURIComponent(TWITCH_REDIRECT_URI)}&response_type=token&scope=${encodeURIComponent(TWITCH_SCOPES)}`;
+const twitchAuthLinkEl = document.getElementById('twitch-auth-link');
+if (twitchAuthLinkEl) {
+    twitchAuthLinkEl.href = authUrl;
+}
+
+// Funkcje otwierania i zamykania
+function openTwitchModal() {
+    const linkEl = document.getElementById('twitch-auth-link');
+    if (linkEl) linkEl.href = authUrl;
+    const modal = document.getElementById('twitch-modal');
+    if (modal) modal.style.display = 'flex';
+}
+
+function closeTwitchModal() {
+    document.getElementById('twitch-modal').style.display = 'none';
+}
+
+// Zamknięcie po kliknięciu poza okienkiem
+window.addEventListener('click', (e) => {
+    const modal = document.getElementById('twitch-modal');
+    if (e.target === modal) {
+        closeTwitchModal();
+    }
+});
+// Uruchamia się po załadowaniu strony
+document.addEventListener('DOMContentLoaded', () => {
+    const token = localStorage.getItem('twitch_access_token');
+
+    if (token) {
+        // 1. Sprawdzamy czy token działa i pobieramy dane usera
+        fetch('https://api.twitch.tv/helix/users', {
+            headers: {
+                'Client-Id': TWITCH_CLIENT_ID,
+                'Authorization': `Bearer ${token}`
+            }
+        })
+            .then(res => {
+                if (!res.ok) throw new Error('Token nieprawidłowy lub wygasł');
+                return res.json();
+            })
+            .then(data => {
+                const user = data.data[0];
+                console.log('Połączono z Twitchem:', user.display_name);
+
+                // 2. Aktywujemy zielony stan "Połączono" na kafelku
+                aktywujKafelekTwitch(user.id);
+            })
+            .catch(err => {
+                console.error(err);
+                localStorage.removeItem('twitch_access_token');
+            });
+    }
+});
+function aktywujKafelekTwitch(broadcasterId) {
+    const twitchCard = document.getElementById('card-twitch'); // Upewnij się, że Twój kafelek Twitcha ma id="card-twitch"
+
+    if (!twitchCard) return;
+
+    twitchCard.innerHTML = `
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+      <div style="display: flex; align-items: center; gap: 8px;">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="#9146FF">
+          <path d="M11.571 4.714h1.715v5.143H11.57zm4.715 0H18v5.143h-1.714zM6 0L1.714 4.286v15.428h5.143V24l4.286-4.286h3.428L22.286 12V0zm14.571 11.143l-3.428 3.428h-3.429l-3 3v-3H6.857V1.714h13.714Z"/>
+        </svg>
+        <span style="color: #fff; font-weight: 700; font-size: 16px;">Twitch</span>
+      </div>
+      <span style="color: #00ffaa; background: rgba(0, 255, 170, 0.1); border: 1px solid rgba(0, 255, 170, 0.3); font-size: 11px; padding: 2px 8px; border-radius: 20px;">• Połączono</span>
+    </div>
+
+    <p style="color: #8b949e; font-size: 12px; margin-bottom: 16px;">Przeanalizuj zasięgi transmisji i transmisję na Twitchu</p>
+
+    <div style="display: flex; justify-content: space-between; margin-bottom: 16px;">
+      <div>
+        <div style="color: #6e7681; font-size: 10px; font-weight: 700;">ZASIĘG</div>
+        <div style="color: #ffaa00; font-size: 15px; font-weight: 700;">278.5K</div>
+      </div>
+      <div>
+        <div style="color: #6e7681; font-size: 10px; font-weight: 700;">SCORE</div>
+        <div style="color: #ffaa00; font-size: 15px; font-weight: 700;">88%</div>
+      </div>
+    </div>
+
+    <button style="width: 100%; background: #ff8800; border: none; color: #000; font-weight: 700; padding: 10px; border-radius: 8px; cursor: pointer;" onclick="pokazSzczegolyTwitch('${broadcasterId}')">
+      Sprawdź &gt;
+    </button>
+  `;
+}
+
+function pokazSzczegolyTwitch(broadcasterId) {
+    alert('Otwieranie zaawansowanej analityki dla kanału ID: ' + broadcasterId);
+    // Tutaj podepniesz przejście do widoku wykresów/analizy algorytmu
 }

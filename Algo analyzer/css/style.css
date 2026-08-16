@@ -52,7 +52,8 @@
     box-sizing: border-box;
 }
 
-html, body {
+html,
+body {
     width: 100%;
     height: 100%;
     overflow: hidden;
@@ -71,13 +72,16 @@ body {
     width: 6px;
     height: 6px;
 }
+
 ::-webkit-scrollbar-track {
     background: rgba(0, 0, 0, 0.2);
 }
+
 ::-webkit-scrollbar-thumb {
     background: rgba(250, 204, 21, 0.25);
     border-radius: 4px;
 }
+
 ::-webkit-scrollbar-thumb:hover {
     background: rgba(250, 204, 21, 0.5);
 }
@@ -174,8 +178,17 @@ body {
 }
 
 @keyframes pulseGlow {
-    0%, 100% { opacity: 0.4; transform: scale(0.9); }
-    50% { opacity: 1; transform: scale(1.15); }
+
+    0%,
+    100% {
+        opacity: 0.4;
+        transform: scale(0.9);
+    }
+
+    50% {
+        opacity: 1;
+        transform: scale(1.15);
+    }
 }
 
 .top-header-right {
@@ -285,8 +298,15 @@ body {
 }
 
 @keyframes dropdownFadeIn {
-    from { opacity: 0; transform: translateY(-8px) scale(0.96); }
-    to { opacity: 1; transform: translateY(0) scale(1); }
+    from {
+        opacity: 0;
+        transform: translateY(-8px) scale(0.96);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
 }
 
 .dropdown-header {
@@ -333,9 +353,11 @@ body {
 .dropdown-item.danger {
     color: var(--color-danger);
 }
+
 .dropdown-item.danger svg {
     stroke: var(--color-danger);
 }
+
 .dropdown-item.danger:hover {
     background: rgba(244, 63, 94, 0.12);
     color: var(--color-danger);
@@ -504,6 +526,7 @@ body {
     font-size: 11px;
     color: var(--color-text-muted);
 }
+
 .app-hub-text strong {
     color: var(--color-yellow-main);
     display: block;
@@ -533,6 +556,7 @@ body {
         opacity: 0;
         transform: translateY(10px) scale(0.995);
     }
+
     100% {
         opacity: 1;
         transform: translateY(0) scale(1);
@@ -545,8 +569,15 @@ body {
 }
 
 @keyframes fadePulse {
-    0% { opacity: 0.3; transform: scale(0.985); }
-    100% { opacity: 1; transform: scale(1); }
+    0% {
+        opacity: 0.3;
+        transform: scale(0.985);
+    }
+
+    100% {
+        opacity: 1;
+        transform: scale(1);
+    }
 }
 
 .period-btn {
@@ -855,8 +886,15 @@ body {
 }
 
 @keyframes slideIn {
-    0% { opacity: 0; transform: translateY(10px); }
-    100% { opacity: 1; transform: translateY(0); }
+    0% {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+
+    100% {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }
 
 .detail-header {
@@ -1312,8 +1350,15 @@ body {
 }
 
 @keyframes toastIn {
-    from { opacity: 0; transform: translateY(20px); }
-    to { opacity: 1; transform: translateY(0); }
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }
 
 /* ==========================================================================
@@ -1346,9 +1391,17 @@ body {
 }
 
 @keyframes apliProShimmer {
-    0% { background-position: 0% 50%; }
-    50% { background-position: 100% 50%; }
-    100% { background-position: 0% 50%; }
+    0% {
+        background-position: 0% 50%;
+    }
+
+    50% {
+        background-position: 100% 50%;
+    }
+
+    100% {
+        background-position: 0% 50%;
+    }
 }
 
 .btn-apli-pro .pro-crown {
@@ -1356,11 +1409,11 @@ body {
     filter: drop-shadow(0 0 4px rgba(255, 215, 0, 0.8));
 }
 
-.switch-toggle input:checked + .toggle-slider {
+.switch-toggle input:checked+.toggle-slider {
     background-color: var(--color-yellow-main) !important;
 }
 
-.switch-toggle input:checked + .toggle-slider:before {
+.switch-toggle input:checked+.toggle-slider:before {
     transform: translateX(20px);
 }
 
@@ -1382,7 +1435,7 @@ body {
     border-radius: 16px;
     padding: 40px 30px;
     text-align: center;
-    box-shadow: 0 12px 36px rgba(0,0,0,0.4), inset 0 0 20px rgba(245,158,11,0.05);
+    box-shadow: 0 12px 36px rgba(0, 0, 0, 0.4), inset 0 0 20px rgba(245, 158, 11, 0.05);
     margin: 20px 0;
     backdrop-filter: blur(16px);
 }
@@ -1454,8 +1507,13 @@ body {
 }
 
 @keyframes goldGlow {
-    from { box-shadow: 0 0 6px rgba(245, 158, 11, 0.3); }
-    to { box-shadow: 0 0 16px rgba(245, 158, 11, 0.7); }
+    from {
+        box-shadow: 0 0 6px rgba(245, 158, 11, 0.3);
+    }
+
+    to {
+        box-shadow: 0 0 16px rgba(245, 158, 11, 0.7);
+    }
 }
 
 /* Dynamic Analysis Platform Cards */
@@ -1593,11 +1651,13 @@ body {
     stroke: #ff0000 !important;
     filter: drop-shadow(0 0 6px rgba(255, 0, 0, 0.6)) !important;
 }
+
 .tab-btn[data-target="tab-youtube"].active {
     border-color: rgba(255, 0, 0, 0.35) !important;
     background: rgba(255, 0, 0, 0.1) !important;
     color: #ff4d4d !important;
 }
+
 .tab-btn[data-target="tab-youtube"].active::before {
     background: #ff0000 !important;
     box-shadow: 0 0 10px #ff0000 !important;
@@ -1608,11 +1668,13 @@ body {
     stroke: #00f2fe !important;
     filter: drop-shadow(0 0 6px rgba(0, 242, 254, 0.6)) !important;
 }
+
 .tab-btn[data-target="tab-tiktok"].active {
     border-color: rgba(0, 242, 254, 0.35) !important;
     background: rgba(0, 242, 254, 0.1) !important;
     color: #00f2fe !important;
 }
+
 .tab-btn[data-target="tab-tiktok"].active::before {
     background: #00f2fe !important;
     box-shadow: 0 0 10px #00f2fe !important;
@@ -1623,11 +1685,13 @@ body {
     stroke: #e1306c !important;
     filter: drop-shadow(0 0 6px rgba(225, 48, 108, 0.6)) !important;
 }
+
 .tab-btn[data-target="tab-instagram"].active {
     border-color: rgba(225, 48, 108, 0.35) !important;
     background: rgba(225, 48, 108, 0.1) !important;
     color: #f43f5e !important;
 }
+
 .tab-btn[data-target="tab-instagram"].active::before {
     background: #e1306c !important;
     box-shadow: 0 0 10px #e1306c !important;
@@ -1638,11 +1702,13 @@ body {
     stroke: #1877f2 !important;
     filter: drop-shadow(0 0 6px rgba(24, 119, 242, 0.6)) !important;
 }
+
 .tab-btn[data-target="tab-facebook"].active {
     border-color: rgba(24, 119, 242, 0.35) !important;
     background: rgba(24, 119, 242, 0.1) !important;
     color: #38bdf8 !important;
 }
+
 .tab-btn[data-target="tab-facebook"].active::before {
     background: #1877f2 !important;
     box-shadow: 0 0 10px #1877f2 !important;
@@ -1653,11 +1719,13 @@ body {
     stroke: #9146ff !important;
     filter: drop-shadow(0 0 6px rgba(145, 70, 255, 0.6)) !important;
 }
+
 .tab-btn[data-target="tab-twitch"].active {
     border-color: rgba(145, 70, 255, 0.35) !important;
     background: rgba(145, 70, 255, 0.1) !important;
     color: #c084fc !important;
 }
+
 .tab-btn[data-target="tab-twitch"].active::before {
     background: #9146ff !important;
     box-shadow: 0 0 10px #9146ff !important;
@@ -1668,12 +1736,111 @@ body {
     stroke: var(--color-yellow-main) !important;
     filter: drop-shadow(0 0 6px var(--color-yellow-main)) !important;
 }
+
 .tab-btn[data-target="tab-analiza"].active {
     border-color: rgba(245, 158, 11, 0.35) !important;
     background: rgba(245, 158, 11, 0.12) !important;
     color: var(--color-yellow-main) !important;
 }
+
 .tab-btn[data-target="tab-analiza"].active::before {
     background: var(--color-yellow-main) !important;
     box-shadow: 0 0 10px var(--color-yellow-main) !important;
+}
+
+/* Tło modala (ciemny blur) */
+.custom-modal-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.75);
+    backdrop-filter: blur(8px);
+    z-index: 9999;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Karta okienka */
+.custom-modal-box {
+    background: #0f1318;
+    border: 1px solid rgba(255, 153, 0, 0.25);
+    box-shadow: 0 0 35px rgba(255, 140, 0, 0.15);
+    border-radius: 16px;
+    width: 90%;
+    max-width: 420px;
+    padding: 30px 24px;
+    text-align: center;
+    position: relative;
+    animation: modalFadeIn 0.25s ease-out;
+}
+
+@keyframes modalFadeIn {
+    from {
+        opacity: 0;
+        transform: scale(0.95);
+    }
+
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+/* Przycisk zamknięcia [X] */
+.modal-close-btn {
+    position: absolute;
+    top: 14px;
+    right: 16px;
+    background: transparent;
+    border: none;
+    color: #71767b;
+    font-size: 24px;
+    cursor: pointer;
+    transition: color 0.2s;
+}
+
+.modal-close-btn:hover {
+    color: #fff;
+}
+
+/* Ikona i teksty */
+.modal-header-icon {
+    margin-bottom: 12px;
+}
+
+.modal-title {
+    color: #fff;
+    font-size: 20px;
+    font-weight: 700;
+    margin: 0 0 8px 0;
+}
+
+.modal-desc {
+    color: #8b949e;
+    font-size: 13px;
+    line-height: 1.5;
+    margin-bottom: 24px;
+}
+
+/* Główny przycisk Twitch */
+.twitch-action-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    background: #9146ff;
+    color: #ffffff;
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 14px;
+    padding: 12px 20px;
+    border-radius: 10px;
+    box-shadow: 0 4px 15px rgba(145, 70, 255, 0.35);
+    transition: all 0.2s ease;
+}
+
+.twitch-action-btn:hover {
+    background: #772ce8;
+    box-shadow: 0 6px 20px rgba(145, 70, 255, 0.55);
+    transform: translateY(-1px);
 }
