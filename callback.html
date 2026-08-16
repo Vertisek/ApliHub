@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+  <meta charset="UTF-8">
+  <title>Autoryzacja Twitch...</title>
+</head>
+<body style="background:#0e0e10; color:#fff; font-family:sans-serif; text-align:center; padding-top:50px;">
+  <h2>Trwa łączenie z kontem Twitch...</h2>
+
+  <script>
+    // Pobranie tokenu z hasha adresu URL (#access_token=...)
+    const hash = window.location.hash.substring(1);
+    const params = new URLSearchParams(hash);
+    const accessToken = params.get('access_token');
+
+    if (accessToken) {
+      // Zapisujemy token w przeglądarce
+      localStorage.setItem('twitch_access_token', accessToken);
+      
+      // Przekierowujemy z powrotem do głównej strony Twojej aplikacji
+      window.location.href = 'https://vertisek.github.io/ApliHub/';
+    } else {
+      document.body.innerHTML = '<h2>Wystąpił błąd podczas logowania. Spróbuj ponownie.</h2>';
+    }
+  </script>
+</body>
+</html>
