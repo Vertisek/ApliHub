@@ -13,6 +13,10 @@
         href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&family=Orbitron:wght@600;700;800;900&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap"
         rel="stylesheet">
 
+    <!-- Favicon -->
+    <link rel="icon" type="image/x-icon" href="app.ico">
+    <link rel="shortcut icon" href="app.ico">
+
     <!-- Main Style -->
     <link rel="stylesheet" href="css/style.css?v=1786878771422">
 </head>
@@ -1999,32 +2003,34 @@
     <script src="js/particles.js"></script>
     <script src="js/youtubeAnalytics.js?v=1786880000000"></script>
     <script src="js/app.js?v=1786880000000"></script>
-    <!-- Modal Autoryzacji Twitch -->
-    <div id="twitch-modal" class="custom-modal-overlay">
+    <!-- Modal Autoryzacji Kont Społecznościowych (Twitch, YouTube, TikTok, Instagram, Facebook) -->
+    <div id="social-connect-modal" class="custom-modal-overlay">
         <div class="custom-modal-box">
             <!-- Przycisk zamknięcia -->
-            <button class="modal-close-btn" onclick="closeTwitchModal()">&times;</button>
+            <button class="modal-close-btn" onclick="closeSocialConnectModal()" title="Zamknij">&times;</button>
 
-            <!-- Nagłówek -->
-            <div class="modal-header-icon">
+            <!-- Nagłówek i Ikona -->
+            <div class="modal-header-icon" id="modal-platform-icon">
                 <svg width="40" height="40" viewBox="0 0 24 24" fill="#9146FF">
-                    <path
-                        d="M11.571 4.714h1.715v5.143H11.57zm4.715 0H18v5.143h-1.714zM6 0L1.714 4.286v15.428h5.143V24l4.286-4.286h3.428L22.286 12V0zm14.571 11.143l-3.428 3.428h-3.429l-3 3v-3H6.857V1.714h13.714Z" />
+                    <path d="M11.571 4.714h1.715v5.143H11.57zm4.715 0H18v5.143h-1.714zM6 0L1.714 4.286v15.428h5.143V24l4.286-4.286h3.428L22.286 12V0zm14.571 11.143l-3.428 3.428h-3.429l-3 3v-3H6.857V1.714h13.714Z" />
                 </svg>
             </div>
 
-            <h3 class="modal-title">Połącz z Twitch</h3>
-            <p class="modal-desc">Zaloguj się przez oficjalny portal Twitch, aby odblokować panel zaawansowanej
-                analityki algorytmu.</p>
+            <h3 class="modal-title" id="modal-platform-title">Połącz z Twitch</h3>
+            <p class="modal-desc" id="modal-platform-desc">Zaloguj się przez oficjalny portal, aby odblokować panel zaawansowanej analityki algorytmu.</p>
 
-            <!-- Przycisk logowania Twitch -->
-            <a id="twitch-auth-link" href="#" class="twitch-action-btn">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="#fff">
-                    <path
-                        d="M11.571 4.714h1.715v5.143H11.57zm4.715 0H18v5.143h-1.714zM6 0L1.714 4.286v15.428h5.143V24l4.286-4.286h3.428L22.286 12V0zm14.571 11.143l-3.428 3.428h-3.429l-3 3v-3H6.857V1.714h13.714Z" />
-                </svg>
-                Kontynuuj z Twitch
+            <!-- Przycisk autoryzacji OAuth -->
+            <a id="modal-auth-link" href="#" class="platform-action-btn" target="_blank" rel="noopener noreferrer">
+                <span id="modal-btn-icon"></span>
+                <span id="modal-btn-text">Kontynuuj z Twitch</span>
             </a>
+
+            <!-- Opcja natychmiastowej symulacji API w celach demonstracyjnych / deweloperskich -->
+            <div class="modal-secondary-actions">
+                <button type="button" class="btn-modal-manual" id="btn-modal-manual" onclick="handleManualSimulatedConnect()">
+                    ⚡ Symuluj autoryzację API (Tryb testowy)
+                </button>
+            </div>
         </div>
     </div>
 

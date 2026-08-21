@@ -952,18 +952,25 @@ function renderConnectedSocialAccounts() {
         btn.addEventListener('click', () => {
             const key = btn.getAttribute('data-key');
             const currentUser = getApliHubUserData();
-            const newState = !currentUser.connectedAccounts[key];
-            currentUser.connectedAccounts[key] = newState;
+            const isCurrentlyConnected = !!(currentUser.connectedAccounts && currentUser.connectedAccounts[key]);
 
-            saveApliHubUserData(currentUser);
-            renderConnectedSocialAccounts();
-            renderSocialTrendHubs();
-            renderAnalysisPanels();
-
-            if (newState) AlgoSoundFX.playConnectSuccess();
-            else AlgoSoundFX.playClick();
-
-            showToast(newState ? `Połączono konto ${key.toUpperCase()}` : `Odłączono konto ${key.toUpperCase()}`);
+            if (!isCurrentlyConnected) {
+                // Open real authorization modal for this platform
+                openSocialConnectModal(key);
+            } else {
+                // Disconnect account
+                currentUser.connectedAccounts[key] = false;
+                if (key === 'twitch') {
+                    localStorage.removeItem('twitch_token');
+                    localStorage.removeItem('twitch_access_token');
+                }
+                saveApliHubUserData(currentUser);
+                renderConnectedSocialAccounts();
+                renderSocialTrendHubs();
+                renderAnalysisPanels();
+                AlgoSoundFX.playClick();
+                showToast(`Odłączono konto ${key.toUpperCase()}`);
+            }
         });
     });
 }
@@ -1041,9 +1048,7 @@ function renderAnalysisPanels() {
                             <div class="platform-icon-wrapper" style="border-color: ${p.color}40;">
                                 ${p.svg}
                             </div>
-                            <div>
-                                <div class="platform-title">${p.name}</div>
-                            </div>
+                            <div class="platform-title">${p.name}</div>
                         </div>
                         ${isConnected ? `
                             <span class="platform-status-badge connected">
@@ -1113,15 +1118,7 @@ function renderAnalysisPanels() {
         btn.addEventListener('click', (e) => {
             e.stopPropagation();
             const platformKey = btn.getAttribute('data-platform');
-            const currentUser = getApliHubUserData();
-            if (!currentUser.connectedAccounts) currentUser.connectedAccounts = {};
-            currentUser.connectedAccounts[platformKey] = true;
-            saveApliHubUserData(currentUser);
-
-            AlgoSoundFX.playConnectSuccess();
-            renderAnalysisPanels();
-            renderConnectedSocialAccounts();
-            showToast(`🎉 Połączono konto ${platformKey.toUpperCase()}! Panel analizy został odblokowany.`);
+            openSocialConnectModal(platformKey);
         });
     });
 
@@ -2227,108 +2224,269 @@ if (document.readyState === 'loading') {
         fetchTwitchChannelStats();
     }
 }
-const TWITCH_CLIENT_ID = 'TUTAJ_WKLEJ_SWOJ_CLIENT_ID';
-const TWITCH_REDIRECT_URI = 'https://vertisek.github.io/ApliHub/callback.html';
-const TWITCH_SCOPES = 'user:read:broadcast channel:read:subscriptions';
-
-// Konfiguracja linku logowania
-const authUrl = `https://id.twitch.tv/oauth2/authorize?client_id=${TWITCH_CLIENT_ID}&redirect_uri=${encodeURIComponent(TWITCH_REDIRECT_URI)}&response_type=token&scope=${encodeURIComponent(TWITCH_SCOPES)}`;
-const twitchAuthLinkEl = document.getElementById('twitch-auth-link');
-if (twitchAuthLinkEl) {
-    twitchAuthLinkEl.href = authUrl;
-}
-
-// Funkcje otwierania i zamykania
-function openTwitchModal() {
-    const linkEl = document.getElementById('twitch-auth-link');
-    if (linkEl) linkEl.href = authUrl;
-    const modal = document.getElementById('twitch-modal');
-    if (modal) modal.style.display = 'flex';
-}
-
-function closeTwitchModal() {
-    document.getElementById('twitch-modal').style.display = 'none';
-}
-
-// Zamknięcie po kliknięciu poza okienkiem
-window.addEventListener('click', (e) => {
-    const modal = document.getElementById('twitch-modal');
-    if (e.target === modal) {
-        closeTwitchModal();
+/* ==========================================================================
+   UNIVERSAL SOCIAL OAUTH CONFIGURATION & MODAL CONTROLLER
+   ========================================================================== */
+const SOCIAL_OAUTH_CONFIGS = {
+    twitch: {
+        id: 'twitch',
+        name: 'Twitch',
+        color: '#9146ff',
+        iconSvg: `<svg width="40" height="40" viewBox="0 0 24 24" fill="#9146FF">
+            <path d="M11.571 4.714h1.715v5.143H11.57zm4.715 0H18v5.143h-1.714zM6 0L1.714 4.286v15.428h5.143V24l4.286-4.286h3.428L22.286 12V0zm14.571 11.143l-3.428 3.428h-3.429l-3 3v-3H6.857V1.714h13.714Z"/>
+        </svg>`,
+        btnIconSvg: `<svg width="18" height="18" viewBox="0 0 24 24" fill="#fff">
+            <path d="M11.571 4.714h1.715v5.143H11.57zm4.715 0H18v5.143h-1.714zM6 0L1.714 4.286v15.428h5.143V24l4.286-4.286h3.428L22.286 12V0zm14.571 11.143l-3.428 3.428h-3.429l-3 3v-3H6.857V1.714h13.714Z"/>
+        </svg>`,
+        title: 'Połącz z Twitch',
+        desc: 'Zaloguj się przez oficjalny portal Twitch OAuth, aby odblokować panel zaawansowanej analityki transmisji na żywo, czatu i algorytmu.',
+        btnText: 'Kontynuuj z Twitch',
+        btnBg: '#9146ff',
+        btnBgHover: '#772ce8',
+        getAuthUrl: () => {
+            const clientId = localStorage.getItem('twitch_client_id') || 'gp762nuuoqcoxypju8c569th9wz7q5';
+            const redirectUri = window.location.origin + window.location.pathname;
+            const scopes = 'user:read:broadcast channel:read:subscriptions';
+            return `https://id.twitch.tv/oauth2/authorize?client_id=${encodeURIComponent(clientId)}&redirect_uri=${encodeURIComponent(redirectUri)}&response_type=token&scope=${encodeURIComponent(scopes)}&force_verify=true`;
+        }
+    },
+    youtube: {
+        id: 'youtube',
+        name: 'YouTube',
+        color: '#ff0000',
+        iconSvg: `<svg width="40" height="40" viewBox="0 0 24 24" fill="#ff0000">
+            <path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/>
+        </svg>`,
+        btnIconSvg: `<svg width="18" height="18" viewBox="0 0 24 24" fill="#fff">
+            <path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/>
+        </svg>`,
+        title: 'Połącz z YouTube',
+        desc: 'Zaloguj się przez Google / YouTube OAuth, aby autoryzować pobieranie oficjalnych statystyk CTR, retencji AVD oraz analiz filmów z YouTube API.',
+        btnText: 'Kontynuuj z Google / YouTube',
+        btnBg: '#e60000',
+        btnBgHover: '#cc0000',
+        getAuthUrl: () => {
+            const redirectUri = window.location.origin + window.location.pathname;
+            return `https://accounts.google.com/o/oauth2/v2/auth?client_id=102434567890-aplihub.apps.googleusercontent.com&redirect_uri=${encodeURIComponent(redirectUri)}&response_type=token&scope=https://www.googleapis.com/auth/youtube.readonly&prompt=consent`;
+        }
+    },
+    tiktok: {
+        id: 'tiktok',
+        name: 'TikTok',
+        color: '#00f2fe',
+        iconSvg: `<svg width="40" height="40" viewBox="0 0 24 24" fill="#00f2fe">
+            <path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-5.2 1.74 2.89 2.89 0 0 1 2.31-4.64c.29 0 .56.04.83.12V9.3a6.33 6.33 0 0 0-1-.08 6.34 6.34 0 1 0 6.34 6.34V9.05a8.3 8.3 0 0 0 5-1.63V6.69z"/>
+        </svg>`,
+        btnIconSvg: `<svg width="18" height="18" viewBox="0 0 24 24" fill="#fff">
+            <path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-5.2 1.74 2.89 2.89 0 0 1 2.31-4.64c.29 0 .56.04.83.12V9.3a6.33 6.33 0 0 0-1-.08 6.34 6.34 0 1 0 6.34 6.34V9.05a8.3 8.3 0 0 0 5-1.63V6.69z"/>
+        </svg>`,
+        title: 'Połącz z TikTok',
+        desc: 'Zaloguj się przez oficjalny portal TikTok Creator Kit, aby przeanalizować wiralowość treści i parametry algorytmu karty Dla Ciebie (FYP).',
+        btnText: 'Kontynuuj z TikTok',
+        btnBg: '#010101',
+        btnBgHover: '#1f1f1f',
+        getAuthUrl: () => {
+            const redirectUri = window.location.origin + window.location.pathname;
+            return `https://www.tiktok.com/v2/auth/authorize/?client_key=awz7aplihubtiktok&response_type=code&scope=user.info.basic,video.list&redirect_uri=${encodeURIComponent(redirectUri)}`;
+        }
+    },
+    instagram: {
+        id: 'instagram',
+        name: 'Instagram',
+        color: '#e1306c',
+        iconSvg: `<svg width="40" height="40" viewBox="0 0 24 24" fill="#e1306c">
+            <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/>
+        </svg>`,
+        btnIconSvg: `<svg width="18" height="18" viewBox="0 0 24 24" fill="#fff">
+            <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689-.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/>
+        </svg>`,
+        title: 'Połącz z Instagram',
+        desc: 'Zaloguj się przez Meta for Developers / Instagram Login, aby badać dynamikę wzrostu Rolek (Reels) oraz zaangażowanie społeczności.',
+        btnText: 'Kontynuuj z Instagram',
+        btnBg: 'linear-gradient(45deg, #f09433, #e6683c, #dc2743, #cc2366, #bc1888)',
+        btnBgHover: 'linear-gradient(45deg, #f09433, #dc2743)',
+        getAuthUrl: () => {
+            const redirectUri = window.location.origin + window.location.pathname;
+            return `https://api.instagram.com/oauth/authorize?client_id=123456789&redirect_uri=${encodeURIComponent(redirectUri)}&scope=user_profile,user_media&response_type=code`;
+        }
+    },
+    facebook: {
+        id: 'facebook',
+        name: 'Facebook',
+        color: '#1877f2',
+        iconSvg: `<svg width="40" height="40" viewBox="0 0 24 24" fill="#1877f2">
+            <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
+        </svg>`,
+        btnIconSvg: `<svg width="18" height="18" viewBox="0 0 24 24" fill="#fff">
+            <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
+        </svg>`,
+        title: 'Połącz z Facebook',
+        desc: 'Zaloguj się przez oficjalny portal Meta / Facebook for Developers, aby zsynchronizować statystyki postów i stron.',
+        btnText: 'Kontynuuj z Facebook',
+        btnBg: '#1877f2',
+        btnBgHover: '#1465cc',
+        getAuthUrl: () => {
+            const redirectUri = window.location.origin + window.location.pathname;
+            return `https://www.facebook.com/v18.0/dialog/oauth?client_id=123456789&redirect_uri=${encodeURIComponent(redirectUri)}&scope=pages_show_list,pages_read_engagement`;
+        }
     }
-});
-// Uruchamia się po załadowaniu strony
-document.addEventListener('DOMContentLoaded', () => {
-    const token = localStorage.getItem('twitch_access_token');
+};
 
-    if (token) {
-        // 1. Sprawdzamy czy token działa i pobieramy dane usera
-        fetch('https://api.twitch.tv/helix/users', {
-            headers: {
-                'Client-Id': TWITCH_CLIENT_ID,
-                'Authorization': `Bearer ${token}`
+let currentModalPlatformKey = 'twitch';
+
+function openSocialConnectModal(platformKey) {
+    const pKey = platformKey ? platformKey.toLowerCase() : 'twitch';
+    const config = SOCIAL_OAUTH_CONFIGS[pKey] || SOCIAL_OAUTH_CONFIGS.twitch;
+    currentModalPlatformKey = config.id;
+
+    const modal = document.getElementById('social-connect-modal') || document.getElementById('twitch-modal');
+    if (!modal) return;
+
+    const titleEl = document.getElementById('modal-platform-title') || modal.querySelector('.modal-title');
+    const descEl = document.getElementById('modal-platform-desc') || modal.querySelector('.modal-desc');
+    const iconEl = document.getElementById('modal-platform-icon') || modal.querySelector('.modal-header-icon');
+    const authLinkEl = document.getElementById('modal-auth-link') || modal.querySelector('.platform-action-btn, .twitch-action-btn');
+    const btnTextEl = document.getElementById('modal-btn-text');
+    const btnIconEl = document.getElementById('modal-btn-icon');
+
+    if (titleEl) titleEl.textContent = config.title;
+    if (descEl) descEl.textContent = config.desc;
+    if (iconEl) iconEl.innerHTML = config.iconSvg;
+
+    if (authLinkEl) {
+        authLinkEl.href = config.getAuthUrl();
+        authLinkEl.style.background = config.btnBg;
+        if (btnTextEl) btnTextEl.textContent = config.btnText;
+        if (btnIconEl) btnIconEl.innerHTML = config.btnIconSvg;
+
+        authLinkEl.onclick = () => {
+            // After opening the external OAuth URL, optionally notify user
+            if (typeof showToast === 'function') {
+                showToast(`Przekierowywanie do oficjalnej autoryzacji ${config.name}...`);
             }
-        })
-            .then(res => {
-                if (!res.ok) throw new Error('Token nieprawidłowy lub wygasł');
-                return res.json();
-            })
-            .then(data => {
-                const user = data.data[0];
-                console.log('Połączono z Twitchem:', user.display_name);
+        };
+    }
 
-                // 2. Aktywujemy zielony stan "Połączono" na kafelku
-                aktywujKafelekTwitch(user.id);
-            })
-            .catch(err => {
-                console.error(err);
-                localStorage.removeItem('twitch_access_token');
-            });
+    modal.style.display = 'flex';
+}
+
+function closeSocialConnectModal() {
+    const modal = document.getElementById('social-connect-modal') || document.getElementById('twitch-modal');
+    if (modal) modal.style.display = 'none';
+}
+
+function handleManualSimulatedConnect() {
+    const pKey = currentModalPlatformKey || 'twitch';
+    const config = SOCIAL_OAUTH_CONFIGS[pKey] || { name: pKey.toUpperCase() };
+
+    const currentUser = getApliHubUserData();
+    if (!currentUser.connectedAccounts) currentUser.connectedAccounts = {};
+    currentUser.connectedAccounts[pKey] = true;
+    saveApliHubUserData(currentUser);
+
+    if (typeof AlgoSoundFX !== 'undefined' && AlgoSoundFX.playConnectSuccess) {
+        AlgoSoundFX.playConnectSuccess();
+    }
+
+    if (pKey === 'twitch') {
+        localStorage.setItem('twitch_token', 'simulated_oauth_token_' + Date.now());
+        if (typeof fetchTwitchChannelStats === 'function') fetchTwitchChannelStats();
+    }
+
+    renderAnalysisPanels();
+    renderConnectedSocialAccounts();
+    closeSocialConnectModal();
+
+    if (typeof showToast === 'function') {
+        showToast(`🎉 Pomyślnie autoryzowano konto ${config.name}! Panel analizy został odblokowany.`);
+    }
+}
+
+// Global click outside modal to close
+window.addEventListener('click', (e) => {
+    const modal = document.getElementById('social-connect-modal') || document.getElementById('twitch-modal');
+    if (e.target === modal) {
+        closeSocialConnectModal();
     }
 });
-function aktywujKafelekTwitch(broadcasterId) {
-    const twitchCard = document.getElementById('card-twitch'); // Upewnij się, że Twój kafelek Twitcha ma id="card-twitch"
 
-    if (!twitchCard) return;
+// Automatic OAuth Callback parser across all platforms
+function handleGlobalOAuthCallbacks() {
+    // 1. Check Twitch / Google token hash (#access_token=...)
+    const hash = window.location.hash;
+    if (hash && hash.includes('access_token')) {
+        const cleanHash = hash.replace(/^#/, '');
+        const params = new URLSearchParams(cleanHash.startsWith('?') ? cleanHash : '?' + cleanHash);
+        const token = params.get('access_token');
+        const state = params.get('state') || '';
 
-    twitchCard.innerHTML = `
-    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
-      <div style="display: flex; align-items: center; gap: 8px;">
-        <svg width="22" height="22" viewBox="0 0 24 24" fill="#9146FF">
-          <path d="M11.571 4.714h1.715v5.143H11.57zm4.715 0H18v5.143h-1.714zM6 0L1.714 4.286v15.428h5.143V24l4.286-4.286h3.428L22.286 12V0zm14.571 11.143l-3.428 3.428h-3.429l-3 3v-3H6.857V1.714h13.714Z"/>
-        </svg>
-        <span style="color: #fff; font-weight: 700; font-size: 16px;">Twitch</span>
-      </div>
-      <span style="color: #00ffaa; background: rgba(0, 255, 170, 0.1); border: 1px solid rgba(0, 255, 170, 0.3); font-size: 11px; padding: 2px 8px; border-radius: 20px;">• Połączono</span>
-    </div>
+        if (token) {
+            let platformKey = 'twitch';
+            if (state.includes('youtube') || hash.includes('youtube')) platformKey = 'youtube';
 
-    <p style="color: #8b949e; font-size: 12px; margin-bottom: 16px;">Przeanalizuj zasięgi transmisji i transmisję na Twitchu</p>
+            localStorage.setItem(`${platformKey}_token`, token);
+            localStorage.setItem(`${platformKey}_access_token`, token);
 
-    <div style="display: flex; justify-content: space-between; margin-bottom: 16px;">
-      <div>
-        <div style="color: #6e7681; font-size: 10px; font-weight: 700;">ZASIĘG</div>
-        <div style="color: #ffaa00; font-size: 15px; font-weight: 700;">278.5K</div>
-      </div>
-      <div>
-        <div style="color: #6e7681; font-size: 10px; font-weight: 700;">SCORE</div>
-        <div style="color: #ffaa00; font-size: 15px; font-weight: 700;">88%</div>
-      </div>
-    </div>
+            const user = getApliHubUserData();
+            if (!user.connectedAccounts) user.connectedAccounts = {};
+            user.connectedAccounts[platformKey] = true;
+            saveApliHubUserData(user);
 
-    <button style="width: 100%; background: #ff8800; border: none; color: #000; font-weight: 700; padding: 10px; border-radius: 8px; cursor: pointer;" onclick="pokazSzczegolyTwitch('${broadcasterId}')">
-      Sprawdź &gt;
-    </button>
-  `;
+            if (window.history && window.history.replaceState) {
+                window.history.replaceState(null, null, window.location.pathname + window.location.search);
+            }
+
+            if (typeof showToast === 'function') {
+                showToast(`🎉 Pomyślnie połączono konto ${platformKey.toUpperCase()}!`);
+            }
+
+            if (platformKey === 'twitch' && typeof fetchTwitchChannelStats === 'function') {
+                fetchTwitchChannelStats();
+            }
+
+            renderAnalysisPanels();
+            renderConnectedSocialAccounts();
+        }
+    }
+
+    // 2. Check query params code (?code=... or ?connected=...)
+    const searchParams = new URLSearchParams(window.location.search);
+    const connectedPlatform = searchParams.get('connected');
+    if (connectedPlatform && SOCIAL_OAUTH_CONFIGS[connectedPlatform.toLowerCase()]) {
+        const user = getApliHubUserData();
+        if (!user.connectedAccounts) user.connectedAccounts = {};
+        user.connectedAccounts[connectedPlatform.toLowerCase()] = true;
+        saveApliHubUserData(user);
+
+        if (window.history && window.history.replaceState) {
+            window.history.replaceState(null, null, window.location.pathname);
+        }
+
+        renderAnalysisPanels();
+        renderConnectedSocialAccounts();
+    }
 }
 
-function pokazSzczegolyTwitch(broadcasterId) {
-    alert('Otwieranie zaawansowanej analityki dla kanału ID: ' + broadcasterId);
-    // Tutaj podepniesz przejście do widoku wykresów/analizy algorytmu
+// Global initialization
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', () => {
+        handleGlobalOAuthCallbacks();
+        renderAnalysisPanels();
+        renderConnectedSocialAccounts();
+    });
+} else {
+    handleGlobalOAuthCallbacks();
+    renderAnalysisPanels();
+    renderConnectedSocialAccounts();
 }
 
-window.openTwitchModal = openTwitchModal;
-window.closeTwitchModal = closeTwitchModal;
-window.aktywujKafelekTwitch = aktywujKafelekTwitch;
-window.pokazSzczegolyTwitch = pokazSzczegolyTwitch;
+// Backwards compatibility and window exports
+window.openSocialConnectModal = openSocialConnectModal;
+window.closeSocialConnectModal = closeSocialConnectModal;
+window.handleManualSimulatedConnect = handleManualSimulatedConnect;
+window.openTwitchModal = () => openSocialConnectModal('twitch');
+window.closeTwitchModal = closeSocialConnectModal;
+window.SOCIAL_OAUTH_CONFIGS = SOCIAL_OAUTH_CONFIGS;
+
 
 
