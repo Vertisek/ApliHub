@@ -2302,118 +2302,51 @@ const SOCIAL_OAUTH_CONFIGS = {
         id: 'tiktok',
         name: 'TikTok',
         color: '#00f2fe',
-        iconSvg: `<svg width="40" height="40" viewBox="0 0 24 24" fill="#00f2fe">
+        iconSvg: `<svg width="42" height="42" viewBox="0 0 24 24" fill="#00f2fe">
             <path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-5.2 1.74 2.89 2.89 0 0 1 2.31-4.64c.29 0 .56.04.83.12V9.3a6.33 6.33 0 0 0-1-.08 6.34 6.34 0 1 0 6.34 6.34V9.05a8.3 8.3 0 0 0 5-1.63V6.69z"/>
         </svg>`,
-        btnIconSvg: `<svg width="18" height="18" viewBox="0 0 24 24" fill="#fff">
-            <path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-5.2 1.74 2.89 2.89 0 0 1 2.31-4.64c.29 0 .56.04.83.12V9.3a6.33 6.33 0 0 0-1-.08 6.34 6.34 0 1 0 6.34 6.34V9.05a8.3 8.3 0 0 0 5-1.63V6.69z"/>
-        </svg>`,
-        title: 'Połącz z TikTok',
-        desc: 'Zaloguj się przez oficjalny portal TikTok Creator Kit (OAuth v2 z PKCE), aby analizować wiralowość filmów i algorytm karty Dla Ciebie (FYP).',
-        btnText: 'Kontynuuj z TikTok',
-        btnBg: '#010101',
-        devPortalUrl: 'https://developers.tiktok.com/',
-        defaultClientId: 'awz7aplihubtiktok',
-        buildAuthUrl: async function (clientId) {
-            const cId = clientId || localStorage.getItem('tiktok_client_id') || this.defaultClientId;
-            const redirectUri = getAppRedirectUri();
-            const codeVerifier = generateRandomString(64);
-            sessionStorage.setItem('tiktok_code_verifier', codeVerifier);
-            const codeChallenge = await generateCodeChallenge(codeVerifier);
-            const state = generateRandomString(16);
-            sessionStorage.setItem('tiktok_oauth_state', state);
-
-            return `https://www.tiktok.com/v2/auth/authorize/?client_key=${encodeURIComponent(cId)}&scope=user.info.basic,video.list&response_type=code&redirect_uri=${encodeURIComponent(redirectUri)}&state=${encodeURIComponent(state)}&code_challenge=${encodeURIComponent(codeChallenge)}&code_challenge_method=S256`;
-        }
+        title: 'Połącz z kontem TikTok',
+        desc: 'Połącz swoje konto na TikToku z aplikacją, aby korzystać z niej bez limitu!'
     },
     twitch: {
         id: 'twitch',
         name: 'Twitch',
         color: '#9146ff',
-        iconSvg: `<svg width="40" height="40" viewBox="0 0 24 24" fill="#9146FF">
+        iconSvg: `<svg width="42" height="42" viewBox="0 0 24 24" fill="#9146FF">
             <path d="M11.571 4.714h1.715v5.143H11.57zm4.715 0H18v5.143h-1.714zM6 0L1.714 4.286v15.428h5.143V24l4.286-4.286h3.428L22.286 12V0zm14.571 11.143l-3.428 3.428h-3.429l-3 3v-3H6.857V1.714h13.714Z"/>
         </svg>`,
-        btnIconSvg: `<svg width="18" height="18" viewBox="0 0 24 24" fill="#fff">
-            <path d="M11.571 4.714h1.715v5.143H11.57zm4.715 0H18v5.143h-1.714zM6 0L1.714 4.286v15.428h5.143V24l4.286-4.286h3.428L22.286 12V0zm14.571 11.143l-3.428 3.428h-3.429l-3 3v-3H6.857V1.714h13.714Z"/>
-        </svg>`,
-        title: 'Połącz z Twitch',
-        desc: 'Zaloguj się przez oficjalny portal Twitch OAuth, aby odblokować panel zaawansowanej analityki transmisji na żywo, czatu i algorytmu.',
-        btnText: 'Kontynuuj z Twitch',
-        btnBg: '#9146ff',
-        devPortalUrl: 'https://dev.twitch.tv/console/apps',
-        defaultClientId: 'gp762nuuoqcoxypju8c569th9wz7q5',
-        buildAuthUrl: async function (clientId) {
-            const cId = clientId || localStorage.getItem('twitch_client_id') || this.defaultClientId;
-            const redirectUri = getAppRedirectUri();
-            const scopes = 'user:read:email user:read:broadcast channel:read:subscriptions';
-            return `https://id.twitch.tv/oauth2/authorize?client_id=${encodeURIComponent(cId)}&redirect_uri=${encodeURIComponent(redirectUri)}&response_type=token&scope=${encodeURIComponent(scopes)}&force_verify=true`;
-        }
+        title: 'Połącz z kontem Twitch',
+        desc: 'Połącz swoje konto na Twitchu z aplikacją, aby korzystać z niej bez limitu!'
     },
     youtube: {
         id: 'youtube',
         name: 'YouTube',
         color: '#ff0000',
-        iconSvg: `<svg width="40" height="40" viewBox="0 0 24 24" fill="#ff0000">
+        iconSvg: `<svg width="42" height="42" viewBox="0 0 24 24" fill="#ff0000">
             <path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/>
         </svg>`,
-        btnIconSvg: `<svg width="18" height="18" viewBox="0 0 24 24" fill="#fff">
-            <path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/>
-        </svg>`,
-        title: 'Połącz z YouTube',
-        desc: 'Zaloguj się przez Google / YouTube OAuth, aby autoryzować pobieranie oficjalnych statystyk CTR, retencji AVD oraz analiz filmów z YouTube API.',
-        btnText: 'Kontynuuj z Google / YouTube',
-        btnBg: '#e60000',
-        devPortalUrl: 'https://console.cloud.google.com/apis/credentials',
-        defaultClientId: '102434567890-aplihub.apps.googleusercontent.com',
-        buildAuthUrl: async function (clientId) {
-            const cId = clientId || localStorage.getItem('youtube_client_id') || this.defaultClientId;
-            const redirectUri = getAppRedirectUri();
-            return `https://accounts.google.com/o/oauth2/v2/auth?client_id=${encodeURIComponent(cId)}&redirect_uri=${encodeURIComponent(redirectUri)}&response_type=token&scope=https://www.googleapis.com/auth/youtube.readonly&prompt=consent`;
-        }
+        title: 'Połącz z kontem YouTube',
+        desc: 'Połącz swoje konto na YouTube z aplikacją, aby korzystać z niej bez limitu!'
     },
     instagram: {
         id: 'instagram',
         name: 'Instagram',
         color: '#e1306c',
-        iconSvg: `<svg width="40" height="40" viewBox="0 0 24 24" fill="#e1306c">
+        iconSvg: `<svg width="42" height="42" viewBox="0 0 24 24" fill="#e1306c">
             <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/>
         </svg>`,
-        btnIconSvg: `<svg width="18" height="18" viewBox="0 0 24 24" fill="#fff">
-            <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689-.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/>
-        </svg>`,
-        title: 'Połącz z Instagram',
-        desc: 'Zaloguj się przez Meta for Developers / Instagram Login, aby badać dynamikę wzrostu Rolek (Reels) oraz zaangażowanie społeczności.',
-        btnText: 'Kontynuuj z Instagram',
-        btnBg: 'linear-gradient(45deg, #f09433, #e6683c, #dc2743, #cc2366, #bc1888)',
-        devPortalUrl: 'https://developers.facebook.com/apps/',
-        defaultClientId: '123456789012345',
-        buildAuthUrl: async function (clientId) {
-            const cId = clientId || localStorage.getItem('instagram_client_id') || this.defaultClientId;
-            const redirectUri = getAppRedirectUri();
-            return `https://api.instagram.com/oauth/authorize?client_id=${encodeURIComponent(cId)}&redirect_uri=${encodeURIComponent(redirectUri)}&scope=user_profile,user_media&response_type=code`;
-        }
+        title: 'Połącz z kontem Instagram',
+        desc: 'Połącz swoje konto na Instagramie z aplikacją, aby korzystać z niej bez limitu!'
     },
     facebook: {
         id: 'facebook',
         name: 'Facebook',
         color: '#1877f2',
-        iconSvg: `<svg width="40" height="40" viewBox="0 0 24 24" fill="#1877f2">
+        iconSvg: `<svg width="42" height="42" viewBox="0 0 24 24" fill="#1877f2">
             <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
         </svg>`,
-        btnIconSvg: `<svg width="18" height="18" viewBox="0 0 24 24" fill="#fff">
-            <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
-        </svg>`,
-        title: 'Połącz z Facebook',
-        desc: 'Zaloguj się przez oficjalny portal Meta / Facebook for Developers, aby zsynchronizować statystyki postów i stron.',
-        btnText: 'Kontynuuj z Facebook',
-        btnBg: '#1877f2',
-        devPortalUrl: 'https://developers.facebook.com/apps/',
-        defaultClientId: '123456789012345',
-        buildAuthUrl: async function (clientId) {
-            const cId = clientId || localStorage.getItem('facebook_client_id') || this.defaultClientId;
-            const redirectUri = getAppRedirectUri();
-            return `https://www.facebook.com/v18.0/dialog/oauth?client_id=${encodeURIComponent(cId)}&redirect_uri=${encodeURIComponent(redirectUri)}&scope=pages_show_list,pages_read_engagement&response_type=token`;
-        }
+        title: 'Połącz z kontem Facebook',
+        desc: 'Połącz swoje konto na Facebooku z aplikacją, aby korzystać z niej bez limitu!'
     }
 };
 
@@ -2431,103 +2364,28 @@ async function openSocialConnectModal(platformKey) {
     const config = SOCIAL_OAUTH_CONFIGS[pKey] || SOCIAL_OAUTH_CONFIGS.tiktok;
     currentModalPlatformKey = config.id;
 
-    const modal = document.getElementById('social-connect-modal') || document.getElementById('twitch-modal');
+    const modal = document.getElementById('social-connect-modal');
     if (!modal) return;
 
-    const titleEl = document.getElementById('modal-platform-title') || modal.querySelector('.modal-title');
-    const descEl = document.getElementById('modal-platform-desc') || modal.querySelector('.modal-desc');
-    const iconEl = document.getElementById('modal-platform-icon') || modal.querySelector('.modal-header-icon');
-    const authLinkEl = document.getElementById('modal-auth-link') || modal.querySelector('.platform-action-btn, .twitch-action-btn');
+    const titleEl = document.getElementById('modal-platform-title');
+    const descEl = document.getElementById('modal-platform-desc');
+    const iconEl = document.getElementById('modal-platform-icon');
     const btnTextEl = document.getElementById('modal-btn-text');
-    const btnIconEl = document.getElementById('modal-btn-icon');
-    const inputClientId = document.getElementById('input-client-id');
-    const displayRedirectUri = document.getElementById('display-redirect-uri');
-    const devPortalLink = document.getElementById('dev-portal-link');
 
     if (titleEl) titleEl.textContent = config.title;
     if (descEl) descEl.textContent = config.desc;
     if (iconEl) iconEl.innerHTML = config.iconSvg;
-
-    const currentClientId = localStorage.getItem(`${config.id}_client_id`) || '';
-    if (inputClientId) {
-        inputClientId.value = currentClientId;
-        inputClientId.placeholder = `Twój ${config.name} Client ID / App Key...`;
-    }
-
-    const redirectUri = getAppRedirectUri();
-    if (displayRedirectUri) {
-        displayRedirectUri.textContent = redirectUri;
-    }
-
-    if (devPortalLink) {
-        devPortalLink.href = config.devPortalUrl;
-        devPortalLink.textContent = `↗ Otwórz Portal Developers dla ${config.name}`;
-    }
-
-    if (authLinkEl) {
-        authLinkEl.style.background = config.btnBg;
-        if (btnTextEl) btnTextEl.textContent = config.btnText;
-        if (btnIconEl) btnIconEl.innerHTML = config.btnIconSvg;
-
-        // Generate async URL with PKCE if needed
-        const authUrl = await config.buildAuthUrl(currentClientId);
-        authLinkEl.href = authUrl;
-
-        authLinkEl.onclick = () => {
-            if (typeof showToast === 'function') {
-                showToast(`Przekierowywanie do oficjalnej autoryzacji ${config.name}...`);
-            }
-        };
-    }
+    if (btnTextEl) btnTextEl.textContent = 'Kontynuuj';
 
     modal.style.display = 'flex';
 }
 
 function closeSocialConnectModal() {
-    const modal = document.getElementById('social-connect-modal') || document.getElementById('twitch-modal');
+    const modal = document.getElementById('social-connect-modal');
     if (modal) modal.style.display = 'none';
 }
 
-function toggleModalDevConfig() {
-    const body = document.getElementById('dev-config-body');
-    const arrow = document.getElementById('config-arrow');
-    if (!body) return;
-    const isHidden = body.style.display === 'none';
-    body.style.display = isHidden ? 'flex' : 'none';
-    if (arrow) arrow.textContent = isHidden ? '▲' : '▼';
-}
-
-async function handleClientIdInput(val) {
-    const pKey = currentModalPlatformKey || 'tiktok';
-    const config = SOCIAL_OAUTH_CONFIGS[pKey];
-    if (!config) return;
-
-    if (val && val.trim()) {
-        localStorage.setItem(`${pKey}_client_id`, val.trim());
-    } else {
-        localStorage.removeItem(`${pKey}_client_id`);
-    }
-
-    const authLinkEl = document.getElementById('modal-auth-link');
-    if (authLinkEl) {
-        authLinkEl.href = await config.buildAuthUrl(val.trim());
-    }
-}
-
-function copyRedirectUri() {
-    const uri = getAppRedirectUri();
-    if (navigator.clipboard && navigator.clipboard.writeText) {
-        navigator.clipboard.writeText(uri).then(() => {
-            if (typeof showToast === 'function') {
-                showToast('✓ Skopiowano Redirect URI do schowka: ' + uri);
-            }
-        });
-    } else {
-        prompt('Skopiuj poniższy Redirect URI:', uri);
-    }
-}
-
-function handleManualSimulatedConnect() {
+function handleSocialConnectConfirm() {
     const pKey = currentModalPlatformKey || 'tiktok';
     const config = SOCIAL_OAUTH_CONFIGS[pKey] || { name: pKey.toUpperCase() };
 
@@ -2541,12 +2399,13 @@ function handleManualSimulatedConnect() {
     }
 
     if (pKey === 'twitch') {
-        localStorage.setItem('twitch_token', 'simulated_oauth_token_' + Date.now());
+        localStorage.setItem('twitch_token', 'desktop_auth_token_' + Date.now());
         if (typeof fetchTwitchChannelStats === 'function') fetchTwitchChannelStats();
     }
 
     renderAnalysisPanels();
     renderConnectedSocialAccounts();
+    renderSocialTrendHubs();
     closeSocialConnectModal();
 
     if (typeof showToast === 'function') {

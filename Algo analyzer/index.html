@@ -2004,60 +2004,25 @@
     <script src="js/particles.js?v=1787336500000"></script>
     <script src="js/youtubeAnalytics.js?v=1787336500000"></script>
     <script src="js/app.js?v=1787336500000"></script>
-    <!-- Modal Autoryzacji Kont Społecznościowych (Twitch, YouTube, TikTok, Instagram, Facebook) -->
+    <!-- Modal Autoryzacji Kont Społecznościowych (Soclify Connect Modal) -->
     <div id="social-connect-modal" class="custom-modal-overlay">
-        <div class="custom-modal-box">
+        <div class="custom-modal-box" style="text-align: center; max-width: 440px; padding: 36px 30px; border-radius: 20px; background: #0e111a; border: 1px solid rgba(245, 158, 11, 0.25); box-shadow: 0 20px 50px rgba(0,0,0,0.8); position: relative;">
             <!-- Przycisk zamknięcia -->
-            <button class="modal-close-btn" onclick="closeSocialConnectModal()" title="Zamknij">&times;</button>
+            <button class="modal-close-btn" onclick="closeSocialConnectModal()" title="Zamknij" style="position: absolute; top: 16px; right: 16px; background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; color: #94a3b8; width: 32px; height: 32px; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 18px;">&times;</button>
 
             <!-- Nagłówek i Ikona -->
-            <div class="modal-header-icon" id="modal-platform-icon">
-                <svg width="40" height="40" viewBox="0 0 24 24" fill="#9146FF">
-                    <path d="M11.571 4.714h1.715v5.143H11.57zm4.715 0H18v5.143h-1.714zM6 0L1.714 4.286v15.428h5.143V24l4.286-4.286h3.428L22.286 12V0zm14.571 11.143l-3.428 3.428h-3.429l-3 3v-3H6.857V1.714h13.714Z" />
-                </svg>
+            <div class="modal-header-icon" id="modal-platform-icon" style="width: 72px; height: 72px; margin: 0 auto 20px; display: flex; align-items: center; justify-content: center; background: rgba(255,255,255,0.04); border-radius: 20px; border: 1px solid rgba(255,255,255,0.1); box-shadow: 0 8px 24px rgba(0,0,0,0.4);">
+                <!-- SVG Icon -->
             </div>
 
-            <h3 class="modal-title" id="modal-platform-title">Połącz z TikTok</h3>
-            <p class="modal-desc" id="modal-platform-desc">Zaloguj się przez oficjalny portal, aby odblokować panel zaawansowanej analityki algorytmu.</p>
+            <h3 class="modal-title" id="modal-platform-title" style="font-size: 1.4rem; font-weight: 800; color: #fff; margin-bottom: 12px; font-family: var(--font-sans); text-align: center;">Połącz z kontem TikTok</h3>
+            <p class="modal-desc" id="modal-platform-desc" style="font-size: 0.92rem; color: #94a3b8; line-height: 1.5; margin-bottom: 26px; text-align: center;">Połącz swoje konto na TikToku z aplikacją, aby korzystać z niej bez limitu!</p>
 
-            <!-- Główny Przycisk autoryzacji OAuth -->
-            <a id="modal-auth-link" href="#" class="platform-action-btn" target="_blank" rel="noopener noreferrer">
+            <!-- Główny Przycisk Kontynuuj -->
+            <button id="modal-auth-btn" class="platform-action-btn" onclick="handleSocialConnectConfirm()" style="width: 100%; padding: 14px 20px; background: #f59e0b; color: #000; font-weight: 800; font-size: 1.05rem; border: none; border-radius: 12px; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 10px; transition: all 0.2s ease; box-shadow: 0 6px 20px rgba(245, 158, 11, 0.35);">
                 <span id="modal-btn-icon"></span>
-                <span id="modal-btn-text">Kontynuuj z TikTok</span>
-            </a>
-
-            <!-- Rozwijany panel konfiguracji kluczy i redirect URI -->
-            <div class="modal-config-panel">
-                <button type="button" class="btn-toggle-config" onclick="toggleModalDevConfig()" id="btn-toggle-dev-config">
-                    <span>⚙️ Ustawienia API & Redirect URI</span>
-                    <span id="config-arrow">▼</span>
-                </button>
-                <div class="dev-config-body" id="dev-config-body" style="display: none;">
-                    <div class="config-field">
-                        <label id="lbl-client-id" for="input-client-id">Twój Client ID / App Key:</label>
-                        <input type="text" id="input-client-id" class="modal-input" placeholder="Wklej swój Client ID..." oninput="handleClientIdInput(this.value)">
-                    </div>
-                    <div class="config-field">
-                        <label>Wymagany Redirect URI w portalu:</label>
-                        <div class="redirect-uri-box">
-                            <code id="display-redirect-uri">http://localhost:54321/index.html</code>
-                            <button type="button" class="btn-copy-uri" onclick="copyRedirectUri()">📋 Kopiuj</button>
-                        </div>
-                    </div>
-                    <div class="config-links">
-                        <a id="dev-portal-link" href="https://developers.tiktok.com" target="_blank" rel="noopener" class="dev-portal-anchor">
-                            ↗ Otwórz Portal Deweloperski dla tej platformy
-                        </a>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Opcja natychmiastowej symulacji API w celach demonstracyjnych / deweloperskich -->
-            <div class="modal-secondary-actions">
-                <button type="button" class="btn-modal-manual" id="btn-modal-manual" onclick="handleManualSimulatedConnect()">
-                    ⚡ Symuluj autoryzację API (Tryb demonstracyjny)
-                </button>
-            </div>
+                <span id="modal-btn-text">Kontynuuj</span>
+            </button>
         </div>
     </div>
 
