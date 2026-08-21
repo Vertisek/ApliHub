@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="pl">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Polityka Prywatności — Soclify (ApliHub)</title>
+    <link rel="icon" type="image/x-icon" href="app.ico">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Orbitron:wght@700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-color: #0b0e14;
+            --card-bg: rgba(18, 22, 32, 0.85);
+            --border-color: rgba(250, 204, 21, 0.2);
+            --accent: #facc15;
+            --text-primary: #f8fafc;
+            --text-secondary: #94a3b8;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background: var(--bg-color);
+            color: var(--text-primary);
+            font-family: 'Inter', sans-serif;
+            line-height: 1.7;
+            padding: 40px 20px;
+            background-image: radial-gradient(circle at top center, rgba(250, 204, 21, 0.08) 0%, transparent 60%);
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 860px;
+            margin: 0 auto;
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(12px);
+        }
+
+        .header {
+            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+            padding-bottom: 24px;
+            margin-bottom: 30px;
+        }
+
+        .brand-badge {
+            display: inline-block;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 13px;
+            font-weight: 800;
+            color: var(--accent);
+            letter-spacing: 0.1em;
+            margin-bottom: 12px;
+            text-transform: uppercase;
+        }
+
+        h1 {
+            font-size: 28px;
+            font-weight: 800;
+            color: #ffffff;
+            margin-bottom: 8px;
+        }
+
+        .last-updated {
+            font-size: 13px;
+            color: var(--text-secondary);
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        h2 {
+            font-size: 20px;
+            font-weight: 700;
+            color: var(--accent);
+            margin: 28px 0 12px 0;
+        }
+
+        p {
+            color: var(--text-secondary);
+            font-size: 15px;
+            margin-bottom: 16px;
+        }
+
+        ul {
+            list-style: none;
+            padding-left: 0;
+            margin-bottom: 18px;
+        }
+
+        li {
+            position: relative;
+            padding-left: 24px;
+            color: var(--text-secondary);
+            font-size: 14.5px;
+            margin-bottom: 8px;
+        }
+
+        li::before {
+            content: "✦";
+            position: absolute;
+            left: 0;
+            color: var(--accent);
+        }
+
+        .btn-back {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            margin-top: 30px;
+            background: var(--accent);
+            color: #000;
+            text-decoration: none;
+            font-weight: 700;
+            font-size: 14px;
+            padding: 10px 20px;
+            border-radius: 10px;
+            transition: all 0.2s ease;
+        }
+
+        .btn-back:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(250, 204, 21, 0.4);
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="brand-badge">Soclify // ApliHub</div>
+            <h1>Polityka Prywatności (Privacy Policy)</h1>
+            <div class="last-updated">Ostatnia aktualizacja: 21 sierpnia 2026 r.</div>
+        </div>
+
+        <h2>1. Jakie dane przetwarzamy?</h2>
+        <p>Aplikacja <strong>Soclify</strong> szanuje prywatność swoich użytkowników. Przetwarzamy wyłącznie publiczne oraz autoryzowane wskaźniki analityczne z serwisów społecznościowych (TikTok, YouTube, Twitch, Instagram, Facebook):</p>
+        <ul>
+            <li>Identyfikator użytkownika / nazwa kanału</li>
+            <li>Statystyki wyświetleń, zaangażowania i wskaźników algorytmu (CTR, AVD)</li>
+            <li>Listy opublikowanych materiałów wideo w celu wyliczenia wskaźników wiralowości</li>
+        </ul>
+
+        <h2>2. Jak przechowujemy Twoje dane?</h2>
+        <p>Wszystkie dane są przechowywane lokalnie w pamięci Twojej przeglądarki / komputera (LocalStorage). Soclify nie przesyła, nie gromadzi ani nie sprzedaje Twoich poufnych danych osobowych na zewnętrznych serwerach.</p>
+
+        <h2>3. Bezpieczeństwo i OAuth 2.0 (PKCE)</h2>
+        <p>Autoryzacja z serwisami (m.in. TikTok Login Kit, Google OAuth, Twitch Helix) odbywa się w oparciu o bezpieczny protokół OAuth 2.0 z szyfrowaniem PKCE SHA-256. Tokeny dostępu są wykorzystywane bezpośrednio w Twojej przeglądarce i nie są udostępniane osobom trzecim.</p>
+
+        <h2>4. Twoje prawa (RODO / GDPR)</h2>
+        <p>Masz prawo w dowolnym momencie odłączyć swoje konto w ustawieniach aplikacji lub usunąć pamięć podręczną przeglądarki, co spowoduje natychmiastowe usunięcie wszelkich lokalnie zapisanych tokenów i statystyk.</p>
+
+        <h2>5. Kontakt z administratorem danych</h2>
+        <p>W sprawach związanych z prywatnością i ochroną danych możesz skontaktować się z nami pod adresem: <strong>prywatnosc@aplihub.pl</strong>.</p>
+
+        <a href="index.html" class="btn-back">← Wróć do Soclify</a>
+    </div>
+</body>
+
+</html>
