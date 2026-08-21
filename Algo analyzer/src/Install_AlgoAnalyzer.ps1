@@ -35,6 +35,10 @@ Get-Process -Name "Soclify", "AlgoAnalyzer" -ErrorAction SilentlyContinue | ForE
     Write-Host "  Zatrzymywanie instancji ID: $($_.Id)" -ForegroundColor DarkYellow
     Stop-Process -Id $_.Id -Force -ErrorAction SilentlyContinue
 }
+Get-CimInstance Win32_Process -ErrorAction SilentlyContinue | Where-Object { $_.CommandLine -like "*ApliHub.Soclify*" -or $_.CommandLine -like "*AlgoAnalyzer\profile*" } | ForEach-Object {
+    Write-Host "  Zamykanie okna aplikacji PID: $($_.ProcessId)" -ForegroundColor DarkYellow
+    Stop-Process -Id $_.ProcessId -Force -ErrorAction SilentlyContinue
+}
 
 # 2. Compile Binaries
 Write-Host "[2/6] Kompilowanie binariow EXE (Launcher, Uninstaller, Updater)..." -ForegroundColor Gray
