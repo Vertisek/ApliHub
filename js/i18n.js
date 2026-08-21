@@ -1,5 +1,5 @@
 /* ==========================================================================
-   ApliHub & Algo Analyzer - Internationalization (i18n) Multilingual Engine
+   ApliHub & Soclify - Internationalization (i18n) Multilingual Engine
    Supported Languages: Polski (pl), English (en), Français (fr), Русский (ru)
    ========================================================================== */
 

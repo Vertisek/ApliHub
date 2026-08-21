@@ -99,7 +99,7 @@ window.openAppLaunchModal = function(item) {
 
   if (!backdrop || !title || !content) return;
 
-  const isAlgo = item.id === 'app-1' || item.name.includes('Algo Analyzer');
+  const isAlgo = item.id === 'app-1' || item.name.includes('Soclify') || item.name.includes('Algo Analyzer');
   const isKonwerter = item.id === 'plug-2' || item.name.includes('Plixy') || item.name.includes('Fast Konwerter');
 
   title.innerHTML = `⚡ ${item.name} <span style="font-size: 0.8rem; opacity: 0.7;">(${item.version || 'v1.0.0'})</span>`;
@@ -335,7 +335,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const card = document.createElement('div');
     card.className = 'card glowing-card';
 
-    const isAlgo = item.id === 'app-1' || item.name.includes('Algo Analyzer');
+    const isAlgo = item.id === 'app-1' || item.name.includes('Soclify') || item.name.includes('Algo Analyzer');
     const isPlixy = item.id === 'plug-2' || item.name.includes('Plixy') || item.name.includes('Fast Konwerter');
 
     let buttonHtml = '';
@@ -344,10 +344,10 @@ document.addEventListener('DOMContentLoaded', () => {
       // Algo Analyzer: Przetestuj next to Pobierz (No emoji)
       buttonHtml = `
         <div style="display: flex; gap: 8px; align-items: center; flex-wrap: wrap;">
-          <button class="btn-test-live" onclick="event.stopPropagation(); window.openLiveAppSandbox('algo');" title="Zobacz podgląd Algo Analyzer w symulatorze">
+          <button class="btn-test-live" onclick="event.stopPropagation(); window.openLiveAppSandbox('algo');" title="Zobacz podgląd Soclify w symulatorze">
             Przetestuj
           </button>
-          <button class="btn-download btn-card-download" data-download-id="${item.id}" data-download-name="${item.name}" title="Pobierz instalator Algo Analyzer">
+          <button class="btn-download btn-card-download" data-download-id="${item.id}" data-download-name="${item.name}" title="Pobierz instalator Soclify">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
               <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
               <polyline points="7 10 12 15 17 10"></polyline>
@@ -529,7 +529,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
           <div>
             <h4 style="font-weight: 800; color: #fff; font-size: 1rem; margin-bottom: 6px;">1. Autorskie Oprogramowanie i Narzędzia</h4>
-            <p>Zarówno serwis ApliHub, jak i dedykowane narzędzia (m.in. Algo Analyzer, Plixy, Ofertomat, Theme Injector) są chronione prawem autorskim oraz międzynarodowymi konwencjami o ochronie własności intelektualnej.</p>
+            <p>Zarówno serwis ApliHub, jak i dedykowane narzędzia (m.in. Soclify, Plixy, Ofertomat, Theme Injector) są chronione prawem autorskim oraz międzynarodowymi konwencjami o ochronie własności intelektualnej.</p>
           </div>
 
           <div>

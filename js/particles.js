@@ -1,5 +1,5 @@
 /* ==========================================================================
-   ApliHub & Algo Analyzer - Ambient Particle Background Engine
+   ApliHub & Soclify - Ambient Particle Background Engine
    ========================================================================== */
 
 (function () {
