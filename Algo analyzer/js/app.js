@@ -922,12 +922,18 @@ function initSettingsForm() {
 
 function isDesktopApp() {
     if (typeof window === 'undefined') return false;
+    const isFile = window.location.protocol === 'file:';
     const isPort54321 = window.location.port === '54321';
+    const isLocalhost = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
     const isExplicitDesktop = window.location.search.includes('env=desktop') || window.location.search.includes('mode=desktop') || localStorage.getItem('soclify_env') === 'desktop';
-    return isPort54321 || isExplicitDesktop;
+    return isFile || isPort54321 || isLocalhost || isExplicitDesktop;
 }
 
 function isWebSimulation() {
+    if (window.parent && window.parent !== window) return true;
+    if (window.location.hostname.includes('github.io') || window.location.hostname.includes('aplihub')) {
+        return !window.location.search.includes('env=desktop');
+    }
     return !isDesktopApp();
 }
 window.isDesktopApp = isDesktopApp;
@@ -944,7 +950,7 @@ function renderConnectedSocialAccounts() {
                 <div style="font-weight: 700; color: #f59e0b; font-size: 1.05rem; margin-bottom: 6px;">Tryb Podglądu Symulacji</div>
                 <div style="color: #94a3b8; font-size: 0.88rem; line-height: 1.5; margin-bottom: 14px;">
                     W symulatorze na stronie wszystkie platformy (YouTube, TikTok, Instagram, Facebook, Twitch) są w pełni odblokowane do interaktywnego testowania.<br>
-                    Rzeczywiste łączenie i synchronizacja Twoich kont przez oficjalne API jest dostępne w <strong>Aplikacji Desktopowej Soclify</strong>.
+                    Rzeczywiste łączenie i synchronizacja Twoich kont przez oficjalne API jest wymagana w <strong>Aplikacji Desktopowej Soclify</strong>.
                 </div>
                 <a href="assets/installer/ApliHub_AlgoAnalyzer_Setup.exe" style="display: inline-block; padding: 9px 18px; background: #f59e0b; color: #000; font-weight: 700; border-radius: 8px; text-decoration: none; font-size: 0.85rem;">
                     📥 Pobierz Aplikację Desktopową (.EXE)
@@ -969,7 +975,12 @@ function renderConnectedSocialAccounts() {
             <div style="display: flex; align-items: center; justify-content: space-between; padding: 12px 16px; background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.06); border-radius: 10px;">
                 <div style="display: flex; align-items: center; gap: 12px;">
                     <span style="font-size: 1.3rem;">${p.icon}</span>
-                    <span style="font-weight: 700; font-size: 0.95rem; color: #fff;">${p.name}</span>
+                    <div>
+                        <div style="font-weight: 700; font-size: 0.95rem; color: #fff;">${p.name}</div>
+                        <div style="font-size: 0.78rem; color: ${isConnected ? '#34d399' : '#f87171'}; font-weight: 600;">
+                            ${isConnected ? '● Połączono' : '● Nie połączono'}
+                        </div>
+                    </div>
                 </div>
                 <button class="btn-toggle-algo-social" data-key="${p.key}" style="padding: 8px 18px; border-radius: 8px; font-weight: 700; font-size: 0.85rem; cursor: pointer; transition: all 0.2s ease; ${isConnected ? 'background: rgba(239, 68, 68, 0.15); border: 1px solid rgba(239, 68, 68, 0.4); color: #f87171;' : 'background: rgba(245, 158, 11, 0.15); border: 1px solid rgba(245, 158, 11, 0.4); color: #f59e0b;'}">
                     ${isConnected ? 'Odłącz' : 'Połącz'}
@@ -985,10 +996,8 @@ function renderConnectedSocialAccounts() {
             const isCurrentlyConnected = !!(currentUser.connectedAccounts && currentUser.connectedAccounts[key]);
 
             if (!isCurrentlyConnected) {
-                // Open real authorization modal for this platform
                 openSocialConnectModal(key);
             } else {
-                // Disconnect account
                 currentUser.connectedAccounts[key] = false;
                 if (key === 'twitch') {
                     localStorage.removeItem('twitch_token');
@@ -1018,7 +1027,7 @@ function renderAnalysisPanels() {
 
     const isSim = isWebSimulation();
     const user = typeof getApliHubUserData === 'function' ? getApliHubUserData() : { connectedAccounts: {} };
-    const connected = user.connectedAccounts || {};
+    const connected = (user && user.connectedAccounts) ? user.connectedAccounts : {};
 
     const platforms = [
         {
@@ -1069,50 +1078,49 @@ function renderAnalysisPanels() {
     ];
 
     grid.innerHTML = platforms.map(p => {
-        // In web simulation, everything is fully unlocked for test preview
         const isConnected = isSim ? true : !!connected[p.id];
 
         return `
-            <div class="glass-card analysis-platform-card connected-card" data-platform="${p.id}" style="cursor: pointer;">
+            <div class="glass-card analysis-platform-card ${isConnected ? 'connected-card' : 'locked-card'}" data-platform="${p.id}" style="cursor: pointer; display: flex; flex-direction: column; justify-content: space-between; position: relative;">
                 <div>
-                    <div class="card-header">
-                        <div class="platform-info">
-                            <div class="platform-icon-wrapper" style="border-color: ${p.color}40;">
+                    <div class="card-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; gap: 10px;">
+                        <div class="platform-info" style="display: flex; align-items: center; gap: 10px;">
+                            <div class="platform-icon-wrapper" style="width: 36px; height: 36px; display: flex; align-items: center; justify-content: center; border-radius: 8px; background: rgba(0,0,0,0.3); border: 1px solid ${p.color}40;">
                                 ${p.svg}
                             </div>
-                            <div class="platform-title">${p.name}</div>
+                            <div class="platform-title" style="font-weight: 700; font-size: 1.05rem; color: #fff;">${p.name}</div>
                         </div>
-                        <span class="platform-status-badge connected">
-                            <span>●</span> ${isSim ? 'Podgląd (Demo)' : (isConnected ? 'Połączono' : 'Niepołączone')}
+                        <span class="platform-status-badge ${isConnected ? 'connected' : 'locked'}" style="padding: 4px 10px; border-radius: 999px; font-size: 11px; font-weight: 700; display: inline-flex; align-items: center; gap: 5px; ${isConnected ? 'background: rgba(16,185,129,0.15); color: #34d399; border: 1px solid rgba(16,185,129,0.3);' : 'background: rgba(239,68,68,0.15); color: #f87171; border: 1px solid rgba(239,68,68,0.3);'}">
+                            <span>●</span> ${isSim ? 'Podgląd (Demo)' : (isConnected ? 'Połączono' : 'Nie połączono')}
                         </span>
                     </div>
 
-                    <div class="card-description">
+                    <div class="card-description" style="font-size: 13px; color: var(--color-text-muted); line-height: 1.4; margin-bottom: 16px;">
                         ${p.desc}
                     </div>
 
-                    <div class="card-metrics-preview">
+                    <div class="card-metrics-preview" style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 20px; background: rgba(0,0,0,0.25); padding: 12px; border-radius: 10px; border: 1px solid rgba(255,255,255,0.04);">
                         <div class="preview-stat">
-                            <span class="preview-label">Zasięg</span>
-                            <span class="preview-value">${p.reach}</span>
+                            <span class="preview-label" style="display: block; font-size: 11px; color: var(--color-text-dim); text-transform: uppercase; font-weight: 700; margin-bottom: 4px;">Zasięg</span>
+                            <span class="preview-value" style="font-size: 16px; font-weight: 800; color: ${isConnected ? '#fff' : 'var(--color-text-dim)'};">${isConnected ? p.reach : 'Brak danych'}</span>
                         </div>
                         <div class="preview-stat">
-                            <span class="preview-label">Score</span>
-                            <span class="preview-value">${p.score}</span>
+                            <span class="preview-label" style="display: block; font-size: 11px; color: var(--color-text-dim); text-transform: uppercase; font-weight: 700; margin-bottom: 4px;">Score</span>
+                            <span class="preview-value" style="font-size: 16px; font-weight: 800; color: ${isConnected ? 'var(--color-yellow-main)' : 'var(--color-text-dim)'};">${isConnected ? p.score : '--'}</span>
                         </div>
                     </div>
                 </div>
 
                 <div>
-                    ${(isSim || isConnected) ? `
-                        <button class="btn-yellow btn-check-platform" data-platform="${p.id}">
-                            <span>Sprawdź podgląd</span>
+                    ${isConnected ? `
+                        <button class="btn-yellow btn-check-platform" data-platform="${p.id}" style="width: 100%; display: flex; align-items: center; justify-content: center; gap: 8px; padding: 10px 16px; font-weight: 700; border-radius: 8px; cursor: pointer;">
+                            <span>${isSim ? 'Sprawdź podgląd' : 'Sprawdź analitykę'}</span>
                             <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
                                 <polyline points="9 18 15 12 9 6"></polyline>
                             </svg>
                         </button>
                     ` : `
-                        <button class="btn-connect-platform" data-platform="${p.id}">
+                        <button class="btn-connect-platform" data-platform="${p.id}" style="width: 100%; display: flex; align-items: center; justify-content: center; gap: 8px; padding: 10px 16px; font-weight: 700; border-radius: 8px; cursor: pointer; background: linear-gradient(135deg, rgba(245,158,11,0.2), rgba(245,158,11,0.08)); border: 1px solid rgba(245,158,11,0.4); color: #f59e0b; transition: all 0.2s ease;">
                             <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
                                 <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path>
                                 <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path>
@@ -1142,10 +1150,15 @@ function renderAnalysisPanels() {
         });
     });
 
-    grid.querySelectorAll('.analysis-platform-card.connected-card').forEach(card => {
+    grid.querySelectorAll('.analysis-platform-card').forEach(card => {
         card.addEventListener('click', () => {
             const platformKey = card.getAttribute('data-platform');
-            openPlatformDetail(platformKey);
+            const isConn = isSim ? true : !!connected[platformKey];
+            if (isConn) {
+                openPlatformDetail(platformKey);
+            } else {
+                openSocialConnectModal(platformKey);
+            }
         });
     });
 }
