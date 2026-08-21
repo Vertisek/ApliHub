@@ -1095,20 +1095,24 @@ function renderAnalysisPanels() {
                         </span>
                     </div>
 
-                    <div class="card-description" style="font-size: 13px; color: var(--color-text-muted); line-height: 1.4; margin-bottom: 16px;">
+                    <div class="card-description" style="font-size: 13px; color: var(--color-text-muted); line-height: 1.4; margin-bottom: 18px;">
                         ${p.desc}
                     </div>
 
+                    ${isConnected ? `
                     <div class="card-metrics-preview" style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 20px; background: rgba(0,0,0,0.25); padding: 12px; border-radius: 10px; border: 1px solid rgba(255,255,255,0.04);">
                         <div class="preview-stat">
                             <span class="preview-label" style="display: block; font-size: 11px; color: var(--color-text-dim); text-transform: uppercase; font-weight: 700; margin-bottom: 4px;">Zasięg</span>
-                            <span class="preview-value" style="font-size: 16px; font-weight: 800; color: ${isConnected ? '#fff' : 'var(--color-text-dim)'};">${isConnected ? p.reach : 'Brak danych'}</span>
+                            <span class="preview-value" style="font-size: 16px; font-weight: 800; color: #fff;">${p.reach}</span>
                         </div>
                         <div class="preview-stat">
                             <span class="preview-label" style="display: block; font-size: 11px; color: var(--color-text-dim); text-transform: uppercase; font-weight: 700; margin-bottom: 4px;">Score</span>
-                            <span class="preview-value" style="font-size: 16px; font-weight: 800; color: ${isConnected ? 'var(--color-yellow-main)' : 'var(--color-text-dim)'};">${isConnected ? p.score : '--'}</span>
+                            <span class="preview-value" style="font-size: 16px; font-weight: 800; color: var(--color-yellow-main);">${p.score}</span>
                         </div>
                     </div>
+                    ` : `
+                    <div style="margin-bottom: 16px;"></div>
+                    `}
                 </div>
 
                 <div>
