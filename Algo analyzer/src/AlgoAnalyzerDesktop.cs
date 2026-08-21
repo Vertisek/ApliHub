@@ -1,24 +1,18 @@
 using System;
 using System.IO;
-using System.Net;
-using System.Net.Sockets;
-using System.Reflection;
 using System.Diagnostics;
 using System.Threading;
-using System.Text;
 using System.Drawing;
 using System.Windows.Forms;
 
-namespace ApliHub.AlgoAnalyzer
+namespace ApliHub.Soclify
 {
     static class Program
     {
         private static Mutex _mutex;
-        private static HttpListener _listener;
         private static string _appDir;
         private static string _profileDir;
         private static string _rootDir;
-        private static int _port;
         private static bool _isRunning = true;
         private static NotifyIcon _trayIcon;
         private static Process _browserProcess;
@@ -28,13 +22,22 @@ namespace ApliHub.AlgoAnalyzer
         {
             // Single Instance Mutex
             bool createdNew;
-            _mutex = new Mutex(true, "ApliHub_AlgoAnalyzer_SingleInstance_Mutex", out createdNew);
+            _mutex = new Mutex(true, "ApliHub_Soclify_SingleInstance_Mutex", out createdNew);
             if (!createdNew)
             {
-                // Bring existing window or trigger URL
+                // Bring existing window or launch
                 try
                 {
-                    Process.Start("http://127.0.0.1:54321/index.html");
+                    string localAppData = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
+                    string indexFile = Path.Combine(localAppData, "ApliHub", "AlgoAnalyzer", "app", "index.html");
+                    if (!File.Exists(indexFile))
+                    {
+                        indexFile = Path.Combine(localAppData, "ApliHub", "Soclify", "app", "index.html");
+                    }
+                    if (File.Exists(indexFile))
+                    {
+                        LaunchBrowserApp(indexFile, Path.Combine(localAppData, "ApliHub", "AlgoAnalyzer", "profile"));
+                    }
                 }
                 catch { }
                 return;
@@ -50,7 +53,6 @@ namespace ApliHub.AlgoAnalyzer
                 _appDir = Path.Combine(_rootDir, "app");
                 _profileDir = Path.Combine(_rootDir, "profile");
 
-                // If running from portable folder where index.html is present, use current folder as fallback
                 string currentExeDir = AppDomain.CurrentDomain.BaseDirectory;
                 if (!Directory.Exists(_appDir) || !File.Exists(Path.Combine(_appDir, "index.html")))
                 {
@@ -67,25 +69,20 @@ namespace ApliHub.AlgoAnalyzer
                 Directory.CreateDirectory(_appDir);
                 Directory.CreateDirectory(_profileDir);
 
-                // Find a free TCP port (prefer 54321)
-                _port = GetFreeTcpPort(54321);
-
-                // Start embedded HTTP Server
-                StartHttpServer();
-
                 // Initialize System Tray Icon
                 InitTrayIcon();
 
-                // Launch Edge/Chrome App Window
-                _browserProcess = LaunchBrowserApp();
+                // Launch Native Standalone App Window (Direct File Execution, No Localhost)
+                string htmlPath = Path.Combine(_appDir, "index.html");
+                _browserProcess = LaunchBrowserApp(htmlPath, _profileDir);
 
                 // Run message loop for TrayIcon and background handling
                 Application.Run();
             }
             catch (Exception ex)
             {
-                MessageBox.Show("Wystąpił błąd podczas uruchamiania Algo Analyzer:\n\n" + ex.Message,
-                    "Algo Analyzer — Błąd", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show("Wystąpił błąd podczas uruchamiania Soclify:\n\n" + ex.Message,
+                    "Soclify — Błąd", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
             finally
             {
@@ -113,7 +110,8 @@ namespace ApliHub.AlgoAnalyzer
 
             ContextMenuStrip menu = new ContextMenuStrip();
             ToolStripMenuItem itemOpen = new ToolStripMenuItem("🚀 Otwórz Soclify", null, (s, e) => {
-                LaunchBrowserApp();
+                string htmlPath = Path.Combine(_appDir, "index.html");
+                LaunchBrowserApp(htmlPath, _profileDir);
             });
             itemOpen.Font = new Font(menu.Font, FontStyle.Bold);
 
@@ -126,7 +124,7 @@ namespace ApliHub.AlgoAnalyzer
             });
 
             ToolStripMenuItem itemSite = new ToolStripMenuItem("🌐 Strona ApliHub", null, (s, e) => {
-                try { Process.Start("https://aplihub.pl"); } catch { }
+                try { Process.Start("https://vertisek.github.io/ApliHub/"); } catch { }
             });
 
             ToolStripMenuItem itemExit = new ToolStripMenuItem("❌ Zamknij Soclify", null, (s, e) => {
@@ -145,7 +143,10 @@ namespace ApliHub.AlgoAnalyzer
 
             _trayIcon.ContextMenuStrip = menu;
             _trayIcon.Visible = true;
-            _trayIcon.DoubleClick += (s, e) => LaunchBrowserApp();
+            _trayIcon.DoubleClick += (s, e) => {
+                string htmlPath = Path.Combine(_appDir, "index.html");
+                LaunchBrowserApp(htmlPath, _profileDir);
+            };
         }
 
         private static void RunUpdater()
@@ -169,140 +170,15 @@ namespace ApliHub.AlgoAnalyzer
             }
         }
 
-        private static int GetFreeTcpPort(int defaultPort)
+        private static Process LaunchBrowserApp(string htmlPath, string profileDir)
         {
-            try
+            if (string.IsNullOrEmpty(htmlPath) || !File.Exists(htmlPath))
             {
-                TcpListener l = new TcpListener(IPAddress.Loopback, defaultPort);
-                l.Start();
-                l.Stop();
-                return defaultPort;
+                string localAppData = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
+                htmlPath = Path.Combine(localAppData, "ApliHub", "AlgoAnalyzer", "app", "index.html");
             }
-            catch
-            {
-                TcpListener l2 = new TcpListener(IPAddress.Loopback, 0);
-                l2.Start();
-                int p = ((IPEndPoint)l2.LocalEndpoint).Port;
-                l2.Stop();
-                return p;
-            }
-        }
 
-        private static void StartHttpServer()
-        {
-            _listener = new HttpListener();
-            _listener.Prefixes.Add("http://127.0.0.1:" + _port + "/");
-            _listener.Prefixes.Add("http://localhost:" + _port + "/");
-            _listener.Start();
-
-            Thread serverThread = new Thread(() =>
-            {
-                while (_isRunning && _listener.IsListening)
-                {
-                    try
-                    {
-                        HttpListenerContext ctx = _listener.GetContext();
-                        ThreadPool.QueueUserWorkItem((state) => HandleRequest((HttpListenerContext)state), ctx);
-                    }
-                    catch
-                    {
-                        if (!_isRunning) break;
-                    }
-                }
-            })
-            {
-                IsBackground = true
-            };
-            serverThread.Start();
-        }
-
-        private static void HandleRequest(HttpListenerContext ctx)
-        {
-            try
-            {
-                string rawUrl = ctx.Request.Url.AbsolutePath.TrimStart('/');
-                if (string.IsNullOrEmpty(rawUrl) || rawUrl == "/") rawUrl = "index.html";
-
-                rawUrl = Uri.UnescapeDataString(rawUrl);
-
-                // API commands handling
-                if (rawUrl.Equals("api/update", StringComparison.OrdinalIgnoreCase))
-                {
-                    ThreadPool.QueueUserWorkItem((w) => RunUpdater());
-                    byte[] ok = Encoding.UTF8.GetBytes("{\"status\":\"updating\"}");
-                    ctx.Response.ContentType = "application/json";
-                    ctx.Response.OutputStream.Write(ok, 0, ok.Length);
-                    return;
-                }
-
-                string filePath = Path.Combine(_appDir, rawUrl.Replace('/', Path.DirectorySeparatorChar));
-
-                if (!File.Exists(filePath))
-                {
-                    if (rawUrl.StartsWith("Algo analyzer/", StringComparison.OrdinalIgnoreCase))
-                    {
-                        string sub = rawUrl.Substring("Algo analyzer/".Length);
-                        filePath = Path.Combine(_appDir, sub.Replace('/', Path.DirectorySeparatorChar));
-                    }
-                }
-
-                if (File.Exists(filePath))
-                {
-                    byte[] bytes = File.ReadAllBytes(filePath);
-                    string ext = Path.GetExtension(filePath).ToLowerInvariant();
-                    string mime = GetMimeType(ext);
-
-                    ctx.Response.ContentType = mime;
-                    ctx.Response.ContentLength64 = bytes.Length;
-                    ctx.Response.Headers.Add("Access-Control-Allow-Origin", "*");
-                    ctx.Response.Headers.Add("Cache-Control", "no-cache, no-store, must-revalidate");
-                    ctx.Response.StatusCode = (int)HttpStatusCode.OK;
-
-                    ctx.Response.OutputStream.Write(bytes, 0, bytes.Length);
-                }
-                else
-                {
-                    ctx.Response.StatusCode = (int)HttpStatusCode.NotFound;
-                    byte[] notFound = Encoding.UTF8.GetBytes("404 - Plik nie został odnaleziony: " + rawUrl);
-                    ctx.Response.OutputStream.Write(notFound, 0, notFound.Length);
-                }
-            }
-            catch
-            {
-                try { ctx.Response.StatusCode = (int)HttpStatusCode.InternalServerError; } catch { }
-            }
-            finally
-            {
-                try { ctx.Response.OutputStream.Close(); } catch { }
-            }
-        }
-
-        private static string GetMimeType(string ext)
-        {
-            switch (ext)
-            {
-                case ".html": case ".htm": return "text/html; charset=utf-8";
-                case ".css": return "text/css; charset=utf-8";
-                case ".js": return "application/javascript; charset=utf-8";
-                case ".json": return "application/json; charset=utf-8";
-                case ".png": return "image/png";
-                case ".jpg": case ".jpeg": return "image/jpeg";
-                case ".gif": return "image/gif";
-                case ".svg": return "image/svg+xml";
-                case ".ico": return "image/x-icon";
-                case ".woff": return "font/woff";
-                case ".woff2": return "font/woff2";
-                case ".ttf": return "font/ttf";
-                case ".mp3": return "audio/mpeg";
-                case ".wav": return "audio/wav";
-                case ".ogg": return "audio/ogg";
-                default: return "application/octet-stream";
-            }
-        }
-
-        private static Process LaunchBrowserApp()
-        {
-            string url = "http://127.0.0.1:" + _port + "/index.html";
+            string fileUrl = "file:///" + htmlPath.Replace('\\', '/');
 
             string[] candidateBrowsers = new string[]
             {
@@ -326,8 +202,8 @@ namespace ApliHub.AlgoAnalyzer
 
             if (browserPath != null)
             {
-                string args = string.Format("--app=\"{0}\" --window-size=1440,920 --user-data-dir=\"{1}\" --app-id=\"ApliHub.Soclify\" --disable-features=Translate",
-                    url, _profileDir);
+                string args = string.Format("--app=\"{0}\" --window-size=1440,920 --user-data-dir=\"{1}\" --app-id=\"ApliHub.Soclify\" --app-title=\"Soclify\" --app-name=\"Soclify\" --allow-file-access-from-files --allow-file-access --disable-features=Translate,InterestFeedContentSuggestions",
+                    fileUrl, profileDir);
 
                 ProcessStartInfo psi = new ProcessStartInfo
                 {
@@ -339,13 +215,11 @@ namespace ApliHub.AlgoAnalyzer
                 Process p = Process.Start(psi);
                 if (p != null)
                 {
-                    // Monitor browser process
                     ThreadPool.QueueUserWorkItem((state) =>
                     {
                         try
                         {
                             p.WaitForExit();
-                            // Optional: quit tray if user closed app, or stay in tray
                         }
                         catch { }
                     });
@@ -354,8 +228,8 @@ namespace ApliHub.AlgoAnalyzer
             }
             else
             {
-                // Fallback to system default browser
-                Process.Start(url);
+                // Fallback
+                Process.Start(new ProcessStartInfo(fileUrl) { UseShellExecute = true });
                 return null;
             }
         }
@@ -367,11 +241,6 @@ namespace ApliHub.AlgoAnalyzer
             {
                 _trayIcon.Visible = false;
                 _trayIcon.Dispose();
-            }
-            if (_listener != null)
-            {
-                try { _listener.Stop(); } catch { }
-                try { _listener.Close(); } catch { }
             }
             if (_mutex != null)
             {

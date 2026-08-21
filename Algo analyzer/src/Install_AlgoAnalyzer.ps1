@@ -72,6 +72,7 @@ New-Item -ItemType Directory -Path $profileDir -Force | Out-Null
 
 # 4. Copy Binaries and Web Assets
 Write-Host "[4/6] Kopiowanie plikow aplikacji..." -ForegroundColor Gray
+Copy-Item "$launcherOut" "$installDir\Soclify.exe" -Force
 Copy-Item "$launcherOut" "$installDir\AlgoAnalyzer.exe" -Force
 Copy-Item "$uninstallerOut" "$installDir\Uninstall.exe" -Force
 Copy-Item "$updaterOut" "$installDir\Updater.exe" -Force
@@ -79,7 +80,8 @@ if (Test-Path "$srcDir\app.ico") { Copy-Item "$srcDir\app.ico" "$installDir\app.
 
 # Copy web files
 Copy-Item "$srcDir\index.html" "$appDir\index.html" -Force
-if (Test-Path "$srcDir\onboarding.html") { Copy-Item "$srcDir\onboarding.html" "$appDir\onboarding.html" -Force }
+if (Test-Path "$srcDir\terms.html") { Copy-Item "$srcDir\terms.html" "$appDir\terms.html" -Force }
+if (Test-Path "$srcDir\privacy.html") { Copy-Item "$srcDir\privacy.html" "$appDir\privacy.html" -Force }
 if (Test-Path "$srcDir\app.ico") { Copy-Item "$srcDir\app.ico" "$appDir\app.ico" -Force }
 
 Copy-Item "$srcDir\css\*" "$appDir\css\" -Recurse -Force
@@ -106,10 +108,10 @@ if (Test-Path $oldDesktopLnk) { Remove-Item $oldDesktopLnk -Force }
 
 $desktopLnk = "$desktopFolder\Soclify.lnk"
 $shortcut = $wscript.CreateShortcut($desktopLnk)
-$shortcut.TargetPath = "$installDir\AlgoAnalyzer.exe"
+$shortcut.TargetPath = "$installDir\Soclify.exe"
 $shortcut.WorkingDirectory = $installDir
 $shortcut.Description = "Soclify - Zaawansowana Analityka Social Media (ApliHub)"
-$shortcut.IconLocation = "$installDir\AlgoAnalyzer.exe,0"
+$shortcut.IconLocation = "$installDir\Soclify.exe,0"
 $shortcut.Save()
 
 # Start Menu Shortcut
@@ -124,10 +126,10 @@ if (Test-Path $oldUninstLnk) { Remove-Item $oldUninstLnk -Force }
 
 $menuLnk = "$startMenuApliHub\Soclify.lnk"
 $shortcut2 = $wscript.CreateShortcut($menuLnk)
-$shortcut2.TargetPath = "$installDir\AlgoAnalyzer.exe"
+$shortcut2.TargetPath = "$installDir\Soclify.exe"
 $shortcut2.WorkingDirectory = $installDir
 $shortcut2.Description = "Soclify - Zaawansowana Analityka Social Media (ApliHub)"
-$shortcut2.IconLocation = "$installDir\AlgoAnalyzer.exe,0"
+$shortcut2.IconLocation = "$installDir\Soclify.exe,0"
 $shortcut2.Save()
 
 $uninstallLnk = "$startMenuApliHub\Odinstaluj Soclify.lnk"
@@ -149,12 +151,12 @@ $appSizeKB = [int]((Get-ChildItem $installDir -Recurse | Measure-Object -Propert
 Set-ItemProperty -Path $regPath -Name "DisplayName" -Value "ApliHub Soclify"
 Set-ItemProperty -Path $regPath -Name "DisplayVersion" -Value "1.0.0"
 Set-ItemProperty -Path $regPath -Name "Publisher" -Value "ApliHub"
-Set-ItemProperty -Path $regPath -Name "DisplayIcon" -Value "$installDir\AlgoAnalyzer.exe,0"
+Set-ItemProperty -Path $regPath -Name "DisplayIcon" -Value "$installDir\Soclify.exe,0"
 Set-ItemProperty -Path $regPath -Name "InstallLocation" -Value $installDir
 Set-ItemProperty -Path $regPath -Name "UninstallString" -Value "`"$installDir\Uninstall.exe`""
 Set-ItemProperty -Path $regPath -Name "QuietUninstallString" -Value "`"$installDir\Uninstall.exe`" /silent"
-Set-ItemProperty -Path $regPath -Name "HelpLink" -Value "https://aplihub.pl"
-Set-ItemProperty -Path $regPath -Name "URLInfoAbout" -Value "https://aplihub.pl"
+Set-ItemProperty -Path $regPath -Name "HelpLink" -Value "https://vertisek.github.io/ApliHub/"
+Set-ItemProperty -Path $regPath -Name "URLInfoAbout" -Value "https://vertisek.github.io/ApliHub/"
 Set-ItemProperty -Path $regPath -Name "EstimatedSize" -Value $appSizeKB -Type DWord
 Set-ItemProperty -Path $regPath -Name "NoModify" -Value 1 -Type DWord
 Set-ItemProperty -Path $regPath -Name "NoRepair" -Value 1 -Type DWord
@@ -167,7 +169,7 @@ Remove-Item $tempBuildDir -Recurse -Force -ErrorAction SilentlyContinue
 
 # 6. Launch Application
 Write-Host "[6/6] Uruchamianie zainstalowanej aplikacji Soclify..." -ForegroundColor Green
-Start-Process -FilePath "$installDir\AlgoAnalyzer.exe"
+Start-Process -FilePath "$installDir\Soclify.exe"
 
 Write-Host ""
 Write-Host "============================================================" -ForegroundColor Green
