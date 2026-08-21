@@ -2204,7 +2204,12 @@ function disconnectTwitchAccount() {
     if (typeof renderAnalysisPanels === 'function') renderAnalysisPanels();
     if (typeof renderConnectedSocialAccounts === 'function') renderConnectedSocialAccounts();
     if (typeof showToast === 'function') {
-        sho/* ==========================================================================
+        showToast('🔌 Rozłączono konto Twitch.');
+    }
+}
+window.disconnectTwitchAccount = disconnectTwitchAccount;
+
+/* ==========================================================================
    UNIVERSAL SOCIAL OAUTH ENGINE & PKCE CONTROLLER (TIKTOK, TWITCH, YOUTUBE, INSTAGRAM, FACEBOOK)
    ========================================================================== */
 
