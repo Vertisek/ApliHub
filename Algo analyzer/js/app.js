@@ -2204,30 +2204,79 @@ function disconnectTwitchAccount() {
     if (typeof renderAnalysisPanels === 'function') renderAnalysisPanels();
     if (typeof renderConnectedSocialAccounts === 'function') renderConnectedSocialAccounts();
     if (typeof showToast === 'function') {
-        showToast('Odłączono konto Twitch.');
-    }
-}
-window.disconnectTwitchAccount = disconnectTwitchAccount;
-
-// Initialize Twitch OAuth callback handler on load
-handleTwitchOAuthCallback();
-if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', () => {
-        renderTwitchLiveDashboard();
-        if (localStorage.getItem('twitch_token')) {
-            fetchTwitchChannelStats();
-        }
-    });
-} else {
-    renderTwitchLiveDashboard();
-    if (localStorage.getItem('twitch_token')) {
-        fetchTwitchChannelStats();
-    }
-}
-/* ==========================================================================
-   UNIVERSAL SOCIAL OAUTH CONFIGURATION & MODAL CONTROLLER
+        sho/* ==========================================================================
+   UNIVERSAL SOCIAL OAUTH ENGINE & PKCE CONTROLLER (TIKTOK, TWITCH, YOUTUBE, INSTAGRAM, FACEBOOK)
    ========================================================================== */
+
+function generateRandomString(length = 64) {
+    const charset = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-._~';
+    let result = '';
+    const values = new Uint8Array(length);
+    if (window.crypto && window.crypto.getRandomValues) {
+        window.crypto.getRandomValues(values);
+        for (let i = 0; i < length; i++) {
+            result += charset[values[i] % charset.length];
+        }
+    } else {
+        for (let i = 0; i < length; i++) {
+            result += charset[Math.floor(Math.random() * charset.length)];
+        }
+    }
+    return result;
+}
+
+async function generateCodeChallenge(codeVerifier) {
+    if (window.crypto && window.crypto.subtle && window.crypto.subtle.digest) {
+        const encoder = new TextEncoder();
+        const data = encoder.encode(codeVerifier);
+        const digest = await window.crypto.subtle.digest('SHA-256', data);
+        return btoa(String.fromCharCode(...new Uint8Array(digest)))
+            .replace(/\+/g, '-')
+            .replace(/\//g, '_')
+            .replace(/=+$/, '');
+    }
+    return btoa(codeVerifier).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+}
+
+function getAppRedirectUri() {
+    if (typeof window !== 'undefined') {
+        if (window.location.hostname.includes('github.io')) {
+            return 'https://vertisek.github.io/ApliHub/Algo%20analyzer/index.html';
+        }
+        return window.location.origin + window.location.pathname;
+    }
+    return 'http://localhost:54321/index.html';
+}
+
 const SOCIAL_OAUTH_CONFIGS = {
+    tiktok: {
+        id: 'tiktok',
+        name: 'TikTok',
+        color: '#00f2fe',
+        iconSvg: `<svg width="40" height="40" viewBox="0 0 24 24" fill="#00f2fe">
+            <path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-5.2 1.74 2.89 2.89 0 0 1 2.31-4.64c.29 0 .56.04.83.12V9.3a6.33 6.33 0 0 0-1-.08 6.34 6.34 0 1 0 6.34 6.34V9.05a8.3 8.3 0 0 0 5-1.63V6.69z"/>
+        </svg>`,
+        btnIconSvg: `<svg width="18" height="18" viewBox="0 0 24 24" fill="#fff">
+            <path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-5.2 1.74 2.89 2.89 0 0 1 2.31-4.64c.29 0 .56.04.83.12V9.3a6.33 6.33 0 0 0-1-.08 6.34 6.34 0 1 0 6.34 6.34V9.05a8.3 8.3 0 0 0 5-1.63V6.69z"/>
+        </svg>`,
+        title: 'Połącz z TikTok',
+        desc: 'Zaloguj się przez oficjalny portal TikTok Creator Kit (OAuth v2 z PKCE), aby analizować wiralowość filmów i algorytm karty Dla Ciebie (FYP).',
+        btnText: 'Kontynuuj z TikTok',
+        btnBg: '#010101',
+        devPortalUrl: 'https://developers.tiktok.com/',
+        defaultClientId: 'awz7aplihubtiktok',
+        buildAuthUrl: async function (clientId) {
+            const cId = clientId || localStorage.getItem('tiktok_client_id') || this.defaultClientId;
+            const redirectUri = getAppRedirectUri();
+            const codeVerifier = generateRandomString(64);
+            sessionStorage.setItem('tiktok_code_verifier', codeVerifier);
+            const codeChallenge = await generateCodeChallenge(codeVerifier);
+            const state = generateRandomString(16);
+            sessionStorage.setItem('tiktok_oauth_state', state);
+
+            return `https://www.tiktok.com/v2/auth/authorize/?client_key=${encodeURIComponent(cId)}&scope=user.info.basic,video.list&response_type=code&redirect_uri=${encodeURIComponent(redirectUri)}&state=${encodeURIComponent(state)}&code_challenge=${encodeURIComponent(codeChallenge)}&code_challenge_method=S256`;
+        }
+    },
     twitch: {
         id: 'twitch',
         name: 'Twitch',
@@ -2242,12 +2291,13 @@ const SOCIAL_OAUTH_CONFIGS = {
         desc: 'Zaloguj się przez oficjalny portal Twitch OAuth, aby odblokować panel zaawansowanej analityki transmisji na żywo, czatu i algorytmu.',
         btnText: 'Kontynuuj z Twitch',
         btnBg: '#9146ff',
-        btnBgHover: '#772ce8',
-        getAuthUrl: () => {
-            const clientId = localStorage.getItem('twitch_client_id') || 'gp762nuuoqcoxypju8c569th9wz7q5';
-            const redirectUri = window.location.origin + window.location.pathname;
-            const scopes = 'user:read:broadcast channel:read:subscriptions';
-            return `https://id.twitch.tv/oauth2/authorize?client_id=${encodeURIComponent(clientId)}&redirect_uri=${encodeURIComponent(redirectUri)}&response_type=token&scope=${encodeURIComponent(scopes)}&force_verify=true`;
+        devPortalUrl: 'https://dev.twitch.tv/console/apps',
+        defaultClientId: 'gp762nuuoqcoxypju8c569th9wz7q5',
+        buildAuthUrl: async function (clientId) {
+            const cId = clientId || localStorage.getItem('twitch_client_id') || this.defaultClientId;
+            const redirectUri = getAppRedirectUri();
+            const scopes = 'user:read:email user:read:broadcast channel:read:subscriptions';
+            return `https://id.twitch.tv/oauth2/authorize?client_id=${encodeURIComponent(cId)}&redirect_uri=${encodeURIComponent(redirectUri)}&response_type=token&scope=${encodeURIComponent(scopes)}&force_verify=true`;
         }
     },
     youtube: {
@@ -2264,30 +2314,12 @@ const SOCIAL_OAUTH_CONFIGS = {
         desc: 'Zaloguj się przez Google / YouTube OAuth, aby autoryzować pobieranie oficjalnych statystyk CTR, retencji AVD oraz analiz filmów z YouTube API.',
         btnText: 'Kontynuuj z Google / YouTube',
         btnBg: '#e60000',
-        btnBgHover: '#cc0000',
-        getAuthUrl: () => {
-            const redirectUri = window.location.origin + window.location.pathname;
-            return `https://accounts.google.com/o/oauth2/v2/auth?client_id=102434567890-aplihub.apps.googleusercontent.com&redirect_uri=${encodeURIComponent(redirectUri)}&response_type=token&scope=https://www.googleapis.com/auth/youtube.readonly&prompt=consent`;
-        }
-    },
-    tiktok: {
-        id: 'tiktok',
-        name: 'TikTok',
-        color: '#00f2fe',
-        iconSvg: `<svg width="40" height="40" viewBox="0 0 24 24" fill="#00f2fe">
-            <path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-5.2 1.74 2.89 2.89 0 0 1 2.31-4.64c.29 0 .56.04.83.12V9.3a6.33 6.33 0 0 0-1-.08 6.34 6.34 0 1 0 6.34 6.34V9.05a8.3 8.3 0 0 0 5-1.63V6.69z"/>
-        </svg>`,
-        btnIconSvg: `<svg width="18" height="18" viewBox="0 0 24 24" fill="#fff">
-            <path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-5.2 1.74 2.89 2.89 0 0 1 2.31-4.64c.29 0 .56.04.83.12V9.3a6.33 6.33 0 0 0-1-.08 6.34 6.34 0 1 0 6.34 6.34V9.05a8.3 8.3 0 0 0 5-1.63V6.69z"/>
-        </svg>`,
-        title: 'Połącz z TikTok',
-        desc: 'Zaloguj się przez oficjalny portal TikTok Creator Kit, aby przeanalizować wiralowość treści i parametry algorytmu karty Dla Ciebie (FYP).',
-        btnText: 'Kontynuuj z TikTok',
-        btnBg: '#010101',
-        btnBgHover: '#1f1f1f',
-        getAuthUrl: () => {
-            const redirectUri = window.location.origin + window.location.pathname;
-            return `https://www.tiktok.com/v2/auth/authorize/?client_key=awz7aplihubtiktok&response_type=code&scope=user.info.basic,video.list&redirect_uri=${encodeURIComponent(redirectUri)}`;
+        devPortalUrl: 'https://console.cloud.google.com/apis/credentials',
+        defaultClientId: '102434567890-aplihub.apps.googleusercontent.com',
+        buildAuthUrl: async function (clientId) {
+            const cId = clientId || localStorage.getItem('youtube_client_id') || this.defaultClientId;
+            const redirectUri = getAppRedirectUri();
+            return `https://accounts.google.com/o/oauth2/v2/auth?client_id=${encodeURIComponent(cId)}&redirect_uri=${encodeURIComponent(redirectUri)}&response_type=token&scope=https://www.googleapis.com/auth/youtube.readonly&prompt=consent`;
         }
     },
     instagram: {
@@ -2304,10 +2336,12 @@ const SOCIAL_OAUTH_CONFIGS = {
         desc: 'Zaloguj się przez Meta for Developers / Instagram Login, aby badać dynamikę wzrostu Rolek (Reels) oraz zaangażowanie społeczności.',
         btnText: 'Kontynuuj z Instagram',
         btnBg: 'linear-gradient(45deg, #f09433, #e6683c, #dc2743, #cc2366, #bc1888)',
-        btnBgHover: 'linear-gradient(45deg, #f09433, #dc2743)',
-        getAuthUrl: () => {
-            const redirectUri = window.location.origin + window.location.pathname;
-            return `https://api.instagram.com/oauth/authorize?client_id=123456789&redirect_uri=${encodeURIComponent(redirectUri)}&scope=user_profile,user_media&response_type=code`;
+        devPortalUrl: 'https://developers.facebook.com/apps/',
+        defaultClientId: '123456789012345',
+        buildAuthUrl: async function (clientId) {
+            const cId = clientId || localStorage.getItem('instagram_client_id') || this.defaultClientId;
+            const redirectUri = getAppRedirectUri();
+            return `https://api.instagram.com/oauth/authorize?client_id=${encodeURIComponent(cId)}&redirect_uri=${encodeURIComponent(redirectUri)}&scope=user_profile,user_media&response_type=code`;
         }
     },
     facebook: {
@@ -2324,19 +2358,21 @@ const SOCIAL_OAUTH_CONFIGS = {
         desc: 'Zaloguj się przez oficjalny portal Meta / Facebook for Developers, aby zsynchronizować statystyki postów i stron.',
         btnText: 'Kontynuuj z Facebook',
         btnBg: '#1877f2',
-        btnBgHover: '#1465cc',
-        getAuthUrl: () => {
-            const redirectUri = window.location.origin + window.location.pathname;
-            return `https://www.facebook.com/v18.0/dialog/oauth?client_id=123456789&redirect_uri=${encodeURIComponent(redirectUri)}&scope=pages_show_list,pages_read_engagement`;
+        devPortalUrl: 'https://developers.facebook.com/apps/',
+        defaultClientId: '123456789012345',
+        buildAuthUrl: async function (clientId) {
+            const cId = clientId || localStorage.getItem('facebook_client_id') || this.defaultClientId;
+            const redirectUri = getAppRedirectUri();
+            return `https://www.facebook.com/v18.0/dialog/oauth?client_id=${encodeURIComponent(cId)}&redirect_uri=${encodeURIComponent(redirectUri)}&scope=pages_show_list,pages_read_engagement&response_type=token`;
         }
     }
 };
 
-let currentModalPlatformKey = 'twitch';
+let currentModalPlatformKey = 'tiktok';
 
-function openSocialConnectModal(platformKey) {
-    const pKey = platformKey ? platformKey.toLowerCase() : 'twitch';
-    const config = SOCIAL_OAUTH_CONFIGS[pKey] || SOCIAL_OAUTH_CONFIGS.twitch;
+async function openSocialConnectModal(platformKey) {
+    const pKey = platformKey ? platformKey.toLowerCase() : 'tiktok';
+    const config = SOCIAL_OAUTH_CONFIGS[pKey] || SOCIAL_OAUTH_CONFIGS.tiktok;
     currentModalPlatformKey = config.id;
 
     const modal = document.getElementById('social-connect-modal') || document.getElementById('twitch-modal');
@@ -2348,19 +2384,40 @@ function openSocialConnectModal(platformKey) {
     const authLinkEl = document.getElementById('modal-auth-link') || modal.querySelector('.platform-action-btn, .twitch-action-btn');
     const btnTextEl = document.getElementById('modal-btn-text');
     const btnIconEl = document.getElementById('modal-btn-icon');
+    const inputClientId = document.getElementById('input-client-id');
+    const displayRedirectUri = document.getElementById('display-redirect-uri');
+    const devPortalLink = document.getElementById('dev-portal-link');
 
     if (titleEl) titleEl.textContent = config.title;
     if (descEl) descEl.textContent = config.desc;
     if (iconEl) iconEl.innerHTML = config.iconSvg;
 
+    const currentClientId = localStorage.getItem(`${config.id}_client_id`) || '';
+    if (inputClientId) {
+        inputClientId.value = currentClientId;
+        inputClientId.placeholder = `Twój ${config.name} Client ID / App Key...`;
+    }
+
+    const redirectUri = getAppRedirectUri();
+    if (displayRedirectUri) {
+        displayRedirectUri.textContent = redirectUri;
+    }
+
+    if (devPortalLink) {
+        devPortalLink.href = config.devPortalUrl;
+        devPortalLink.textContent = `↗ Otwórz Portal Developers dla ${config.name}`;
+    }
+
     if (authLinkEl) {
-        authLinkEl.href = config.getAuthUrl();
         authLinkEl.style.background = config.btnBg;
         if (btnTextEl) btnTextEl.textContent = config.btnText;
         if (btnIconEl) btnIconEl.innerHTML = config.btnIconSvg;
 
+        // Generate async URL with PKCE if needed
+        const authUrl = await config.buildAuthUrl(currentClientId);
+        authLinkEl.href = authUrl;
+
         authLinkEl.onclick = () => {
-            // After opening the external OAuth URL, optionally notify user
             if (typeof showToast === 'function') {
                 showToast(`Przekierowywanie do oficjalnej autoryzacji ${config.name}...`);
             }
@@ -2375,8 +2432,47 @@ function closeSocialConnectModal() {
     if (modal) modal.style.display = 'none';
 }
 
+function toggleModalDevConfig() {
+    const body = document.getElementById('dev-config-body');
+    const arrow = document.getElementById('config-arrow');
+    if (!body) return;
+    const isHidden = body.style.display === 'none';
+    body.style.display = isHidden ? 'flex' : 'none';
+    if (arrow) arrow.textContent = isHidden ? '▲' : '▼';
+}
+
+async function handleClientIdInput(val) {
+    const pKey = currentModalPlatformKey || 'tiktok';
+    const config = SOCIAL_OAUTH_CONFIGS[pKey];
+    if (!config) return;
+
+    if (val && val.trim()) {
+        localStorage.setItem(`${pKey}_client_id`, val.trim());
+    } else {
+        localStorage.removeItem(`${pKey}_client_id`);
+    }
+
+    const authLinkEl = document.getElementById('modal-auth-link');
+    if (authLinkEl) {
+        authLinkEl.href = await config.buildAuthUrl(val.trim());
+    }
+}
+
+function copyRedirectUri() {
+    const uri = getAppRedirectUri();
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(uri).then(() => {
+            if (typeof showToast === 'function') {
+                showToast('✓ Skopiowano Redirect URI do schowka: ' + uri);
+            }
+        });
+    } else {
+        prompt('Skopiuj poniższy Redirect URI:', uri);
+    }
+}
+
 function handleManualSimulatedConnect() {
-    const pKey = currentModalPlatformKey || 'twitch';
+    const pKey = currentModalPlatformKey || 'tiktok';
     const config = SOCIAL_OAUTH_CONFIGS[pKey] || { name: pKey.toUpperCase() };
 
     const currentUser = getApliHubUserData();
@@ -2398,7 +2494,7 @@ function handleManualSimulatedConnect() {
     closeSocialConnectModal();
 
     if (typeof showToast === 'function') {
-        showToast(`🎉 Pomyślnie autoryzowano konto ${config.name}! Panel analizy został odblokowany.`);
+        showToast(`🎉 Pomyślnie połączono konto ${config.name}! Panel analizy został odblokowany.`);
     }
 }
 
@@ -2412,7 +2508,7 @@ window.addEventListener('click', (e) => {
 
 // Automatic OAuth Callback parser across all platforms
 function handleGlobalOAuthCallbacks() {
-    // 1. Check Twitch / Google token hash (#access_token=...)
+    // 1. Check token hash (#access_token=...)
     const hash = window.location.hash;
     if (hash && hash.includes('access_token')) {
         const cleanHash = hash.replace(/^#/, '');
@@ -2437,7 +2533,7 @@ function handleGlobalOAuthCallbacks() {
             }
 
             if (typeof showToast === 'function') {
-                showToast(`🎉 Pomyślnie połączono konto ${platformKey.toUpperCase()}!`);
+                showToast(`🎉 Pomyślnie autoryzowano konto ${platformKey.toUpperCase()}!`);
             }
 
             if (platformKey === 'twitch' && typeof fetchTwitchChannelStats === 'function') {
@@ -2451,8 +2547,32 @@ function handleGlobalOAuthCallbacks() {
 
     // 2. Check query params code (?code=... or ?connected=...)
     const searchParams = new URLSearchParams(window.location.search);
+    const code = searchParams.get('code');
+    const state = searchParams.get('state');
     const connectedPlatform = searchParams.get('connected');
-    if (connectedPlatform && SOCIAL_OAUTH_CONFIGS[connectedPlatform.toLowerCase()]) {
+
+    if (code) {
+        // Find which platform was in state
+        let detectedPlatform = 'tiktok';
+        if (state && state === sessionStorage.getItem('tiktok_oauth_state')) detectedPlatform = 'tiktok';
+        else if (window.location.href.includes('instagram')) detectedPlatform = 'instagram';
+
+        const user = getApliHubUserData();
+        if (!user.connectedAccounts) user.connectedAccounts = {};
+        user.connectedAccounts[detectedPlatform] = true;
+        saveApliHubUserData(user);
+
+        if (window.history && window.history.replaceState) {
+            window.history.replaceState(null, null, window.location.pathname);
+        }
+
+        if (typeof showToast === 'function') {
+            showToast(`🎉 Pomyślnie powiązano konto ${detectedPlatform.toUpperCase()}! Kod autoryzacji odebrany.`);
+        }
+
+        renderAnalysisPanels();
+        renderConnectedSocialAccounts();
+    } else if (connectedPlatform && SOCIAL_OAUTH_CONFIGS[connectedPlatform.toLowerCase()]) {
         const user = getApliHubUserData();
         if (!user.connectedAccounts) user.connectedAccounts = {};
         user.connectedAccounts[connectedPlatform.toLowerCase()] = true;
@@ -2483,10 +2603,14 @@ if (document.readyState === 'loading') {
 // Backwards compatibility and window exports
 window.openSocialConnectModal = openSocialConnectModal;
 window.closeSocialConnectModal = closeSocialConnectModal;
+window.toggleModalDevConfig = toggleModalDevConfig;
+window.handleClientIdInput = handleClientIdInput;
+window.copyRedirectUri = copyRedirectUri;
 window.handleManualSimulatedConnect = handleManualSimulatedConnect;
 window.openTwitchModal = () => openSocialConnectModal('twitch');
 window.closeTwitchModal = closeSocialConnectModal;
 window.SOCIAL_OAUTH_CONFIGS = SOCIAL_OAUTH_CONFIGS;
+
 
 
 

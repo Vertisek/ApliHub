@@ -2016,19 +2016,45 @@
                 </svg>
             </div>
 
-            <h3 class="modal-title" id="modal-platform-title">Połącz z Twitch</h3>
+            <h3 class="modal-title" id="modal-platform-title">Połącz z TikTok</h3>
             <p class="modal-desc" id="modal-platform-desc">Zaloguj się przez oficjalny portal, aby odblokować panel zaawansowanej analityki algorytmu.</p>
 
-            <!-- Przycisk autoryzacji OAuth -->
+            <!-- Główny Przycisk autoryzacji OAuth -->
             <a id="modal-auth-link" href="#" class="platform-action-btn" target="_blank" rel="noopener noreferrer">
                 <span id="modal-btn-icon"></span>
-                <span id="modal-btn-text">Kontynuuj z Twitch</span>
+                <span id="modal-btn-text">Kontynuuj z TikTok</span>
             </a>
+
+            <!-- Rozwijany panel konfiguracji kluczy i redirect URI -->
+            <div class="modal-config-panel">
+                <button type="button" class="btn-toggle-config" onclick="toggleModalDevConfig()" id="btn-toggle-dev-config">
+                    <span>⚙️ Ustawienia API & Redirect URI</span>
+                    <span id="config-arrow">▼</span>
+                </button>
+                <div class="dev-config-body" id="dev-config-body" style="display: none;">
+                    <div class="config-field">
+                        <label id="lbl-client-id" for="input-client-id">Twój Client ID / App Key:</label>
+                        <input type="text" id="input-client-id" class="modal-input" placeholder="Wklej swój Client ID..." oninput="handleClientIdInput(this.value)">
+                    </div>
+                    <div class="config-field">
+                        <label>Wymagany Redirect URI w portalu:</label>
+                        <div class="redirect-uri-box">
+                            <code id="display-redirect-uri">http://localhost:54321/index.html</code>
+                            <button type="button" class="btn-copy-uri" onclick="copyRedirectUri()">📋 Kopiuj</button>
+                        </div>
+                    </div>
+                    <div class="config-links">
+                        <a id="dev-portal-link" href="https://developers.tiktok.com" target="_blank" rel="noopener" class="dev-portal-anchor">
+                            ↗ Otwórz Portal Deweloperski dla tej platformy
+                        </a>
+                    </div>
+                </div>
+            </div>
 
             <!-- Opcja natychmiastowej symulacji API w celach demonstracyjnych / deweloperskich -->
             <div class="modal-secondary-actions">
                 <button type="button" class="btn-modal-manual" id="btn-modal-manual" onclick="handleManualSimulatedConnect()">
-                    ⚡ Symuluj autoryzację API (Tryb testowy)
+                    ⚡ Symuluj autoryzację API (Tryb demonstracyjny)
                 </button>
             </div>
         </div>

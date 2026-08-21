@@ -1893,6 +1893,127 @@ body {
     gap: 8px;
 }
 
+.modal-config-panel {
+    margin-top: 16px;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 12px;
+    overflow: hidden;
+    text-align: left;
+}
+
+.btn-toggle-config {
+    width: 100%;
+    background: transparent;
+    border: none;
+    color: #94a3b8;
+    padding: 10px 14px;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    transition: all 0.2s;
+}
+
+.btn-toggle-config:hover {
+    color: #fff;
+    background: rgba(255, 255, 255, 0.04);
+}
+
+.dev-config-body {
+    padding: 12px 14px 14px 14px;
+    border-top: 1px solid rgba(255, 255, 255, 0.06);
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.config-field label {
+    display: block;
+    font-size: 11px;
+    font-weight: 600;
+    color: #94a3b8;
+    margin-bottom: 4px;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+}
+
+.modal-input {
+    width: 100%;
+    background: rgba(0, 0, 0, 0.4);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    border-radius: 8px;
+    padding: 8px 12px;
+    color: #fff;
+    font-size: 12px;
+    font-family: var(--font-mono);
+    outline: none;
+    transition: all 0.2s;
+    box-sizing: border-box;
+}
+
+.modal-input:focus {
+    border-color: var(--color-yellow-main);
+    box-shadow: 0 0 10px rgba(250, 204, 21, 0.2);
+}
+
+.redirect-uri-box {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    background: rgba(0, 0, 0, 0.4);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 8px;
+    padding: 6px 10px;
+}
+
+.redirect-uri-box code {
+    font-size: 11px;
+    color: #38bdf8;
+    font-family: var(--font-mono);
+    flex: 1;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.btn-copy-uri {
+    background: rgba(255, 255, 255, 0.08);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    color: #e2e8f0;
+    font-size: 11px;
+    font-weight: 600;
+    padding: 4px 8px;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.2s;
+    flex-shrink: 0;
+}
+
+.btn-copy-uri:hover {
+    background: var(--color-yellow-main);
+    color: #000;
+    border-color: var(--color-yellow-main);
+}
+
+.dev-portal-anchor {
+    color: #facc15;
+    font-size: 11.5px;
+    font-weight: 600;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    transition: all 0.2s;
+}
+
+.dev-portal-anchor:hover {
+    text-decoration: underline;
+    color: #fef08a;
+}
+
 .btn-modal-manual {
     background: transparent;
     border: 1px dashed rgba(250, 204, 21, 0.3);
