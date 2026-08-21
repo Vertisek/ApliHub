@@ -6,11 +6,11 @@ window.handleBackToHub = function () {
     }
 };
 /* ==========================================================================
-   Algo Analyzer - Application Core & Social Algorithm Trends Intelligence
+   Soclify - Application Core & Social Algorithm Trends Intelligence
    ========================================================================== */
 
 /* ==========================================================================
-   WEB AUDIO SOUND FX ENGINE FOR ALGO ANALYZER
+   WEB AUDIO SOUND FX ENGINE FOR SOCLIFY
    ========================================================================== */
 const AlgoSoundFX = {
     ctx: null,
@@ -767,7 +767,7 @@ function handleDropdownAction(action) {
             }
             syncUserInfo();
             if (typeof renderAnalysisPanels === "function") renderAnalysisPanels();
-            showToast('👋 Wylogowano pomyślnie z panelu Algo Analyzer.');
+            showToast('👋 Wylogowano pomyślnie z panelu Soclify.');
             break;
     }
 }

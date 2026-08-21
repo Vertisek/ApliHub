@@ -6,7 +6,7 @@ using System.Threading;
 using System.Diagnostics;
 using System.Windows.Forms;
 
-namespace ApliHub.AlgoAnalyzer
+namespace ApliHub.Soclify
 {
     static class UpdaterProgram
     {
@@ -36,7 +36,7 @@ namespace ApliHub.AlgoAnalyzer
 
         private void InitializeComponent()
         {
-            this.Text = "ApliHub — Aktualizacja Algo Analyzer";
+            this.Text = "ApliHub — Aktualizacja Soclify";
             this.Size = new Size(460, 260);
             this.StartPosition = FormStartPosition.CenterScreen;
             this.FormBorderStyle = FormBorderStyle.FixedDialog;
@@ -51,7 +51,7 @@ namespace ApliHub.AlgoAnalyzer
             _appDir = Path.Combine(_rootDir, "app");
 
             Label lblTitle = new Label();
-            lblTitle.Text = "Centrum Aktualizacji Algo Analyzer";
+            lblTitle.Text = "Centrum Aktualizacji Soclify";
             lblTitle.Font = new Font("Segoe UI", 12F, FontStyle.Bold);
             lblTitle.ForeColor = Color.FromArgb(245, 158, 11);
             lblTitle.Location = new Point(24, 20);
@@ -122,7 +122,7 @@ namespace ApliHub.AlgoAnalyzer
 
                     using (WebClient client = new WebClient())
                     {
-                        client.Headers.Add("User-Agent", "ApliHub-AlgoAnalyzer-Desktop");
+                        client.Headers.Add("User-Agent", "ApliHub-Soclify-Desktop");
 
                         int count = 0;
                         foreach (string file in files)
@@ -158,7 +158,7 @@ namespace ApliHub.AlgoAnalyzer
 
                     this.Invoke(new Action(() => {
                         _progressBar.Value = 100;
-                        _lblStatus.Text = "✓ Algo Analyzer jest aktualny!";
+                        _lblStatus.Text = "✓ Soclify jest aktualny!";
                         _lblStatus.ForeColor = Color.FromArgb(34, 197, 94);
                         _lblSub.Text = "Pomyślnie zaktualizowano wszystkie pliki aplikacji.";
                         _btnAction.Text = "Uruchom ponownie";

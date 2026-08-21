@@ -180,11 +180,11 @@ const APLIHUB_DATA = {
   apps: [
     {
       id: "app-1",
-      name: "Algo Analyzer",
+      name: "Soclify",
       category: "Social Media",
       badge: "Aplikacja",
       icon: "📊",
-      desc: "Zaawansowany analizer algorytmu YouTube oraz innych social mediów. Przeanalizuj zachowanie algorytmu i określ jak mniej więcej z nim pracować.",
+      desc: "Zaawansowany analizer algorytmu YouTube oraz innych social mediów. Przeanalizuj zachowanie algorytmu i określ jak z nim pracować.",
       version: "v1.0.0",
       size: "2.8 MB",
       downloads: "14,200",

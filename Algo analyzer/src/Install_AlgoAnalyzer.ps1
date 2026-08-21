@@ -1,5 +1,5 @@
 # ==============================================================================
-# ApliHub Algo Analyzer - Native Windows Application Installer & Setup
+# ApliHub Soclify - Native Windows Application Installer & Setup
 # ==============================================================================
 
 $ErrorActionPreference = "Stop"
@@ -13,7 +13,7 @@ if (-not (Test-Path "$srcDir\index.html")) {
 }
 
 Write-Host "------------------------------------------------------------" -ForegroundColor Cyan
-Write-Host "   ApliHub Algo Analyzer - Instalator Aplikacji Desktop    " -ForegroundColor Yellow
+Write-Host "       ApliHub Soclify - Instalator Aplikacji Desktop       " -ForegroundColor Yellow
 Write-Host "------------------------------------------------------------" -ForegroundColor Cyan
 
 $csc = "C:\Windows\Microsoft.NET\Framework64\v4.0.30319\csc.exe"
@@ -24,14 +24,14 @@ if (-not (Test-Path $csc)) {
 $installDir = "$env:LOCALAPPDATA\ApliHub\AlgoAnalyzer"
 $appDir = "$installDir\app"
 $profileDir = "$installDir\profile"
-$tempBuildDir = "$env:TEMP\ApliHub_AlgoBuild"
+$tempBuildDir = "$env:TEMP\ApliHub_SoclifyBuild"
 
 if (Test-Path $tempBuildDir) { Remove-Item $tempBuildDir -Recurse -Force -ErrorAction SilentlyContinue }
 New-Item -ItemType Directory -Path $tempBuildDir -Force | Out-Null
 
 # 1. Kill running instances
-Write-Host "[1/6] Sprawdzanie aktywnych procesow AlgoAnalyzer..." -ForegroundColor Gray
-Get-Process -Name "AlgoAnalyzer" -ErrorAction SilentlyContinue | ForEach-Object {
+Write-Host "[1/6] Sprawdzanie aktywnych procesow Soclify / AlgoAnalyzer..." -ForegroundColor Gray
+Get-Process -Name "Soclify", "AlgoAnalyzer" -ErrorAction SilentlyContinue | ForEach-Object {
     Write-Host "  Zatrzymywanie instancji ID: $($_.Id)" -ForegroundColor DarkYellow
     Stop-Process -Id $_.Id -Force -ErrorAction SilentlyContinue
 }
@@ -44,7 +44,7 @@ if (Test-Path $iconPath) {
     $iconParam = "/win32icon:`"$iconPath`""
 }
 
-# Compile AlgoAnalyzer.exe
+# Compile AlgoAnalyzer.exe (Soclify launcher)
 $launcherSrc = "$srcDir\src\AlgoAnalyzerDesktop.cs"
 $launcherOut = "$tempBuildDir\AlgoAnalyzer.exe"
 & $csc /target:winexe /optimize+ $iconParam /out:"$launcherOut" /r:System.Windows.Forms.dll /r:System.Drawing.dll /r:System.dll "$launcherSrc"
@@ -86,12 +86,12 @@ Copy-Item "$srcDir\css\*" "$appDir\css\" -Recurse -Force
 Copy-Item "$srcDir\js\*" "$appDir\js\" -Recurse -Force
 
 # Create Update.bat helper
-$updateBatContent = "@echo off`r`ntitle ApliHub Algo Analyzer - Aktualizacja`r`nstart `"`" `"%~dp0Updater.exe`""
+$updateBatContent = "@echo off`r`ntitle ApliHub Soclify - Aktualizacja`r`nstart `"`" `"%~dp0Updater.exe`""
 Set-Content -Path "$installDir\Update.bat" -Value $updateBatContent -Encoding ASCII
 
 # Create version.json
 $currDate = (Get-Date).ToString("yyyy-MM-dd HH:mm:ss")
-$versionJson = "{`"name`": `"Algo Analyzer`", `"version`": `"1.0.0`", `"publisher`": `"ApliHub`", `"installDate`": `"$currDate`"}"
+$versionJson = "{`"name`": `"Soclify`", `"version`": `"1.0.0`", `"publisher`": `"ApliHub`", `"installDate`": `"$currDate`"}"
 Set-Content -Path "$installDir\version.json" -Value $versionJson -Encoding UTF8
 
 # 5. Create Shortcuts & Register in Windows
@@ -101,11 +101,14 @@ $wscript = New-Object -ComObject WScript.Shell
 
 # Desktop Shortcut
 $desktopFolder = [Environment]::GetFolderPath([Environment+SpecialFolder]::DesktopDirectory)
-$desktopLnk = "$desktopFolder\Algo Analyzer.lnk"
+$oldDesktopLnk = "$desktopFolder\Algo Analyzer.lnk"
+if (Test-Path $oldDesktopLnk) { Remove-Item $oldDesktopLnk -Force }
+
+$desktopLnk = "$desktopFolder\Soclify.lnk"
 $shortcut = $wscript.CreateShortcut($desktopLnk)
 $shortcut.TargetPath = "$installDir\AlgoAnalyzer.exe"
 $shortcut.WorkingDirectory = $installDir
-$shortcut.Description = "Algo Analyzer - Zaawansowana Analityka Social Media (ApliHub)"
+$shortcut.Description = "Soclify - Zaawansowana Analityka Social Media (ApliHub)"
 $shortcut.IconLocation = "$installDir\AlgoAnalyzer.exe,0"
 $shortcut.Save()
 
@@ -114,31 +117,36 @@ $startMenuPrograms = [Environment]::GetFolderPath([Environment+SpecialFolder]::P
 $startMenuApliHub = "$startMenuPrograms\ApliHub"
 New-Item -ItemType Directory -Path $startMenuApliHub -Force | Out-Null
 
-$menuLnk = "$startMenuApliHub\Algo Analyzer.lnk"
+$oldMenuLnk = "$startMenuApliHub\Algo Analyzer.lnk"
+if (Test-Path $oldMenuLnk) { Remove-Item $oldMenuLnk -Force }
+$oldUninstLnk = "$startMenuApliHub\Odinstaluj Algo Analyzer.lnk"
+if (Test-Path $oldUninstLnk) { Remove-Item $oldUninstLnk -Force }
+
+$menuLnk = "$startMenuApliHub\Soclify.lnk"
 $shortcut2 = $wscript.CreateShortcut($menuLnk)
 $shortcut2.TargetPath = "$installDir\AlgoAnalyzer.exe"
 $shortcut2.WorkingDirectory = $installDir
-$shortcut2.Description = "Algo Analyzer - Zaawansowana Analityka Social Media (ApliHub)"
+$shortcut2.Description = "Soclify - Zaawansowana Analityka Social Media (ApliHub)"
 $shortcut2.IconLocation = "$installDir\AlgoAnalyzer.exe,0"
 $shortcut2.Save()
 
-$uninstallLnk = "$startMenuApliHub\Odinstaluj Algo Analyzer.lnk"
+$uninstallLnk = "$startMenuApliHub\Odinstaluj Soclify.lnk"
 $shortcut3 = $wscript.CreateShortcut($uninstallLnk)
 $shortcut3.TargetPath = "$installDir\Uninstall.exe"
 $shortcut3.WorkingDirectory = $installDir
-$shortcut3.Description = "Odinstaluj program ApliHub Algo Analyzer"
+$shortcut3.Description = "Odinstaluj program ApliHub Soclify"
 $shortcut3.IconLocation = "$installDir\Uninstall.exe,0"
 $shortcut3.Save()
 
 # Registry Registration for Windows Add/Remove Programs (Settings -> Apps -> Installed Apps)
-$regPath = "HKCU:\Software\Microsoft\Windows\CurrentVersion\Uninstall\ApliHub_AlgoAnalyzer"
+$regPath = "HKCU:\Software\Microsoft\Windows\CurrentVersion\Uninstall\ApliHub_Soclify"
 if (-not (Test-Path $regPath)) {
     New-Item -Path $regPath -Force | Out-Null
 }
 
 $appSizeKB = [int]((Get-ChildItem $installDir -Recurse | Measure-Object -Property Length -Sum).Sum / 1024)
 
-Set-ItemProperty -Path $regPath -Name "DisplayName" -Value "ApliHub Algo Analyzer"
+Set-ItemProperty -Path $regPath -Name "DisplayName" -Value "ApliHub Soclify"
 Set-ItemProperty -Path $regPath -Name "DisplayVersion" -Value "1.0.0"
 Set-ItemProperty -Path $regPath -Name "Publisher" -Value "ApliHub"
 Set-ItemProperty -Path $regPath -Name "DisplayIcon" -Value "$installDir\AlgoAnalyzer.exe,0"
@@ -151,16 +159,19 @@ Set-ItemProperty -Path $regPath -Name "EstimatedSize" -Value $appSizeKB -Type DW
 Set-ItemProperty -Path $regPath -Name "NoModify" -Value 1 -Type DWord
 Set-ItemProperty -Path $regPath -Name "NoRepair" -Value 1 -Type DWord
 
+# Clean old registry key if present
+Remove-Item "HKCU:\Software\Microsoft\Windows\CurrentVersion\Uninstall\ApliHub_AlgoAnalyzer" -Force -ErrorAction SilentlyContinue
+
 # Clean temp build dir
 Remove-Item $tempBuildDir -Recurse -Force -ErrorAction SilentlyContinue
 
 # 6. Launch Application
-Write-Host "[6/6] Uruchamianie zainstalowanej aplikacji Algo Analyzer..." -ForegroundColor Green
+Write-Host "[6/6] Uruchamianie zainstalowanej aplikacji Soclify..." -ForegroundColor Green
 Start-Process -FilePath "$installDir\AlgoAnalyzer.exe"
 
 Write-Host ""
 Write-Host "============================================================" -ForegroundColor Green
-Write-Host "  SUKCES: Algo Analyzer zostal pomyslnie zainstalowany!     " -ForegroundColor Green
+Write-Host "      SUKCES: Soclify zostal pomyslnie zainstalowany!       " -ForegroundColor Green
 Write-Host "============================================================" -ForegroundColor Green
 Write-Host " - Lokalizacja:  $installDir"
 Write-Host " - Skrot Pulpit: $desktopLnk"

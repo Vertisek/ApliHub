@@ -4,7 +4,7 @@ using System.Diagnostics;
 using System.Windows.Forms;
 using Microsoft.Win32;
 
-namespace ApliHub.AlgoAnalyzer
+namespace ApliHub.Soclify
 {
     static class UninstallerProgram
     {
@@ -28,8 +28,8 @@ namespace ApliHub.AlgoAnalyzer
             if (!isSilent)
             {
                 DialogResult res = MessageBox.Show(
-                    "Czy na pewno chcesz odinstalować program ApliHub Algo Analyzer ze swojego komputera?",
-                    "Deinstalacja — ApliHub Algo Analyzer",
+                    "Czy na pewno chcesz odinstalować program ApliHub Soclify ze swojego komputera?",
+                    "Deinstalacja — ApliHub Soclify",
                     MessageBoxButtons.YesNo,
                     MessageBoxIcon.Question);
 
@@ -41,8 +41,8 @@ namespace ApliHub.AlgoAnalyzer
 
             try
             {
-                // 1. Terminate any running AlgoAnalyzer processes
-                Process[] procs = Process.GetProcessesByName("AlgoAnalyzer");
+                // 1. Terminate any running Soclify or AlgoAnalyzer processes
+                Process[] procs = Process.GetProcessesByName("Soclify");
                 foreach (Process p in procs)
                 {
                     try
@@ -63,18 +63,21 @@ namespace ApliHub.AlgoAnalyzer
                     {
                         if (parent != null)
                         {
+                            parent.DeleteSubKeyTree("ApliHub_Soclify", false);
                             parent.DeleteSubKeyTree("ApliHub_AlgoAnalyzer", false);
                         }
                     }
                 }
                 catch { }
 
-                // 3. Remove Desktop shortcut
+                // 3. Remove Desktop shortcuts
                 try
                 {
                     string desktop = Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory);
-                    string deskLink = Path.Combine(desktop, "Algo Analyzer.lnk");
+                    string deskLink = Path.Combine(desktop, "Soclify.lnk");
                     if (File.Exists(deskLink)) File.Delete(deskLink);
+                    string oldDeskLink = Path.Combine(desktop, "Algo Analyzer.lnk");
+                    if (File.Exists(oldDeskLink)) File.Delete(oldDeskLink);
                 }
                 catch { }
 
@@ -83,8 +86,12 @@ namespace ApliHub.AlgoAnalyzer
                 {
                     string programs = Environment.GetFolderPath(Environment.SpecialFolder.Programs);
                     string apliHubMenu = Path.Combine(programs, "ApliHub");
-                    string menuLink = Path.Combine(apliHubMenu, "Algo Analyzer.lnk");
+                    string menuLink = Path.Combine(apliHubMenu, "Soclify.lnk");
                     if (File.Exists(menuLink)) File.Delete(menuLink);
+                    string oldMenuLink = Path.Combine(apliHubMenu, "Algo Analyzer.lnk");
+                    if (File.Exists(oldMenuLink)) File.Delete(oldMenuLink);
+                    string uninstLink = Path.Combine(apliHubMenu, "Odinstaluj Soclify.lnk");
+                    if (File.Exists(uninstLink)) File.Delete(uninstLink);
 
                     // Delete folder if empty
                     if (Directory.Exists(apliHubMenu) && Directory.GetFiles(apliHubMenu).Length == 0 && Directory.GetDirectories(apliHubMenu).Length == 0)
@@ -115,7 +122,7 @@ namespace ApliHub.AlgoAnalyzer
                 if (!isSilent)
                 {
                     MessageBox.Show(
-                        "Program ApliHub Algo Analyzer został pomyślnie odinstalowany z Twojego komputera.",
+                        "Program ApliHub Soclify został pomyślnie odinstalowany z Twojego komputera.",
                         "Deinstalacja zakończona",
                         MessageBoxButtons.OK,
                         MessageBoxIcon.Information);

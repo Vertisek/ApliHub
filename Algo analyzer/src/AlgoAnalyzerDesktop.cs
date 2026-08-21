@@ -96,7 +96,7 @@ namespace ApliHub.AlgoAnalyzer
         private static void InitTrayIcon()
         {
             _trayIcon = new NotifyIcon();
-            _trayIcon.Text = "ApliHub - Algo Analyzer";
+            _trayIcon.Text = "ApliHub - Soclify";
 
             // Try load icon from file or assembly
             string iconPath = Path.Combine(_appDir, "app.ico");
@@ -112,7 +112,7 @@ namespace ApliHub.AlgoAnalyzer
             }
 
             ContextMenuStrip menu = new ContextMenuStrip();
-            ToolStripMenuItem itemOpen = new ToolStripMenuItem("🚀 Otwórz Algo Analyzer", null, (s, e) => {
+            ToolStripMenuItem itemOpen = new ToolStripMenuItem("🚀 Otwórz Soclify", null, (s, e) => {
                 LaunchBrowserApp();
             });
             itemOpen.Font = new Font(menu.Font, FontStyle.Bold);
@@ -129,7 +129,7 @@ namespace ApliHub.AlgoAnalyzer
                 try { Process.Start("https://aplihub.pl"); } catch { }
             });
 
-            ToolStripMenuItem itemExit = new ToolStripMenuItem("❌ Zamknij Algo Analyzer", null, (s, e) => {
+            ToolStripMenuItem itemExit = new ToolStripMenuItem("❌ Zamknij Soclify", null, (s, e) => {
                 _isRunning = false;
                 Cleanup();
                 Application.Exit();
@@ -164,7 +164,7 @@ namespace ApliHub.AlgoAnalyzer
                 }
                 else
                 {
-                    MessageBox.Show("Aplikacja Algo Analyzer jest w najnowszej wersji.", "Aktualizacje", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    MessageBox.Show("Aplikacja Soclify jest w najnowszej wersji.", "Aktualizacje", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 }
             }
         }
@@ -326,7 +326,7 @@ namespace ApliHub.AlgoAnalyzer
 
             if (browserPath != null)
             {
-                string args = string.Format("--app=\"{0}\" --window-size=1440,920 --user-data-dir=\"{1}\" --app-id=\"ApliHub.AlgoAnalyzer\" --disable-features=Translate",
+                string args = string.Format("--app=\"{0}\" --window-size=1440,920 --user-data-dir=\"{1}\" --app-id=\"ApliHub.Soclify\" --disable-features=Translate",
                     url, _profileDir);
 
                 ProcessStartInfo psi = new ProcessStartInfo
