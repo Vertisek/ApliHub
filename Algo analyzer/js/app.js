@@ -2407,6 +2407,13 @@ const SOCIAL_OAUTH_CONFIGS = {
 let currentModalPlatformKey = 'tiktok';
 
 async function openSocialConnectModal(platformKey) {
+    if (isWebSimulation()) {
+        if (typeof showToast === 'function') {
+            showToast('💡 W symulatorze na stronie wszystkie platformy są już w pełni odblokowane do testowania!');
+        }
+        return;
+    }
+
     const pKey = platformKey ? platformKey.toLowerCase() : 'tiktok';
     const config = SOCIAL_OAUTH_CONFIGS[pKey] || SOCIAL_OAUTH_CONFIGS.tiktok;
     currentModalPlatformKey = config.id;
