@@ -2325,3 +2325,10 @@ function pokazSzczegolyTwitch(broadcasterId) {
     alert('Otwieranie zaawansowanej analityki dla kanału ID: ' + broadcasterId);
     // Tutaj podepniesz przejście do widoku wykresów/analizy algorytmu
 }
+
+window.openTwitchModal = openTwitchModal;
+window.closeTwitchModal = closeTwitchModal;
+window.aktywujKafelekTwitch = aktywujKafelekTwitch;
+window.pokazSzczegolyTwitch = pokazSzczegolyTwitch;
+
+

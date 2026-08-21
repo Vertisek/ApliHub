@@ -1844,3 +1844,77 @@ body {
     box-shadow: 0 6px 20px rgba(145, 70, 255, 0.55);
     transform: translateY(-1px);
 }
+
+/* Tło modala (ciemny blur) */
+.custom-modal-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.75);
+    backdrop-filter: blur(8px);
+    z-index: 9999;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Karta okienka */
+.custom-modal-box {
+    background: #0f1318;
+    border: 1px solid rgba(255, 153, 0, 0.25);
+    box-shadow: 0 0 35px rgba(255, 140, 0, 0.15);
+    border-radius: 16px;
+    width: 90%;
+    max-width: 420px;
+    padding: 30px 24px;
+    text-align: center;
+    position: relative;
+    animation: modalFadeIn 0.25s ease-out;
+}
+
+@keyframes modalFadeIn {
+    from {
+        opacity: 0;
+        transform: scale(0.95);
+    }
+
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+/* Przycisk zamknięcia [X] */
+.modal-close-btn {
+    position: absolute;
+    top: 14px;
+    right: 16px;
+    background: transparent;
+    border: none;
+    color: #71767b;
+    font-size: 24px;
+    cursor: pointer;
+    transition: color 0.2s;
+}
+
+.modal-close-btn:hover {
+    color: #fff;
+}
+
+/* Ikona i teksty */
+.modal-header-icon {
+    margin-bottom: 12px;
+}
+
+.modal-title {
+    color: #fff;
+    font-size: 20px;
+    font-weight: 700;
+    margin: 0 0 8px 0;
+}
+
+.modal-desc {
+    color: #8b949e;
+    font-size: 13px;
+    line-height: 1.5;
+    margin-bottom: 24px;
+}
