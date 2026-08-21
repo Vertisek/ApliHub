@@ -920,9 +920,39 @@ function initSettingsForm() {
     // Apli Pro button removed as requested
 }
 
+function isDesktopApp() {
+    if (typeof window === 'undefined') return false;
+    const isPort54321 = window.location.port === '54321';
+    const isExplicitDesktop = window.location.search.includes('env=desktop') || window.location.search.includes('mode=desktop') || localStorage.getItem('soclify_env') === 'desktop';
+    return isPort54321 || isExplicitDesktop;
+}
+
+function isWebSimulation() {
+    return !isDesktopApp();
+}
+window.isDesktopApp = isDesktopApp;
+window.isWebSimulation = isWebSimulation;
+
 function renderConnectedSocialAccounts() {
     const container = document.getElementById('algo-social-accounts-list');
     if (!container || typeof getApliHubUserData !== 'function') return;
+
+    if (isWebSimulation()) {
+        container.innerHTML = `
+            <div style="background: rgba(245, 158, 11, 0.08); border: 1px solid rgba(245, 158, 11, 0.3); border-radius: 12px; padding: 18px; text-align: center;">
+                <div style="font-size: 1.6rem; margin-bottom: 8px;">📊</div>
+                <div style="font-weight: 700; color: #f59e0b; font-size: 1.05rem; margin-bottom: 6px;">Tryb Podglądu Symulacji</div>
+                <div style="color: #94a3b8; font-size: 0.88rem; line-height: 1.5; margin-bottom: 14px;">
+                    W symulatorze na stronie wszystkie platformy (YouTube, TikTok, Instagram, Facebook, Twitch) są w pełni odblokowane do interaktywnego testowania.<br>
+                    Rzeczywiste łączenie i synchronizacja Twoich kont przez oficjalne API jest dostępne w <strong>Aplikacji Desktopowej Soclify</strong>.
+                </div>
+                <a href="assets/installer/ApliHub_AlgoAnalyzer_Setup.exe" style="display: inline-block; padding: 9px 18px; background: #f59e0b; color: #000; font-weight: 700; border-radius: 8px; text-decoration: none; font-size: 0.85rem;">
+                    📥 Pobierz Aplikację Desktopową (.EXE)
+                </a>
+            </div>
+        `;
+        return;
+    }
 
     const user = getApliHubUserData();
     const socialPlatforms = [
@@ -986,6 +1016,7 @@ function renderAnalysisPanels() {
     const grid = document.querySelector('#tab-analiza .analysis-grid');
     if (!grid) return;
 
+    const isSim = isWebSimulation();
     const user = typeof getApliHubUserData === 'function' ? getApliHubUserData() : { connectedAccounts: {} };
     const connected = user.connectedAccounts || {};
 
@@ -1038,10 +1069,11 @@ function renderAnalysisPanels() {
     ];
 
     grid.innerHTML = platforms.map(p => {
-        const isConnected = !!connected[p.id];
+        // In web simulation, everything is fully unlocked for test preview
+        const isConnected = isSim ? true : !!connected[p.id];
 
         return `
-            <div class="glass-card analysis-platform-card ${isConnected ? 'connected-card' : 'locked-card'}" data-platform="${p.id}">
+            <div class="glass-card analysis-platform-card connected-card" data-platform="${p.id}" style="cursor: pointer;">
                 <div>
                     <div class="card-header">
                         <div class="platform-info">
@@ -1050,43 +1082,31 @@ function renderAnalysisPanels() {
                             </div>
                             <div class="platform-title">${p.name}</div>
                         </div>
-                        ${isConnected ? `
-                            <span class="platform-status-badge connected">
-                                <span>●</span> Połączono
-                            </span>
-                        ` : `
-                            <span class="platform-status-badge locked">
-                                <span>🔒</span> Niepołączone
-                            </span>
-                        `}
+                        <span class="platform-status-badge connected">
+                            <span>●</span> ${isSim ? 'Podgląd (Demo)' : (isConnected ? 'Połączono' : 'Niepołączone')}
+                        </span>
                     </div>
 
                     <div class="card-description">
                         ${p.desc}
                     </div>
 
-                    ${isConnected ? `
-                        <div class="card-metrics-preview">
-                            <div class="preview-stat">
-                                <span class="preview-label">Zasięg</span>
-                                <span class="preview-value">${p.reach}</span>
-                            </div>
-                            <div class="preview-stat">
-                                <span class="preview-label">Score</span>
-                                <span class="preview-value">${p.score}</span>
-                            </div>
+                    <div class="card-metrics-preview">
+                        <div class="preview-stat">
+                            <span class="preview-label">Zasięg</span>
+                            <span class="preview-value">${p.reach}</span>
                         </div>
-                    ` : `
-                        <div class="card-metrics-preview locked-preview">
-                            <span>🔒 Połącz konto, aby odblokować panel analizy</span>
+                        <div class="preview-stat">
+                            <span class="preview-label">Score</span>
+                            <span class="preview-value">${p.score}</span>
                         </div>
-                    `}
+                    </div>
                 </div>
 
                 <div>
-                    ${isConnected ? `
+                    ${(isSim || isConnected) ? `
                         <button class="btn-yellow btn-check-platform" data-platform="${p.id}">
-                            <span data-i18n="check">Sprawdź</span>
+                            <span>Sprawdź podgląd</span>
                             <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
                                 <polyline points="9 18 15 12 9 6"></polyline>
                             </svg>
@@ -2086,39 +2106,50 @@ function renderTwitchLiveDashboard(stats) {
     }
 
     if (!stats || !stats.user) {
-        const savedStatsStr = localStorage.getItem('twitch_stats_data');
-        if (savedStatsStr) {
-            try {
-                const parsed = JSON.parse(savedStatsStr);
-                if (parsed && parsed.user) {
-                    renderTwitchLiveDashboard(parsed);
-                    return;
-                }
-            } catch (e) { }
-        }
+        if (isWebSimulation()) {
+            stats = {
+                user: { displayName: 'Twitch_Creator (Demo)', login: 'creator_stream', avatar: 'app.ico' },
+                channel: { gameName: 'Just Chatting / Gaming' },
+                isLive: true,
+                liveViewers: 1420,
+                followers: 48500,
+                views: 278500
+            };
+        } else {
+            const savedStatsStr = localStorage.getItem('twitch_stats_data');
+            if (savedStatsStr) {
+                try {
+                    const parsed = JSON.parse(savedStatsStr);
+                    if (parsed && parsed.user) {
+                        renderTwitchLiveDashboard(parsed);
+                        return;
+                    }
+                } catch (e) { }
+            }
 
-        card.innerHTML = `
-            <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px;">
-                <div style="display: flex; align-items: center; gap: 14px;">
-                    <div style="width: 48px; height: 48px; border-radius: 12px; background: rgba(145, 70, 255, 0.2); display: flex; align-items: center; justify-content: center; font-size: 24px; border: 1px solid rgba(145, 70, 255, 0.4);">
-                        🟪
+            card.innerHTML = `
+                <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px;">
+                    <div style="display: flex; align-items: center; gap: 14px;">
+                        <div style="width: 48px; height: 48px; border-radius: 12px; background: rgba(145, 70, 255, 0.2); display: flex; align-items: center; justify-content: center; font-size: 24px; border: 1px solid rgba(145, 70, 255, 0.4);">
+                            🟪
+                        </div>
+                        <div>
+                            <h3 style="font-size: 16px; font-weight: 800; color: #fff; margin-bottom: 4px;">Integracja Twitch Helix API</h3>
+                            <p style="font-size: 13px; color: var(--color-text-muted);">Połącz swoje konto Twitch przez OAuth 2.0 (Implicit Flow), aby pobierać statystyki na żywo.</p>
+                        </div>
                     </div>
-                    <div>
-                        <h3 style="font-size: 16px; font-weight: 800; color: #fff; margin-bottom: 4px;">Integracja Twitch Helix API</h3>
-                        <p style="font-size: 13px; color: var(--color-text-muted);">Połącz swoje konto Twitch przez OAuth 2.0 (Implicit Flow), aby pobierać statystyki na żywo.</p>
+                    <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+                        <button class="btn-yellow" style="background: linear-gradient(135deg, #9146ff, #772ce8); color: #fff; border: none; padding: 10px 18px; border-radius: 8px; font-weight: 700; cursor: pointer; display: inline-flex; align-items: center; gap: 8px;" onclick="window.loginWithTwitch()">
+                            <span>🟪</span> Zaloguj przez Twitch OAuth
+                        </button>
+                        <button class="btn-back" onclick="window.promptTwitchClientId()" style="padding: 10px 14px; font-size: 12px;">
+                            ⚙️ Client ID
+                        </button>
                     </div>
                 </div>
-                <div style="display: flex; gap: 10px; flex-wrap: wrap;">
-                    <button class="btn-yellow" style="background: linear-gradient(135deg, #9146ff, #772ce8); color: #fff; border: none; padding: 10px 18px; border-radius: 8px; font-weight: 700; cursor: pointer; display: inline-flex; align-items: center; gap: 8px;" onclick="window.loginWithTwitch()">
-                        <span>🟪</span> Zaloguj przez Twitch OAuth
-                    </button>
-                    <button class="btn-back" onclick="window.promptTwitchClientId()" style="padding: 10px 14px; font-size: 12px;">
-                        ⚙️ Client ID
-                    </button>
-                </div>
-            </div>
-        `;
-        return;
+            `;
+            return;
+        }
     }
 
     const u = stats.user;
