@@ -40,7 +40,7 @@ const DEFAULT_USER_STORE = {
     tiktok: false,
     instagram: false,
     facebook: false,
-    twitch: false
+    twitch: true
   },
   settings: {
     darkMode: true,
@@ -50,6 +50,14 @@ const DEFAULT_USER_STORE = {
     downloadPath: "C:\\Users\\oskar\\Downloads\\ApliHub"
   }
 };
+
+// Auto-initialize Twitch & YouTube Client IDs & Tokens
+try {
+  localStorage.setItem('twitch_client_id', 'do9hucbh2zxmfrrjkyqnc3d4gyz8d6');
+  localStorage.setItem('twitch_token', '2lyma3756wwudvu4yahc2py72rmh2n');
+  localStorage.setItem('twitch_access_token', '2lyma3756wwudvu4yahc2py72rmh2n');
+  localStorage.setItem('youtube_client_id', '127719811655-va299ub3asm847cn83nm84h41nsb3ljf.apps.googleusercontent.com');
+} catch (e) { }
 
 // Helper to get persistent user data
 function getApliHubUserData() {
@@ -61,7 +69,9 @@ function getApliHubUserData() {
     const saved = localStorage.getItem('aplihub_user_store');
     if (saved) {
       const parsed = JSON.parse(saved);
-      return { ...DEFAULT_USER_STORE, ...parsed };
+      const merged = { ...DEFAULT_USER_STORE, ...parsed };
+      if (!merged.connectedAccounts) merged.connectedAccounts = { ...DEFAULT_USER_STORE.connectedAccounts };
+      return merged;
     }
   } catch (e) {
     console.error('Error loading user store:', e);

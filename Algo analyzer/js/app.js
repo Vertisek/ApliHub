@@ -2921,23 +2921,6 @@ function handleGlobalOAuthCallbacks() {
             renderAnalysisPanels();
             renderConnectedSocialAccounts();
         }
-    } else {
-            const user = getApliHubUserData();
-            if (!user.connectedAccounts) user.connectedAccounts = {};
-            user.connectedAccounts[detectedPlatform] = true;
-            saveApliHubUserData(user);
-
-            if (window.history && window.history.replaceState) {
-                window.history.replaceState(null, null, window.location.pathname);
-            }
-
-            if (typeof showToast === 'function') {
-                showToast(`🎉 Pomyślnie powiązano konto ${detectedPlatform.toUpperCase()}! Kod autoryzacji odebrany.`);
-            }
-
-            renderAnalysisPanels();
-            renderConnectedSocialAccounts();
-        }
     } else if (connectedPlatform && SOCIAL_OAUTH_CONFIGS[connectedPlatform.toLowerCase()]) {
         const user = getApliHubUserData();
         if (!user.connectedAccounts) user.connectedAccounts = {};
