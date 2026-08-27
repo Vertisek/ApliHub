@@ -2,26 +2,183 @@
 <html lang="pl">
 <head>
   <meta charset="UTF-8">
-  <title>Autoryzacja Twitch...</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ApliHub — Autoryzacja OAuth</title>
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      background: #09090b;
+      color: #f4f4f5;
+      font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      text-align: center;
+    }
+    .card {
+      background: rgba(24, 24, 27, 0.85);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 16px;
+      padding: 36px 28px;
+      max-width: 440px;
+      width: 90%;
+      box-shadow: 0 20px 50px rgba(0,0,0,0.6), 0 0 30px rgba(245, 158, 11, 0.15);
+    }
+    .spinner {
+      width: 48px;
+      height: 48px;
+      border: 4px solid rgba(245, 158, 11, 0.2);
+      border-top: 4px solid #f59e0b;
+      border-radius: 50%;
+      animation: spin 0.9s linear infinite;
+      margin: 0 auto 20px auto;
+    }
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+    h2 {
+      font-size: 20px;
+      margin: 0 0 10px 0;
+      color: #fff;
+    }
+    p {
+      font-size: 14px;
+      color: #a1a1aa;
+      line-height: 1.5;
+      margin: 0;
+    }
+    .btn {
+      display: inline-block;
+      margin-top: 22px;
+      background: #f59e0b;
+      color: #000;
+      font-weight: 700;
+      font-size: 14px;
+      padding: 12px 24px;
+      border-radius: 8px;
+      text-decoration: none;
+      transition: all 0.2s;
+    }
+    .btn:hover {
+      background: #d97706;
+      transform: translateY(-1px);
+    }
+  </style>
 </head>
-<body style="background:#0e0e10; color:#fff; font-family:sans-serif; text-align:center; padding-top:50px;">
-  <h2>Trwa łączenie z kontem Twitch...</h2>
+<body>
+  <div class="card">
+    <div class="spinner" id="spinner"></div>
+    <h2 id="status-title">Przetwarzanie autoryzacji...</h2>
+    <p id="status-desc">Trwa bezpieczne łączenie Twojego konta społecznościowego z ApliHub.</p>
+    <a href="index.html" class="btn" id="return-btn" style="display:none;">Wróć do aplikacji</a>
+  </div>
 
   <script>
-    // Pobranie tokenu z hasha adresu URL (#access_token=...)
-    const hash = window.location.hash.substring(1);
-    const params = new URLSearchParams(hash);
-    const accessToken = params.get('access_token');
+    (async function() {
+      const searchParams = new URLSearchParams(window.location.search);
+      const hash = window.location.hash ? window.location.hash.substring(1) : '';
+      const hashParams = new URLSearchParams(hash.startsWith('?') ? hash : '?' + hash);
 
-    if (accessToken) {
-      // Zapisujemy token w przeglądarce
-      localStorage.setItem('twitch_access_token', accessToken);
-      
-      // Przekierowujemy z powrotem do głównej strony Twojej aplikacji
-      window.location.href = 'https://vertisek.github.io/ApliHub/';
-    } else {
-      document.body.innerHTML = '<h2>Wystąpił błąd podczas logowania. Spróbuj ponownie.</h2>';
-    }
+      const accessToken = hashParams.get('access_token') || searchParams.get('access_token');
+      const code = searchParams.get('code') || hashParams.get('code');
+      const state = searchParams.get('state') || hashParams.get('state') || '';
+      const error = searchParams.get('error') || hashParams.get('error');
+
+      const titleEl = document.getElementById('status-title');
+      const descEl = document.getElementById('status-desc');
+      const btnEl = document.getElementById('return-btn');
+      const spinnerEl = document.getElementById('spinner');
+
+      if (error) {
+        spinnerEl.style.display = 'none';
+        titleEl.textContent = 'Błąd autoryzacji';
+        titleEl.style.color = '#ef4444';
+        descEl.textContent = 'Nie udało się połączyć konta: ' + error;
+        btnEl.style.display = 'inline-block';
+        return;
+      }
+
+      let detectedPlatform = 'twitch';
+      if (state.startsWith('youtube') || window.location.href.includes('youtube') || hash.includes('youtube')) {
+        detectedPlatform = 'youtube';
+      } else if (state.startsWith('tiktok') || sessionStorage.getItem('tiktok_oauth_state') === state) {
+        detectedPlatform = 'tiktok';
+      } else if (state.startsWith('instagram') || window.location.href.includes('instagram')) {
+        detectedPlatform = 'instagram';
+      } else if (state.startsWith('facebook') || window.location.href.includes('facebook')) {
+        detectedPlatform = 'facebook';
+      }
+
+      // Handle Code Exchange (e.g. YouTube PKCE)
+      if (code) {
+        if (detectedPlatform === 'youtube') {
+          const codeVerifier = sessionStorage.getItem('youtube_code_verifier') || localStorage.getItem('youtube_code_verifier');
+          const cId = localStorage.getItem('youtube_client_id') || sessionStorage.getItem('youtube_client_id') || '';
+          const redirectUri = window.location.origin + window.location.pathname;
+
+          if (codeVerifier && cId) {
+            try {
+              const bodyParams = {
+                client_id: cId,
+                code: code,
+                code_verifier: codeVerifier,
+                grant_type: 'authorization_code',
+                redirect_uri: redirectUri
+              };
+              const res = await fetch('https://oauth2.googleapis.com/token', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                body: new URLSearchParams(bodyParams)
+              });
+              const data = await res.json();
+              if (data.access_token) {
+                localStorage.setItem('youtube_token', data.access_token);
+                localStorage.setItem('youtube_access_token', data.access_token);
+              }
+            } catch (e) {
+              console.warn('Code exchange error:', e);
+            }
+          }
+        }
+        localStorage.setItem(detectedPlatform + '_code', code);
+      }
+
+      if (accessToken) {
+        localStorage.setItem(detectedPlatform + '_token', accessToken);
+        localStorage.setItem(detectedPlatform + '_access_token', accessToken);
+      }
+
+      // Mark connected in ApliHub user data
+      try {
+        const userStoreRaw = localStorage.getItem('soclify_user_data') || localStorage.getItem('aplihub_user_data');
+        const userStore = userStoreRaw ? JSON.parse(userStoreRaw) : {};
+        if (!userStore.connectedAccounts) userStore.connectedAccounts = {};
+        userStore.connectedAccounts[detectedPlatform] = true;
+        localStorage.setItem('soclify_user_data', JSON.stringify(userStore));
+        localStorage.setItem('aplihub_user_data', JSON.stringify(userStore));
+      } catch (e) {}
+
+      // Broadcast channel for desktop/other open tabs
+      try {
+        const bc = new BroadcastChannel('aplihub_oauth_channel');
+        bc.postMessage({ platform: detectedPlatform, success: true, token: accessToken, code: code });
+      } catch (e) {}
+
+      spinnerEl.style.display = 'none';
+      titleEl.textContent = 'Połączono pomyślnie!';
+      titleEl.style.color = '#22c55e';
+      descEl.textContent = 'Twoje konto ' + detectedPlatform.toUpperCase() + ' zostało połączone. Za chwilę wrócisz do aplikacji...';
+
+      setTimeout(function() {
+        const targetUrl = window.location.href.includes('Algo%20analyzer') 
+          ? 'index.html' 
+          : 'https://vertisek.github.io/ApliHub/';
+        window.location.href = targetUrl;
+      }, 1500);
+    })();
   </script>
 </body>
 </html>
