@@ -2546,7 +2546,7 @@ const SOCIAL_OAUTH_CONFIGS = {
         devPortalUrl: 'https://console.cloud.google.com/apis/credentials',
         defaultClientId: '127719811655-rtplre9akrqai7tetmdq8do96ksk4nko.apps.googleusercontent.com',
         buildAuthUrl: async function (clientId) {
-            const cId = clientId || localStorage.getItem('youtube_client_id') || this.defaultClientId;
+            const cId = clientId || this.defaultClientId;
             localStorage.setItem('youtube_client_id', cId);
             sessionStorage.setItem('youtube_client_id', cId);
             const redirectUri = getAppRedirectUri();
@@ -2792,7 +2792,7 @@ function showOAuthSuccessModal(platformKey) {
 async function exchangeYouTubeOAuthCode(code) {
     if (!code) return;
     const codeVerifier = sessionStorage.getItem('youtube_code_verifier') || localStorage.getItem('youtube_code_verifier') || '';
-    const cId = localStorage.getItem('youtube_client_id') || (SOCIAL_OAUTH_CONFIGS.youtube && SOCIAL_OAUTH_CONFIGS.youtube.defaultClientId);
+    const cId = (SOCIAL_OAUTH_CONFIGS.youtube && SOCIAL_OAUTH_CONFIGS.youtube.defaultClientId) || '127719811655-rtplre9akrqai7tetmdq8do96ksk4nko.apps.googleusercontent.com';
     const redirectUri = getAppRedirectUri();
 
     try {
