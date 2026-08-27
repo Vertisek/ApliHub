@@ -2789,6 +2789,59 @@ function showOAuthSuccessModal(platformKey) {
     `;
 }
 
+async function exchangeYouTubeOAuthCode(code) {
+    if (!code) return;
+    const codeVerifier = sessionStorage.getItem('youtube_code_verifier') || localStorage.getItem('youtube_code_verifier') || '';
+    const cId = localStorage.getItem('youtube_client_id') || (SOCIAL_OAUTH_CONFIGS.youtube && SOCIAL_OAUTH_CONFIGS.youtube.defaultClientId);
+    const redirectUri = getAppRedirectUri();
+
+    try {
+        const res = await fetch('https://oauth2.googleapis.com/token', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+            body: new URLSearchParams({
+                client_id: cId,
+                code: code,
+                code_verifier: codeVerifier,
+                grant_type: 'authorization_code',
+                redirect_uri: redirectUri
+            })
+        });
+        const tokenData = await res.json();
+        if (tokenData.access_token) {
+            localStorage.setItem('youtube_token', tokenData.access_token);
+            localStorage.setItem('youtube_access_token', tokenData.access_token);
+            if (tokenData.refresh_token) {
+                localStorage.setItem('youtube_refresh_token', tokenData.refresh_token);
+            }
+
+            const user = getApliHubUserData();
+            if (!user.connectedAccounts) user.connectedAccounts = {};
+            user.connectedAccounts.youtube = true;
+            saveApliHubUserData(user);
+
+            if (typeof showToast === 'function') {
+                showToast('🎉 Pomyślnie powiązano konto YouTube!');
+            }
+
+            showOAuthSuccessModal('youtube');
+            if (typeof fetchYouTubeChannelStats === 'function') {
+                fetchYouTubeChannelStats();
+            }
+            renderAnalysisPanels();
+            renderConnectedSocialAccounts();
+        } else {
+            console.error('Błąd tokenu Google OAuth:', tokenData);
+            if (typeof showToast === 'function') {
+                showToast('Błąd Google OAuth: ' + (tokenData.error_description || tokenData.error || 'Błąd autoryzacji'));
+            }
+        }
+    } catch (err) {
+        console.error('Błąd zapytania o token Google:', err);
+    }
+}
+window.exchangeYouTubeOAuthCode = exchangeYouTubeOAuthCode;
+
 // Automatic OAuth Callback parser across all platforms
 function handleGlobalOAuthCallbacks() {
     // 1. Check token hash (#access_token=...)
@@ -2839,8 +2892,7 @@ function handleGlobalOAuthCallbacks() {
     const connectedPlatform = searchParams.get('connected');
 
     if (code) {
-        // Find which platform was in state
-        let detectedPlatform = 'tiktok';
+        let detectedPlatform = 'youtube';
         const ytState = sessionStorage.getItem('youtube_oauth_state');
         if (state && (state.startsWith('youtube') || (ytState && state === ytState))) {
             detectedPlatform = 'youtube';
@@ -2851,62 +2903,25 @@ function handleGlobalOAuthCallbacks() {
         }
 
         if (detectedPlatform === 'youtube') {
-            const codeVerifier = sessionStorage.getItem('youtube_code_verifier');
-            const cId = localStorage.getItem('youtube_client_id') || (SOCIAL_OAUTH_CONFIGS.youtube && SOCIAL_OAUTH_CONFIGS.youtube.defaultClientId);
-            const redirectUri = getAppRedirectUri();
-
-            if (codeVerifier && cId) {
-                fetch('https://oauth2.googleapis.com/token', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-                    body: new URLSearchParams({
-                        client_id: cId,
-                        code: code,
-                        code_verifier: codeVerifier,
-                        grant_type: 'authorization_code',
-                        redirect_uri: redirectUri
-                    })
-                })
-                .then(res => res.json())
-                .then(tokenData => {
-                    if (tokenData.access_token) {
-                        localStorage.setItem('youtube_token', tokenData.access_token);
-                        localStorage.setItem('youtube_access_token', tokenData.access_token);
-                        if (tokenData.refresh_token) {
-                            localStorage.setItem('youtube_refresh_token', tokenData.refresh_token);
-                        }
-
-                        const user = getApliHubUserData();
-                        if (!user.connectedAccounts) user.connectedAccounts = {};
-                        user.connectedAccounts.youtube = true;
-                        saveApliHubUserData(user);
-
-                        if (window.history && window.history.replaceState) {
-                            window.history.replaceState(null, null, window.location.pathname);
-                        }
-
-                        if (typeof showToast === 'function') {
-                            showToast('🎉 Pomyślnie powiązano konto YouTube z Google API!');
-                        }
-
-                        showOAuthSuccessModal('youtube');
-                        if (typeof fetchYouTubeChannelStats === 'function') {
-                            fetchYouTubeChannelStats();
-                        }
-                        renderAnalysisPanels();
-                        renderConnectedSocialAccounts();
-                    } else {
-                        console.error('Błąd tokenu Google OAuth:', tokenData);
-                        if (typeof showToast === 'function') {
-                            showToast('Błąd Google OAuth: ' + (tokenData.error_description || tokenData.error || 'Błąd autoryzacji'));
-                        }
-                    }
-                })
-                .catch(err => {
-                    console.error('Błąd zapytania o token Google:', err);
-                });
-            }
+            exchangeYouTubeOAuthCode(code);
         } else {
+            const user = getApliHubUserData();
+            if (!user.connectedAccounts) user.connectedAccounts = {};
+            user.connectedAccounts[detectedPlatform] = true;
+            saveApliHubUserData(user);
+
+            if (window.history && window.history.replaceState) {
+                window.history.replaceState(null, null, window.location.pathname);
+            }
+
+            if (typeof showToast === 'function') {
+                showToast(`🎉 Pomyślnie powiązano konto ${detectedPlatform.toUpperCase()}! Kod autoryzacji odebrany.`);
+            }
+
+            renderAnalysisPanels();
+            renderConnectedSocialAccounts();
+        }
+    } else {
             const user = getApliHubUserData();
             if (!user.connectedAccounts) user.connectedAccounts = {};
             user.connectedAccounts[detectedPlatform] = true;
@@ -2993,34 +3008,58 @@ if (!localStorage.getItem('soclify_accounts_reset_v8')) {
 try {
     const oauthBroadcastChannel = new BroadcastChannel('aplihub_oauth_channel');
     oauthBroadcastChannel.onmessage = (event) => {
-        if (event.data && event.data.platform) {
-            const platformKey = event.data.platform;
-            const user = getApliHubUserData();
-            if (!user.connectedAccounts) user.connectedAccounts = {};
-            user.connectedAccounts[platformKey] = true;
-            saveApliHubUserData(user);
+        if (!event.data) return;
+        const { type, platform, code, token } = event.data;
+        const platformKey = (platform || 'youtube').toLowerCase();
 
-            if (typeof showOAuthSuccessModal === 'function') {
-                showOAuthSuccessModal(platformKey);
-            }
-            if (platformKey === 'youtube' && typeof fetchYouTubeChannelStats === 'function') {
-                fetchYouTubeChannelStats();
-            } else if (platformKey === 'twitch' && typeof fetchTwitchChannelStats === 'function') {
-                fetchTwitchChannelStats();
-            }
-            renderAnalysisPanels();
-            renderConnectedSocialAccounts();
+        if (code && platformKey === 'youtube') {
+            exchangeYouTubeOAuthCode(code);
+            return;
         }
-    };
-} catch (e) {}
 
-window.addEventListener('message', (event) => {
-    if (event.data && (event.data.type === 'SOCLIFY_OAUTH_SUCCESS' || event.data.platform)) {
-        const platformKey = event.data.platform;
         const user = getApliHubUserData();
         if (!user.connectedAccounts) user.connectedAccounts = {};
         user.connectedAccounts[platformKey] = true;
         saveApliHubUserData(user);
+
+        if (token) {
+            localStorage.setItem(`${platformKey}_token`, token);
+            localStorage.setItem(`${platformKey}_access_token`, token);
+        }
+
+        if (typeof showOAuthSuccessModal === 'function') {
+            showOAuthSuccessModal(platformKey);
+        }
+        if (platformKey === 'youtube' && typeof fetchYouTubeChannelStats === 'function') {
+            fetchYouTubeChannelStats();
+        } else if (platformKey === 'twitch' && typeof fetchTwitchChannelStats === 'function') {
+            fetchTwitchChannelStats();
+        }
+        renderAnalysisPanels();
+        renderConnectedSocialAccounts();
+    };
+} catch (e) {}
+
+window.addEventListener('message', (event) => {
+    if (!event.data) return;
+    const { type, platform, code, token } = event.data;
+    const platformKey = (platform || 'youtube').toLowerCase();
+
+    if (code && platformKey === 'youtube') {
+        exchangeYouTubeOAuthCode(code);
+        return;
+    }
+
+    if (type === 'SOCLIFY_OAUTH_SUCCESS' || platformKey) {
+        const user = getApliHubUserData();
+        if (!user.connectedAccounts) user.connectedAccounts = {};
+        user.connectedAccounts[platformKey] = true;
+        saveApliHubUserData(user);
+
+        if (token) {
+            localStorage.setItem(`${platformKey}_token`, token);
+            localStorage.setItem(`${platformKey}_access_token`, token);
+        }
 
         if (typeof showOAuthSuccessModal === 'function') {
             showOAuthSuccessModal(platformKey);

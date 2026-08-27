@@ -18,13 +18,13 @@
       text-align: center;
     }
     .card {
-      background: rgba(24, 24, 27, 0.9);
+      background: rgba(24, 24, 27, 0.95);
       border: 1px solid rgba(255, 255, 255, 0.12);
       border-radius: 20px;
       padding: 40px 32px;
-      max-width: 460px;
+      max-width: 480px;
       width: 90%;
-      box-shadow: 0 25px 60px rgba(0,0,0,0.7), 0 0 40px rgba(34, 197, 94, 0.15);
+      box-shadow: 0 25px 60px rgba(0,0,0,0.8), 0 0 40px rgba(34, 197, 94, 0.15);
     }
     .spinner {
       width: 48px;
@@ -71,17 +71,27 @@
       color: #000;
       font-weight: 800;
       font-size: 14px;
-      padding: 12px 28px;
+      padding: 13px 30px;
       border-radius: 10px;
       text-decoration: none;
       border: none;
       cursor: pointer;
       transition: all 0.2s;
+      margin: 6px;
     }
     .btn:hover {
       background: #16a34a;
       transform: translateY(-2px);
       box-shadow: 0 8px 20px rgba(34, 197, 94, 0.35);
+    }
+    .btn-secondary {
+      background: rgba(255, 255, 255, 0.1);
+      color: #fff;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+    }
+    .btn-secondary:hover {
+      background: rgba(255, 255, 255, 0.18);
+      box-shadow: none;
     }
   </style>
 </head>
@@ -90,8 +100,11 @@
     <div class="spinner" id="spinner"></div>
     <div class="success-icon" id="success-icon">✓</div>
     <h2 id="status-title">Przetwarzanie autoryzacji...</h2>
-    <p id="status-desc">Trwa bezpieczne pobieranie danych i łączenie konta z aplikacją Soclify.</p>
-    <button class="btn" id="return-btn" style="display:none;" onclick="window.close()">Zamknij to okno</button>
+    <p id="status-desc">Trwa bezpieczne przekazywanie danych do aplikacji Soclify.</p>
+    <div id="action-buttons" style="display:none;">
+      <a href="#" class="btn" id="open-app-btn">🚀 Otwórz Aplikację Soclify</a>
+      <button class="btn btn-secondary" onclick="window.close()">Zamknij</button>
+    </div>
   </div>
 
   <script>
@@ -107,18 +120,18 @@
 
       const titleEl = document.getElementById('status-title');
       const descEl = document.getElementById('status-desc');
-      const btnEl = document.getElementById('return-btn');
       const spinnerEl = document.getElementById('spinner');
       const successIconEl = document.getElementById('success-icon');
+      const actionBtns = document.getElementById('action-buttons');
+      const openAppBtn = document.getElementById('open-app-btn');
 
       if (error) {
         spinnerEl.style.display = 'none';
         titleEl.textContent = 'Błąd autoryzacji';
         titleEl.style.color = '#ef4444';
         descEl.textContent = 'Nie udało się połączyć konta: ' + error;
-        btnEl.style.display = 'inline-block';
-        btnEl.style.background = '#ef4444';
-        btnEl.textContent = 'Zamknij';
+        actionBtns.style.display = 'block';
+        openAppBtn.style.display = 'none';
         return;
       }
 
@@ -135,93 +148,61 @@
         detectedPlatform = 'facebook';
       }
 
-      // 1. Code Exchange (e.g. YouTube PKCE)
-      let finalToken = accessToken;
+      // Store in local/session storage
+      if (accessToken) {
+        localStorage.setItem(detectedPlatform + '_token', accessToken);
+        localStorage.setItem(detectedPlatform + '_access_token', accessToken);
+      }
       if (code) {
-        if (detectedPlatform === 'youtube') {
-          const codeVerifier = sessionStorage.getItem('youtube_code_verifier') || localStorage.getItem('youtube_code_verifier');
-          const cId = localStorage.getItem('youtube_client_id') || sessionStorage.getItem('youtube_client_id') || '127719811655-rtplre9akrqai7tetmdq8do96ksk4nko.apps.googleusercontent.com';
-          const redirectUri = window.location.origin + window.location.pathname;
-
-          if (codeVerifier && cId) {
-            try {
-              const res = await fetch('https://oauth2.googleapis.com/token', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-                body: new URLSearchParams({
-                  client_id: cId,
-                  code: code,
-                  code_verifier: codeVerifier,
-                  grant_type: 'authorization_code',
-                  redirect_uri: redirectUri
-                })
-              });
-              const data = await res.json();
-              if (data.access_token) {
-                finalToken = data.access_token;
-                localStorage.setItem('youtube_token', data.access_token);
-                localStorage.setItem('youtube_access_token', data.access_token);
-                if (data.refresh_token) localStorage.setItem('youtube_refresh_token', data.refresh_token);
-              }
-            } catch (e) {
-              console.warn('Code exchange error:', e);
-            }
-          }
-        }
         localStorage.setItem(detectedPlatform + '_code', code);
       }
 
-      if (finalToken) {
-        localStorage.setItem(detectedPlatform + '_token', finalToken);
-        localStorage.setItem(detectedPlatform + '_access_token', finalToken);
-      }
-
-      // Mark connected in ApliHub user store
-      try {
-        const userStoreRaw = localStorage.getItem('soclify_user_data') || localStorage.getItem('aplihub_user_data');
-        const userStore = userStoreRaw ? JSON.parse(userStoreRaw) : {};
-        if (!userStore.connectedAccounts) userStore.connectedAccounts = {};
-        userStore.connectedAccounts[detectedPlatform] = true;
-        localStorage.setItem('soclify_user_data', JSON.stringify(userStore));
-        localStorage.setItem('aplihub_user_data', JSON.stringify(userStore));
-      } catch (e) {}
-
-      // 2. Notify Parent Window (if opened in popup)
+      // 1. Post message to Opener Window (Popup flow)
+      let sentToOpener = false;
       if (window.opener && !window.opener.closed) {
         try {
           window.opener.postMessage({
-            type: 'SOCLIFY_OAUTH_SUCCESS',
+            type: code ? 'SOCLIFY_OAUTH_CODE' : 'SOCLIFY_OAUTH_SUCCESS',
             platform: detectedPlatform,
-            token: finalToken,
-            code: code
+            token: accessToken,
+            code: code,
+            state: state
           }, '*');
-        } catch (e) {}
+          sentToOpener = true;
+        } catch (e) {
+          console.warn('postMessage to opener failed:', e);
+        }
       }
 
-      // 3. Notify BroadcastChannel (desktop app and open tabs)
+      // 2. BroadcastChannel
       try {
         const bc = new BroadcastChannel('aplihub_oauth_channel');
         bc.postMessage({
-          type: 'SOCLIFY_OAUTH_SUCCESS',
+          type: code ? 'SOCLIFY_OAUTH_CODE' : 'SOCLIFY_OAUTH_SUCCESS',
           platform: detectedPlatform,
-          token: finalToken,
-          code: code
+          token: accessToken,
+          code: code,
+          state: state
         });
       } catch (e) {}
 
-      // 4. Update UI
+      // Update UI
       spinnerEl.style.display = 'none';
       successIconEl.style.display = 'flex';
       titleEl.textContent = '🎉 Połączono pomyślnie!';
       titleEl.style.color = '#22c55e';
-      descEl.innerHTML = 'Twoje konto <strong>' + detectedPlatform.toUpperCase() + '</strong> zostało pomyślnie powiązane z aplikacją Soclify.<br><br>Możesz teraz zamknąć tę kartę i przejść do aplikacji!';
-      btnEl.style.display = 'inline-block';
+      descEl.innerHTML = 'Twoje konto <strong>' + detectedPlatform.toUpperCase() + '</strong> zostało pomyślnie autoryzowane.<br>Aplikacja Soclify odbiera dane kanału...';
+      actionBtns.style.display = 'block';
 
-      // Auto close popup if opener exists
-      if (window.opener) {
+      // Set fallback direct app URL if needed
+      const appUrl = 'http://localhost:54321/index.html?code=' + encodeURIComponent(code || '') + '&state=' + encodeURIComponent(state) + '&connected=' + detectedPlatform;
+      openAppBtn.href = appUrl;
+
+      // If opened in popup and communicated with opener, auto-close after 1.5s
+      if (sentToOpener) {
         setTimeout(function() {
-          window.close();
-        }, 2000);
+          try { window.close(); } catch (e) {}
+        }, 1500);
       }
     })();
   </script>
