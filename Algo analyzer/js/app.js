@@ -6,11 +6,11 @@ window.handleBackToHub = function () {
     }
 };
 /* ==========================================================================
-   Soclify - Application Core & Social Algorithm Trends Intelligence
+   Algo Analyzer - Application Core & Social Algorithm Trends Intelligence
    ========================================================================== */
 
 /* ==========================================================================
-   WEB AUDIO SOUND FX ENGINE FOR SOCLIFY
+   WEB AUDIO SOUND FX ENGINE FOR ALGO ANALYZER
    ========================================================================== */
 const AlgoSoundFX = {
     ctx: null,
@@ -767,7 +767,7 @@ function handleDropdownAction(action) {
             }
             syncUserInfo();
             if (typeof renderAnalysisPanels === "function") renderAnalysisPanels();
-            showToast('👋 Wylogowano pomyślnie z panelu Soclify.');
+            showToast('👋 Wylogowano pomyślnie z panelu Algo Analyzer.');
             break;
     }
 }
@@ -920,45 +920,41 @@ function initSettingsForm() {
     // Apli Pro button removed as requested
 }
 
-function isDesktopApp() {
-    if (typeof window === 'undefined') return false;
-    const isFile = window.location.protocol === 'file:';
-    const isPort54321 = window.location.port === '54321';
-    const isLocalhost = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
-    const isExplicitDesktop = window.location.search.includes('env=desktop') || window.location.search.includes('mode=desktop') || localStorage.getItem('soclify_env') === 'desktop';
-    return isFile || isPort54321 || isLocalhost || isExplicitDesktop;
-}
+function disconnectSocialPlatform(platformKey) {
+    const key = (platformKey || '').toLowerCase();
+    const user = typeof getApliHubUserData === 'function' ? getApliHubUserData() : {};
+    if (!user.connectedAccounts) user.connectedAccounts = {};
+    user.connectedAccounts[key] = false;
+    if (typeof saveApliHubUserData === 'function') saveApliHubUserData(user);
 
-function isWebSimulation() {
-    if (window.parent && window.parent !== window) return true;
-    if (window.location.hostname.includes('github.io') || window.location.hostname.includes('aplihub')) {
-        return !window.location.search.includes('env=desktop');
+    localStorage.removeItem(`${key}_token`);
+    localStorage.removeItem(`${key}_access_token`);
+    localStorage.removeItem(`${key}_stats_data`);
+    localStorage.removeItem(`${key}_code`);
+
+    if (key === 'youtube' && typeof renderYouTubeLiveDashboard === 'function') {
+        renderYouTubeLiveDashboard(null);
+    } else if (key === 'twitch' && typeof renderTwitchLiveDashboard === 'function') {
+        renderTwitchLiveDashboard(null);
     }
-    return !isDesktopApp();
+
+    if (typeof renderAnalysisPanels === 'function') renderAnalysisPanels();
+    if (typeof renderConnectedSocialAccounts === 'function') renderConnectedSocialAccounts();
+    if (typeof renderSocialTrendHubs === 'function') renderSocialTrendHubs();
+
+    if (typeof AlgoSoundFX !== 'undefined' && AlgoSoundFX.playClick) {
+        AlgoSoundFX.playClick();
+    }
+    if (typeof showToast === 'function') {
+        const pName = (typeof SOCIAL_OAUTH_CONFIGS !== 'undefined' && SOCIAL_OAUTH_CONFIGS[key] && SOCIAL_OAUTH_CONFIGS[key].name) || key.toUpperCase();
+        showToast(`🔌 Pomyślnie odłączono konto ${pName}.`);
+    }
 }
-window.isDesktopApp = isDesktopApp;
-window.isWebSimulation = isWebSimulation;
+window.disconnectSocialPlatform = disconnectSocialPlatform;
 
 function renderConnectedSocialAccounts() {
     const container = document.getElementById('algo-social-accounts-list');
     if (!container || typeof getApliHubUserData !== 'function') return;
-
-    if (isWebSimulation()) {
-        container.innerHTML = `
-            <div style="background: rgba(245, 158, 11, 0.08); border: 1px solid rgba(245, 158, 11, 0.3); border-radius: 12px; padding: 18px; text-align: center;">
-                <div style="font-size: 1.6rem; margin-bottom: 8px;">📊</div>
-                <div style="font-weight: 700; color: #f59e0b; font-size: 1.05rem; margin-bottom: 6px;">Tryb Podglądu Symulacji</div>
-                <div style="color: #94a3b8; font-size: 0.88rem; line-height: 1.5; margin-bottom: 14px;">
-                    W symulatorze na stronie wszystkie platformy (YouTube, TikTok, Instagram, Facebook, Twitch) są w pełni odblokowane do interaktywnego testowania.<br>
-                    Rzeczywiste łączenie i synchronizacja Twoich kont przez oficjalne API jest wymagana w <strong>Aplikacji Desktopowej Soclify</strong>.
-                </div>
-                <a href="assets/installer/ApliHub_AlgoAnalyzer_Setup.exe" style="display: inline-block; padding: 9px 18px; background: #f59e0b; color: #000; font-weight: 700; border-radius: 8px; text-decoration: none; font-size: 0.85rem;">
-                    📥 Pobierz Aplikację Desktopową (.EXE)
-                </a>
-            </div>
-        `;
-        return;
-    }
 
     const user = getApliHubUserData();
     const socialPlatforms = [
@@ -970,17 +966,12 @@ function renderConnectedSocialAccounts() {
     ];
 
     container.innerHTML = socialPlatforms.map(p => {
-        const isConnected = !!user.connectedAccounts[p.key];
+        const isConnected = !!(user.connectedAccounts && user.connectedAccounts[p.key]);
         return `
             <div style="display: flex; align-items: center; justify-content: space-between; padding: 12px 16px; background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.06); border-radius: 10px;">
                 <div style="display: flex; align-items: center; gap: 12px;">
                     <span style="font-size: 1.3rem;">${p.icon}</span>
-                    <div>
-                        <div style="font-weight: 700; font-size: 0.95rem; color: #fff;">${p.name}</div>
-                        <div style="font-size: 0.78rem; color: ${isConnected ? '#34d399' : '#f87171'}; font-weight: 600;">
-                            ${isConnected ? '● Połączono' : '● Nie połączono'}
-                        </div>
-                    </div>
+                    <span style="font-weight: 700; font-size: 0.95rem; color: #fff;">${p.name}</span>
                 </div>
                 <button class="btn-toggle-algo-social" data-key="${p.key}" style="padding: 8px 18px; border-radius: 8px; font-weight: 700; font-size: 0.85rem; cursor: pointer; transition: all 0.2s ease; ${isConnected ? 'background: rgba(239, 68, 68, 0.15); border: 1px solid rgba(239, 68, 68, 0.4); color: #f87171;' : 'background: rgba(245, 158, 11, 0.15); border: 1px solid rgba(245, 158, 11, 0.4); color: #f59e0b;'}">
                     ${isConnected ? 'Odłącz' : 'Połącz'}
@@ -998,17 +989,7 @@ function renderConnectedSocialAccounts() {
             if (!isCurrentlyConnected) {
                 openSocialConnectModal(key);
             } else {
-                currentUser.connectedAccounts[key] = false;
-                if (key === 'twitch') {
-                    localStorage.removeItem('twitch_token');
-                    localStorage.removeItem('twitch_access_token');
-                }
-                saveApliHubUserData(currentUser);
-                renderConnectedSocialAccounts();
-                renderSocialTrendHubs();
-                renderAnalysisPanels();
-                AlgoSoundFX.playClick();
-                showToast(`Odłączono konto ${key.toUpperCase()}`);
+                disconnectSocialPlatform(key);
             }
         });
     });
@@ -1025,9 +1006,8 @@ function renderAnalysisPanels() {
     const grid = document.querySelector('#tab-analiza .analysis-grid');
     if (!grid) return;
 
-    const isSim = isWebSimulation();
     const user = typeof getApliHubUserData === 'function' ? getApliHubUserData() : { connectedAccounts: {} };
-    const connected = (user && user.connectedAccounts) ? user.connectedAccounts : {};
+    const connected = user.connectedAccounts || {};
 
     const platforms = [
         {
@@ -1078,58 +1058,67 @@ function renderAnalysisPanels() {
     ];
 
     grid.innerHTML = platforms.map(p => {
-        const isConnected = isSim ? true : !!connected[p.id];
+        const isConnected = !!connected[p.id];
 
         return `
-            <div class="glass-card analysis-platform-card ${isConnected ? 'connected-card' : 'locked-card'}" data-platform="${p.id}" style="cursor: pointer; display: flex; flex-direction: column; justify-content: space-between; position: relative;">
+            <div class="glass-card analysis-platform-card ${isConnected ? 'connected-card' : 'locked-card'}" data-platform="${p.id}">
                 <div>
-                    <div class="card-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; gap: 10px;">
-                        <div class="platform-info" style="display: flex; align-items: center; gap: 10px;">
-                            <div class="platform-icon-wrapper" style="width: 36px; height: 36px; display: flex; align-items: center; justify-content: center; border-radius: 8px; background: rgba(0,0,0,0.3); border: 1px solid ${p.color}40;">
+                    <div class="card-header">
+                        <div class="platform-info">
+                            <div class="platform-icon-wrapper" style="border-color: ${p.color}40;">
                                 ${p.svg}
                             </div>
-                            <div class="platform-title" style="font-weight: 700; font-size: 1.05rem; color: #fff;">${p.name}</div>
+                            <div class="platform-title">${p.name}</div>
                         </div>
-                        <span class="platform-status-badge ${isConnected ? 'connected' : 'locked'}" style="padding: 4px 10px; border-radius: 999px; font-size: 11px; font-weight: 700; display: inline-flex; align-items: center; gap: 5px; ${isConnected ? 'background: rgba(16,185,129,0.15); color: #34d399; border: 1px solid rgba(16,185,129,0.3);' : 'background: rgba(239,68,68,0.15); color: #f87171; border: 1px solid rgba(239,68,68,0.3);'}">
-                            <span>●</span> ${isSim ? 'Podgląd (Demo)' : (isConnected ? 'Połączono' : 'Nie połączono')}
-                        </span>
+                        ${isConnected ? `
+                            <span class="platform-status-badge connected">
+                                <span>●</span> Połączono
+                            </span>
+                        ` : `
+                            <span class="platform-status-badge locked">
+                                <span>●</span> Nie połączono
+                            </span>
+                        `}
                     </div>
 
-                    <div class="card-description" style="font-size: 13px; color: var(--color-text-muted); line-height: 1.4; margin-bottom: 18px;">
+                    <div class="card-description">
                         ${p.desc}
                     </div>
 
                     ${isConnected ? `
-                    <div class="card-metrics-preview" style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 20px; background: rgba(0,0,0,0.25); padding: 12px; border-radius: 10px; border: 1px solid rgba(255,255,255,0.04);">
-                        <div class="preview-stat">
-                            <span class="preview-label" style="display: block; font-size: 11px; color: var(--color-text-dim); text-transform: uppercase; font-weight: 700; margin-bottom: 4px;">Zasięg</span>
-                            <span class="preview-value" style="font-size: 16px; font-weight: 800; color: #fff;">${p.reach}</span>
+                        <div class="card-metrics-preview">
+                            <div class="preview-stat">
+                                <span class="preview-label">Zasięg</span>
+                                <span class="preview-value">${p.reach}</span>
+                            </div>
+                            <div class="preview-stat">
+                                <span class="preview-label">Score</span>
+                                <span class="preview-value">${p.score}</span>
+                            </div>
                         </div>
-                        <div class="preview-stat">
-                            <span class="preview-label" style="display: block; font-size: 11px; color: var(--color-text-dim); text-transform: uppercase; font-weight: 700; margin-bottom: 4px;">Score</span>
-                            <span class="preview-value" style="font-size: 16px; font-weight: 800; color: var(--color-yellow-main);">${p.score}</span>
-                        </div>
-                    </div>
-                    ` : `
-                    <div style="margin-bottom: 16px;"></div>
-                    `}
+                    ` : ''}
                 </div>
 
                 <div>
                     ${isConnected ? `
-                        <button class="btn-yellow btn-check-platform" data-platform="${p.id}" style="width: 100%; display: flex; align-items: center; justify-content: center; gap: 8px; padding: 10px 16px; font-weight: 700; border-radius: 8px; cursor: pointer;">
-                            <span>${isSim ? 'Sprawdź podgląd' : 'Sprawdź analitykę'}</span>
-                            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
-                                <polyline points="9 18 15 12 9 6"></polyline>
-                            </svg>
-                        </button>
+                        <div style="display: flex; gap: 8px; align-items: center; width: 100%;">
+                            <button class="btn-yellow btn-check-platform" data-platform="${p.id}" style="flex: 1;">
+                                <span>Sprawdź analitykę</span>
+                                <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
+                                    <polyline points="9 18 15 12 9 6"></polyline>
+                                </svg>
+                            </button>
+                            <button class="btn-disconnect-platform" data-platform="${p.id}" style="padding: 10px 14px; background: rgba(239, 68, 68, 0.12); border: 1px solid rgba(239, 68, 68, 0.35); color: #f87171; border-radius: 8px; font-weight: 700; font-size: 12px; cursor: pointer; transition: all 0.2s;">
+                                Odłącz
+                            </button>
+                        </div>
                     ` : `
-                        <button class="btn-connect-platform" data-platform="${p.id}" style="width: 100%; display: flex; align-items: center; justify-content: center; gap: 8px; padding: 10px 16px; font-weight: 700; border-radius: 8px; cursor: pointer; background: linear-gradient(135deg, rgba(245,158,11,0.2), rgba(245,158,11,0.08)); border: 1px solid rgba(245,158,11,0.4); color: #f59e0b; transition: all 0.2s ease;">
+                        <button class="btn-connect-platform" data-platform="${p.id}">
                             <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
                                 <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path>
                                 <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path>
                             </svg>
-                            <span>Połącz konto</span>
+                            <span>Połącz z ${p.name}</span>
                         </button>
                     `}
                 </div>
@@ -1146,6 +1135,14 @@ function renderAnalysisPanels() {
         });
     });
 
+    grid.querySelectorAll('.btn-disconnect-platform').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            const platformKey = btn.getAttribute('data-platform');
+            disconnectSocialPlatform(platformKey);
+        });
+    });
+
     grid.querySelectorAll('.btn-connect-platform').forEach(btn => {
         btn.addEventListener('click', (e) => {
             e.stopPropagation();
@@ -1154,38 +1151,22 @@ function renderAnalysisPanels() {
         });
     });
 
-    grid.querySelectorAll('.analysis-platform-card').forEach(card => {
+    grid.querySelectorAll('.analysis-platform-card.connected-card').forEach(card => {
         card.addEventListener('click', () => {
             const platformKey = card.getAttribute('data-platform');
-            const isConn = isSim ? true : !!connected[platformKey];
-            if (isConn) {
-                openPlatformDetail(platformKey);
-            } else {
-                openSocialConnectModal(platformKey);
-            }
+            openPlatformDetail(platformKey);
+        });
+    });
+
+    grid.querySelectorAll('.analysis-platform-card.locked-card').forEach(card => {
+        card.addEventListener('click', () => {
+            const platformKey = card.getAttribute('data-platform');
+            openSocialConnectModal(platformKey);
         });
     });
 }
 
 function initPlatformCards() {
-    const checkButtons = document.querySelectorAll('.btn-check-platform');
-
-    checkButtons.forEach(btn => {
-        btn.addEventListener('click', (e) => {
-            e.stopPropagation();
-            const platformKey = btn.getAttribute('data-platform');
-            openPlatformDetail(platformKey);
-        });
-    });
-
-    const glassCards = document.querySelectorAll('.glass-card[data-platform]');
-    glassCards.forEach(card => {
-        card.addEventListener('click', () => {
-            const platformKey = card.getAttribute('data-platform');
-            openPlatformDetail(platformKey);
-        });
-    });
-
     const backBtn = document.getElementById('btn-back-to-overview');
     if (backBtn) {
         backBtn.addEventListener('click', () => {
@@ -1213,6 +1194,13 @@ function initPlatformCards() {
 }
 
 function openPlatformDetail(platformKey) {
+    const user = typeof getApliHubUserData === 'function' ? getApliHubUserData() : {};
+    const connected = user.connectedAccounts || {};
+    if (!connected[platformKey]) {
+        openSocialConnectModal(platformKey);
+        return;
+    }
+
     const overviewContainer = document.getElementById('overview-analysis-view');
     const detailedContainer = document.getElementById('detailed-analysis-view');
 
@@ -1898,17 +1886,9 @@ function renderYouTubeAIResults(output) {
 
 const TWITCH_CONFIG = {
     // Default Twitch Client ID (configurable via localStorage or prompt)
-    CLIENT_ID: localStorage.getItem('twitch_client_id') || 'gp762nuuoqcoxypju8c569th9wz7q5',
-    // Redirect URI matching GitHub Pages hosting and local development
-    REDIRECT_URI: (function () {
-        if (typeof window !== 'undefined') {
-            if (window.location.hostname.includes('github.io')) {
-                return 'https://vertisek.github.io/ApliHub/Algo%20analyzer/index.html';
-            }
-            return window.location.origin + window.location.pathname;
-        }
-        return 'https://vertisek.github.io/ApliHub/Algo%20analyzer/index.html';
-    })(),
+    CLIENT_ID: localStorage.getItem('twitch_client_id') || 'do9hucbh2zxmfrrjkyqnc3d4gyz8d6',
+    // Redirect URI matching Soclify app on Twitch Developer Console
+    REDIRECT_URI: 'http://localhost:54321/index.html',
     SCOPES: [
         'user:read:email',
         'user:read:broadcast',
@@ -2089,8 +2069,16 @@ async function fetchTwitchChannelStats() {
         // Save stats to localStorage
         localStorage.setItem('twitch_stats_data', JSON.stringify(statsResult));
 
+        // Mark as connected in user store
+        const userStore = typeof getApliHubUserData === 'function' ? getApliHubUserData() : {};
+        if (!userStore.connectedAccounts) userStore.connectedAccounts = {};
+        userStore.connectedAccounts.twitch = true;
+        if (typeof saveApliHubUserData === 'function') saveApliHubUserData(userStore);
+
         // Update Twitch tab UI with real live stats
         renderTwitchLiveDashboard(statsResult);
+        if (typeof renderAnalysisPanels === 'function') renderAnalysisPanels();
+        if (typeof renderConnectedSocialAccounts === 'function') renderConnectedSocialAccounts();
 
         return statsResult;
     } catch (err) {
@@ -2123,50 +2111,39 @@ function renderTwitchLiveDashboard(stats) {
     }
 
     if (!stats || !stats.user) {
-        if (isWebSimulation()) {
-            stats = {
-                user: { displayName: 'Twitch_Creator (Demo)', login: 'creator_stream', avatar: 'app.ico' },
-                channel: { gameName: 'Just Chatting / Gaming' },
-                isLive: true,
-                liveViewers: 1420,
-                followers: 48500,
-                views: 278500
-            };
-        } else {
-            const savedStatsStr = localStorage.getItem('twitch_stats_data');
-            if (savedStatsStr) {
-                try {
-                    const parsed = JSON.parse(savedStatsStr);
-                    if (parsed && parsed.user) {
-                        renderTwitchLiveDashboard(parsed);
-                        return;
-                    }
-                } catch (e) { }
-            }
+        const savedStatsStr = localStorage.getItem('twitch_stats_data');
+        if (savedStatsStr) {
+            try {
+                const parsed = JSON.parse(savedStatsStr);
+                if (parsed && parsed.user) {
+                    renderTwitchLiveDashboard(parsed);
+                    return;
+                }
+            } catch (e) { }
+        }
 
-            card.innerHTML = `
-                <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px;">
-                    <div style="display: flex; align-items: center; gap: 14px;">
-                        <div style="width: 48px; height: 48px; border-radius: 12px; background: rgba(145, 70, 255, 0.2); display: flex; align-items: center; justify-content: center; font-size: 24px; border: 1px solid rgba(145, 70, 255, 0.4);">
-                            🟪
-                        </div>
-                        <div>
-                            <h3 style="font-size: 16px; font-weight: 800; color: #fff; margin-bottom: 4px;">Integracja Twitch Helix API</h3>
-                            <p style="font-size: 13px; color: var(--color-text-muted);">Połącz swoje konto Twitch przez OAuth 2.0 (Implicit Flow), aby pobierać statystyki na żywo.</p>
-                        </div>
+        card.innerHTML = `
+            <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px;">
+                <div style="display: flex; align-items: center; gap: 14px;">
+                    <div style="width: 48px; height: 48px; border-radius: 12px; background: rgba(145, 70, 255, 0.2); display: flex; align-items: center; justify-content: center; font-size: 24px; border: 1px solid rgba(145, 70, 255, 0.4);">
+                        🟪
                     </div>
-                    <div style="display: flex; gap: 10px; flex-wrap: wrap;">
-                        <button class="btn-yellow" style="background: linear-gradient(135deg, #9146ff, #772ce8); color: #fff; border: none; padding: 10px 18px; border-radius: 8px; font-weight: 700; cursor: pointer; display: inline-flex; align-items: center; gap: 8px;" onclick="window.loginWithTwitch()">
-                            <span>🟪</span> Zaloguj przez Twitch OAuth
-                        </button>
-                        <button class="btn-back" onclick="window.promptTwitchClientId()" style="padding: 10px 14px; font-size: 12px;">
-                            ⚙️ Client ID
-                        </button>
+                    <div>
+                        <h3 style="font-size: 16px; font-weight: 800; color: #fff; margin-bottom: 4px;">Integracja Twitch Helix API</h3>
+                        <p style="font-size: 13px; color: var(--color-text-muted);">Połącz swoje konto Twitch przez OAuth 2.0 (Implicit Flow), aby pobierać statystyki na żywo.</p>
                     </div>
                 </div>
-            `;
-            return;
-        }
+                <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+                    <button class="btn-yellow" style="background: linear-gradient(135deg, #9146ff, #772ce8); color: #fff; border: none; padding: 10px 18px; border-radius: 8px; font-weight: 700; cursor: pointer; display: inline-flex; align-items: center; gap: 8px;" onclick="window.loginWithTwitch()">
+                        <span>🟪</span> Zaloguj przez Twitch OAuth
+                    </button>
+                    <button class="btn-back" onclick="window.promptTwitchClientId()" style="padding: 10px 14px; font-size: 12px;">
+                        ⚙️ Client ID
+                    </button>
+                </div>
+            </div>
+        `;
+        return;
     }
 
     const u = stats.user;
@@ -2250,12 +2227,215 @@ function disconnectTwitchAccount() {
 
     renderTwitchLiveDashboard(null);
     if (typeof renderAnalysisPanels === 'function') renderAnalysisPanels();
-    if (typeof renderConnectedSocialAccounts === 'function') renderConnectedSocialAccounts();
     if (typeof showToast === 'function') {
         showToast('🔌 Rozłączono konto Twitch.');
     }
 }
 window.disconnectTwitchAccount = disconnectTwitchAccount;
+
+/**
+ * Fetches comprehensive channel stats from YouTube Data API v3 & YouTube Analytics API
+ */
+async function fetchYouTubeChannelStats() {
+    const token = localStorage.getItem('youtube_token') || localStorage.getItem('youtube_access_token');
+    if (!token) {
+        console.warn('Brak aktywnego tokenu YouTube w localStorage.');
+        renderYouTubeLiveDashboard(null);
+        return null;
+    }
+
+    try {
+        const headers = { 'Authorization': 'Bearer ' + token };
+
+        // 1. Get YouTube Channel Info
+        const chanRes = await fetch('https://www.googleapis.com/youtube/v3/channels?part=snippet,statistics,brandingSettings&mine=true', { headers });
+        if (!chanRes.ok) {
+            if (chanRes.status === 401) {
+                console.warn('YouTube token wygasł.');
+                localStorage.removeItem('youtube_token');
+                localStorage.removeItem('youtube_access_token');
+            }
+            throw new Error('YouTube API error: ' + chanRes.statusText);
+        }
+        const chanData = await chanRes.json();
+        const channel = chanData.items && chanData.items[0];
+        if (!channel) throw new Error('Nie znaleziono kanału YouTube.');
+
+        const channelTitle = channel.snippet.title;
+        const customUrl = channel.snippet.customUrl || channelTitle;
+        const avatar = channel.snippet.thumbnails?.high?.url || channel.snippet.thumbnails?.default?.url;
+        const subscribers = channel.statistics.subscriberCount;
+        const totalViews = channel.statistics.viewCount;
+        const videoCount = channel.statistics.videoCount;
+
+        // 2. Try to get YouTube Analytics
+        let analyticsData = null;
+        try {
+            const now = new Date();
+            const thirtyDaysAgo = new Date(now.getTime() - (30 * 24 * 60 * 60 * 1000));
+            const startStr = thirtyDaysAgo.toISOString().split('T')[0];
+            const endStr = now.toISOString().split('T')[0];
+
+            const analyticsUrl = `https://youtubeanalytics.googleapis.com/v2/reports?ids=channel==MINE&startDate=${startStr}&endDate=${endStr}&metrics=views,estimatedMinutesWatched,averageViewDuration,subscribersGained,likes,comments&dimensions=day`;
+            const analyticsRes = await fetch(analyticsUrl, { headers });
+            if (analyticsRes.ok) {
+                analyticsData = await analyticsRes.json();
+            }
+        } catch (e) {
+            console.warn('Błąd pobierania szczegółów YouTube Analytics API:', e);
+        }
+
+        const ytStatsResult = {
+            success: true,
+            channel: {
+                id: channel.id,
+                title: channelTitle,
+                handle: customUrl,
+                avatar: avatar,
+                subscribers: parseInt(subscribers || '0', 10),
+                totalViews: parseInt(totalViews || '0', 10),
+                videoCount: parseInt(videoCount || '0', 10)
+            },
+            analytics: analyticsData,
+            updatedAt: new Date().toISOString()
+        };
+
+        localStorage.setItem('youtube_stats_data', JSON.stringify(ytStatsResult));
+
+        const userStore = typeof getApliHubUserData === 'function' ? getApliHubUserData() : {};
+        if (!userStore.connectedAccounts) userStore.connectedAccounts = {};
+        userStore.connectedAccounts.youtube = true;
+        if (typeof saveApliHubUserData === 'function') saveApliHubUserData(userStore);
+
+        renderYouTubeLiveDashboard(ytStatsResult);
+        if (typeof renderAnalysisPanels === 'function') renderAnalysisPanels();
+        if (typeof renderConnectedSocialAccounts === 'function') renderConnectedSocialAccounts();
+
+        return ytStatsResult;
+    } catch (err) {
+        console.error('Błąd pobierania statystyk YouTube API:', err);
+        return null;
+    }
+}
+window.fetchYouTubeChannelStats = fetchYouTubeChannelStats;
+
+function renderYouTubeLiveDashboard(stats) {
+    const ytTab = document.getElementById('tab-youtube');
+    if (!ytTab) return;
+
+    let card = document.getElementById('youtube-live-stats-card');
+    if (!card) {
+        const wrapper = document.createElement('div');
+        wrapper.id = 'youtube-live-stats-card';
+        wrapper.className = 'glass-card';
+        wrapper.style.cssText = 'margin-bottom: 30px; padding: 24px; border: 1px solid rgba(239, 68, 68, 0.4); background: linear-gradient(135deg, rgba(239, 68, 68, 0.08), rgba(0, 0, 0, 0.4));';
+        const pageHeader = ytTab.querySelector('.page-header');
+        if (pageHeader && pageHeader.nextSibling) {
+            ytTab.insertBefore(wrapper, pageHeader.nextSibling);
+        } else {
+            ytTab.insertAdjacentElement('afterbegin', wrapper);
+        }
+        card = wrapper;
+    }
+
+    if (!stats || !stats.channel) {
+        const savedStatsStr = localStorage.getItem('youtube_stats_data');
+        if (savedStatsStr) {
+            try {
+                const parsed = JSON.parse(savedStatsStr);
+                if (parsed && parsed.channel) {
+                    renderYouTubeLiveDashboard(parsed);
+                    return;
+                }
+            } catch (e) { }
+        }
+
+        card.innerHTML = `
+            <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px;">
+                <div style="display: flex; align-items: center; gap: 14px;">
+                    <div style="width: 48px; height: 48px; border-radius: 12px; background: rgba(239, 68, 68, 0.2); display: flex; align-items: center; justify-content: center; font-size: 24px; border: 1px solid rgba(239, 68, 68, 0.4);">
+                        🔴
+                    </div>
+                    <div>
+                        <h3 style="font-size: 16px; font-weight: 800; color: #fff; margin-bottom: 4px;">Integracja YouTube Data & Analytics API</h3>
+                        <p style="font-size: 13px; color: var(--color-text-muted);">Połącz swoje konto YouTube przez Google OAuth 2.0, aby pobierać statystyki na żywo.</p>
+                    </div>
+                </div>
+                <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+                    <button class="btn-yellow" style="background: linear-gradient(135deg, #e60000, #b30000); color: #fff; border: none; padding: 10px 18px; border-radius: 8px; font-weight: 700; cursor: pointer; display: inline-flex; align-items: center; gap: 8px;" onclick="window.openSocialConnectModal('youtube')">
+                        <span>🔴</span> Połącz z YouTube
+                    </button>
+                </div>
+            </div>
+        `;
+        return;
+    }
+
+    const ch = stats.channel;
+    card.innerHTML = `
+        <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px; margin-bottom: 20px; padding-bottom: 16px; border-bottom: 1px solid rgba(255,255,255,0.08);">
+            <div style="display: flex; align-items: center; gap: 16px;">
+                <img src="${ch.avatar || 'icon48.png'}" alt="${ch.title}" style="width: 54px; height: 54px; border-radius: 50%; border: 2px solid #ef4444; object-fit: cover; box-shadow: 0 0 16px rgba(239, 68, 68, 0.5);">
+                <div>
+                    <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
+                        <h3 style="font-size: 18px; font-weight: 800; color: #fff;">${ch.title}</h3>
+                        <span style="background: rgba(239, 68, 68, 0.2); color: #f87171; font-size: 11px; font-weight: 700; padding: 3px 8px; border-radius: 999px; border: 1px solid rgba(239, 68, 68, 0.35);">
+                            Zsynchronizowano
+                        </span>
+                    </div>
+                    <p style="font-size: 12px; color: var(--color-text-muted); font-family: var(--font-mono); margin-top: 2px;">${ch.handle || ch.title} • ${Number(ch.videoCount).toLocaleString()} opublikowanych filmów</p>
+                </div>
+            </div>
+            <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
+                <button class="btn-yellow" style="background: rgba(239, 68, 68, 0.2); color: #f87171; border: 1px solid rgba(239, 68, 68, 0.4); padding: 8px 14px; border-radius: 8px; font-weight: 700; cursor: pointer; font-size: 12px;" onclick="window.fetchYouTubeChannelStats()">
+                    🔄 Odśwież Dane YouTube
+                </button>
+                <button class="btn-back" style="padding: 8px 12px; font-size: 12px; color: #f87171; border-color: rgba(239,68,68,0.3);" onclick="window.disconnectYouTubeAccount()">
+                    Rozłącz
+                </button>
+            </div>
+        </div>
+
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 14px;">
+            <div style="background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.06); padding: 14px; border-radius: 10px;">
+                <div style="font-size: 11px; color: var(--color-text-muted); font-weight: 600; text-transform: uppercase;">Subskrypcje</div>
+                <div style="font-size: 20px; font-weight: 800; color: #fff; font-family: var(--font-mono); margin-top: 4px;">${Number(ch.subscribers).toLocaleString()}</div>
+            </div>
+            <div style="background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.06); padding: 14px; border-radius: 10px;">
+                <div style="font-size: 11px; color: var(--color-text-muted); font-weight: 600; text-transform: uppercase;">Łączne Wyświetlenia</div>
+                <div style="font-size: 20px; font-weight: 800; color: #f87171; font-family: var(--font-mono); margin-top: 4px;">${Number(ch.totalViews).toLocaleString()}</div>
+            </div>
+            <div style="background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.06); padding: 14px; border-radius: 10px;">
+                <div style="font-size: 11px; color: var(--color-text-muted); font-weight: 600; text-transform: uppercase;">Liczba Filmów</div>
+                <div style="font-size: 18px; font-weight: 700; color: #fbbf24; margin-top: 6px;">${Number(ch.videoCount).toLocaleString()}</div>
+            </div>
+            <div style="background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.06); padding: 14px; border-radius: 10px;">
+                <div style="font-size: 11px; color: var(--color-text-muted); font-weight: 600; text-transform: uppercase;">Status Algorytmu</div>
+                <div style="font-size: 15px; font-weight: 700; color: #34d399; margin-top: 6px;">🟢 Aktywny</div>
+            </div>
+        </div>
+    `;
+}
+window.renderYouTubeLiveDashboard = renderYouTubeLiveDashboard;
+
+function disconnectYouTubeAccount() {
+    localStorage.removeItem('youtube_token');
+    localStorage.removeItem('youtube_access_token');
+    localStorage.removeItem('youtube_stats_data');
+
+    const user = typeof getApliHubUserData === 'function' ? getApliHubUserData() : {};
+    if (user.connectedAccounts) {
+        user.connectedAccounts.youtube = false;
+        if (typeof saveApliHubUserData === 'function') saveApliHubUserData(user);
+    }
+
+    renderYouTubeLiveDashboard(null);
+    if (typeof renderAnalysisPanels === 'function') renderAnalysisPanels();
+    if (typeof showToast === 'function') {
+        showToast('🔌 Rozłączono konto YouTube.');
+    }
+}
+window.disconnectYouTubeAccount = disconnectYouTubeAccount;
 
 /* ==========================================================================
    UNIVERSAL SOCIAL OAUTH ENGINE & PKCE CONTROLLER (TIKTOK, TWITCH, YOUTUBE, INSTAGRAM, FACEBOOK)
@@ -2292,13 +2472,9 @@ async function generateCodeChallenge(codeVerifier) {
 }
 
 function getAppRedirectUri() {
-    if (typeof window !== 'undefined') {
-        if (window.location.hostname.includes('github.io')) {
-            return 'https://vertisek.github.io/ApliHub/Algo%20analyzer/index.html';
-        }
-        return window.location.origin + window.location.pathname;
-    }
-    return 'http://localhost:54321/index.html';
+    const customUri = localStorage.getItem('custom_oauth_redirect_uri');
+    if (customUri) return customUri;
+    return 'https://vertisek.github.io/ApliHub/callback.html';
 }
 
 const SOCIAL_OAUTH_CONFIGS = {
@@ -2306,90 +2482,242 @@ const SOCIAL_OAUTH_CONFIGS = {
         id: 'tiktok',
         name: 'TikTok',
         color: '#00f2fe',
-        iconSvg: `<svg width="42" height="42" viewBox="0 0 24 24" fill="#00f2fe">
+        iconSvg: `<svg width="40" height="40" viewBox="0 0 24 24" fill="#00f2fe">
             <path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-5.2 1.74 2.89 2.89 0 0 1 2.31-4.64c.29 0 .56.04.83.12V9.3a6.33 6.33 0 0 0-1-.08 6.34 6.34 0 1 0 6.34 6.34V9.05a8.3 8.3 0 0 0 5-1.63V6.69z"/>
         </svg>`,
-        title: 'Połącz z kontem TikTok',
-        desc: 'Połącz swoje konto na TikToku z aplikacją, aby korzystać z niej bez limitu!'
+        btnIconSvg: `<svg width="18" height="18" viewBox="0 0 24 24" fill="#fff">
+            <path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-5.2 1.74 2.89 2.89 0 0 1 2.31-4.64c.29 0 .56.04.83.12V9.3a6.33 6.33 0 0 0-1-.08 6.34 6.34 0 1 0 6.34 6.34V9.05a8.3 8.3 0 0 0 5-1.63V6.69z"/>
+        </svg>`,
+        title: 'Połącz z TikTok',
+        desc: 'Połącz aplikację ze swoim kontem TikTok, aby otrzymać dostęp do wszystkich funkcji oraz analiz twoich zasięgów.',
+        btnText: 'Kontynuuj z TikTok',
+        btnBg: '#010101',
+        devPortalUrl: 'https://developers.tiktok.com/',
+        defaultClientId: 'awz7aplihubtiktok',
+        buildAuthUrl: async function (clientId) {
+            const cId = clientId || localStorage.getItem('tiktok_client_id') || this.defaultClientId;
+            const redirectUri = getAppRedirectUri();
+            const codeVerifier = generateRandomString(64);
+            sessionStorage.setItem('tiktok_code_verifier', codeVerifier);
+            const codeChallenge = await generateCodeChallenge(codeVerifier);
+            const state = generateRandomString(16);
+            sessionStorage.setItem('tiktok_oauth_state', state);
+
+            return `https://www.tiktok.com/v2/auth/authorize/?client_key=${encodeURIComponent(cId)}&scope=user.info.basic,video.list&response_type=code&redirect_uri=${encodeURIComponent(redirectUri)}&state=${encodeURIComponent(state)}&code_challenge=${encodeURIComponent(codeChallenge)}&code_challenge_method=S256`;
+        }
     },
     twitch: {
         id: 'twitch',
         name: 'Twitch',
         color: '#9146ff',
-        iconSvg: `<svg width="42" height="42" viewBox="0 0 24 24" fill="#9146FF">
+        iconSvg: `<svg width="40" height="40" viewBox="0 0 24 24" fill="#9146FF">
             <path d="M11.571 4.714h1.715v5.143H11.57zm4.715 0H18v5.143h-1.714zM6 0L1.714 4.286v15.428h5.143V24l4.286-4.286h3.428L22.286 12V0zm14.571 11.143l-3.428 3.428h-3.429l-3 3v-3H6.857V1.714h13.714Z"/>
         </svg>`,
-        title: 'Połącz z kontem Twitch',
-        desc: 'Połącz swoje konto na Twitchu z aplikacją, aby korzystać z niej bez limitu!'
+        btnIconSvg: `<svg width="18" height="18" viewBox="0 0 24 24" fill="#fff">
+            <path d="M11.571 4.714h1.715v5.143H11.57zm4.715 0H18v5.143h-1.714zM6 0L1.714 4.286v15.428h5.143V24l4.286-4.286h3.428L22.286 12V0zm14.571 11.143l-3.428 3.428h-3.429l-3 3v-3H6.857V1.714h13.714Z"/>
+        </svg>`,
+        title: 'Połącz z Twitch',
+        desc: 'Połącz aplikację ze swoim kontem Twitch, aby otrzymać dostęp do wszystkich funkcji oraz analiz twoich zasięgów.',
+        btnText: 'Kontynuuj z Twitch',
+        btnBg: '#9146ff',
+        devPortalUrl: 'https://dev.twitch.tv/console/apps',
+        defaultClientId: 'do9hucbh2zxmfrrjkyqnc3d4gyz8d6',
+        buildAuthUrl: async function (clientId) {
+            const cId = clientId || localStorage.getItem('twitch_client_id') || this.defaultClientId;
+            const redirectUri = getAppRedirectUri();
+            const scopes = 'user:read:email user:read:broadcast channel:read:subscriptions';
+            return `https://id.twitch.tv/oauth2/authorize?client_id=${encodeURIComponent(cId)}&redirect_uri=${encodeURIComponent(redirectUri)}&response_type=token&scope=${encodeURIComponent(scopes)}&force_verify=true`;
+        }
     },
     youtube: {
         id: 'youtube',
         name: 'YouTube',
         color: '#ff0000',
-        iconSvg: `<svg width="42" height="42" viewBox="0 0 24 24" fill="#ff0000">
+        iconSvg: `<svg width="40" height="40" viewBox="0 0 24 24" fill="#ff0000">
             <path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/>
         </svg>`,
-        title: 'Połącz z kontem YouTube',
-        desc: 'Połącz swoje konto na YouTube z aplikacją, aby korzystać z niej bez limitu!'
+        btnIconSvg: `<svg width="18" height="18" viewBox="0 0 24 24" fill="#fff">
+            <path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/>
+        </svg>`,
+        title: 'Połącz z YouTube',
+        desc: 'Połącz aplikację ze swoim kontem YouTube, aby otrzymać dostęp do wszystkich funkcji oraz analiz twoich zasięgów.',
+        btnText: 'Kontynuuj z Google / YouTube',
+        btnBg: '#e60000',
+        devPortalUrl: 'https://console.cloud.google.com/apis/credentials',
+        defaultClientId: '127719811655-rtplre9akrqai7tetmdq8do96ksk4nko.apps.googleusercontent.com',
+        buildAuthUrl: async function (clientId) {
+            const cId = clientId || localStorage.getItem('youtube_client_id') || this.defaultClientId;
+            localStorage.setItem('youtube_client_id', cId);
+            sessionStorage.setItem('youtube_client_id', cId);
+            const redirectUri = getAppRedirectUri();
+            const scopes = 'https://www.googleapis.com/auth/youtube.readonly https://www.googleapis.com/auth/yt-analytics.readonly';
+            const codeVerifier = generateRandomString(64);
+            sessionStorage.setItem('youtube_code_verifier', codeVerifier);
+            localStorage.setItem('youtube_code_verifier', codeVerifier);
+            const codeChallenge = await generateCodeChallenge(codeVerifier);
+            const state = 'youtube_' + generateRandomString(12);
+            sessionStorage.setItem('youtube_oauth_state', state);
+
+            return `https://accounts.google.com/o/oauth2/v2/auth?client_id=${encodeURIComponent(cId)}&redirect_uri=${encodeURIComponent(redirectUri)}&response_type=code&scope=${encodeURIComponent(scopes)}&code_challenge=${encodeURIComponent(codeChallenge)}&code_challenge_method=S256&state=${encodeURIComponent(state)}&access_type=offline&prompt=consent`;
+        }
     },
     instagram: {
         id: 'instagram',
         name: 'Instagram',
         color: '#e1306c',
-        iconSvg: `<svg width="42" height="42" viewBox="0 0 24 24" fill="#e1306c">
+        iconSvg: `<svg width="40" height="40" viewBox="0 0 24 24" fill="#e1306c">
             <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/>
         </svg>`,
-        title: 'Połącz z kontem Instagram',
-        desc: 'Połącz swoje konto na Instagramie z aplikacją, aby korzystać z niej bez limitu!'
+        btnIconSvg: `<svg width="18" height="18" viewBox="0 0 24 24" fill="#fff">
+            <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/>
+        </svg>`,
+        title: 'Połącz z Instagram',
+        desc: 'Połącz aplikację ze swoim kontem Instagram, aby otrzymać dostęp do wszystkich funkcji oraz analiz twoich zasięgów.',
+        btnText: 'Kontynuuj z Instagram',
+        btnBg: 'linear-gradient(45deg, #f09433, #e6683c, #dc2743, #cc2366, #bc1888)',
+        devPortalUrl: 'https://developers.facebook.com/apps/',
+        defaultClientId: '123456789012345',
+        buildAuthUrl: async function (clientId) {
+            const cId = clientId || localStorage.getItem('instagram_client_id') || this.defaultClientId;
+            const redirectUri = getAppRedirectUri();
+            return `https://api.instagram.com/oauth/authorize?client_id=${encodeURIComponent(cId)}&redirect_uri=${encodeURIComponent(redirectUri)}&scope=user_profile,user_media&response_type=code`;
+        }
     },
     facebook: {
         id: 'facebook',
         name: 'Facebook',
         color: '#1877f2',
-        iconSvg: `<svg width="42" height="42" viewBox="0 0 24 24" fill="#1877f2">
+        iconSvg: `<svg width="40" height="40" viewBox="0 0 24 24" fill="#1877f2">
             <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
         </svg>`,
-        title: 'Połącz z kontem Facebook',
-        desc: 'Połącz swoje konto na Facebooku z aplikacją, aby korzystać z niej bez limitu!'
+        btnIconSvg: `<svg width="18" height="18" viewBox="0 0 24 24" fill="#fff">
+            <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
+        </svg>`,
+        title: 'Połącz z Facebook',
+        desc: 'Połącz aplikację ze swoim kontem Facebook, aby otrzymać dostęp do wszystkich funkcji oraz analiz twoich zasięgów.',
+        btnText: 'Kontynuuj z Facebook',
+        btnBg: '#1877f2',
+        devPortalUrl: 'https://developers.facebook.com/apps/',
+        defaultClientId: '123456789012345',
+        buildAuthUrl: async function (clientId) {
+            const cId = clientId || localStorage.getItem('facebook_client_id') || this.defaultClientId;
+            const redirectUri = getAppRedirectUri();
+            return `https://www.facebook.com/v18.0/dialog/oauth?client_id=${encodeURIComponent(cId)}&redirect_uri=${encodeURIComponent(redirectUri)}&scope=pages_show_list,pages_read_engagement&response_type=token`;
+        }
     }
 };
 
 let currentModalPlatformKey = 'tiktok';
 
 async function openSocialConnectModal(platformKey) {
-    if (isWebSimulation()) {
-        if (typeof showToast === 'function') {
-            showToast('💡 W symulatorze na stronie wszystkie platformy są już w pełni odblokowane do testowania!');
-        }
-        return;
-    }
-
     const pKey = platformKey ? platformKey.toLowerCase() : 'tiktok';
     const config = SOCIAL_OAUTH_CONFIGS[pKey] || SOCIAL_OAUTH_CONFIGS.tiktok;
     currentModalPlatformKey = config.id;
 
-    const modal = document.getElementById('social-connect-modal');
+    const modal = document.getElementById('social-connect-modal') || document.getElementById('twitch-modal');
     if (!modal) return;
 
-    const titleEl = document.getElementById('modal-platform-title');
-    const descEl = document.getElementById('modal-platform-desc');
-    const iconEl = document.getElementById('modal-platform-icon');
+    const titleEl = document.getElementById('modal-platform-title') || modal.querySelector('.modal-title');
+    const descEl = document.getElementById('modal-platform-desc') || modal.querySelector('.modal-desc');
+    const iconEl = document.getElementById('modal-platform-icon') || modal.querySelector('.modal-header-icon');
+    const authLinkEl = document.getElementById('modal-auth-link') || modal.querySelector('.platform-action-btn, .twitch-action-btn');
     const btnTextEl = document.getElementById('modal-btn-text');
+    const btnIconEl = document.getElementById('modal-btn-icon');
+    const inputClientId = document.getElementById('input-client-id');
+    const displayRedirectUri = document.getElementById('display-redirect-uri');
+    const devPortalLink = document.getElementById('dev-portal-link');
 
     if (titleEl) titleEl.textContent = config.title;
     if (descEl) descEl.textContent = config.desc;
     if (iconEl) iconEl.innerHTML = config.iconSvg;
-    if (btnTextEl) btnTextEl.textContent = 'Kontynuuj';
+
+    const currentClientId = localStorage.getItem(`${config.id}_client_id`) || '';
+    if (inputClientId) {
+        inputClientId.value = currentClientId;
+        inputClientId.placeholder = `Twój ${config.name} Client ID / App Key...`;
+    }
+
+    const redirectUri = getAppRedirectUri();
+    if (displayRedirectUri) {
+        displayRedirectUri.textContent = redirectUri;
+    }
+
+    if (devPortalLink) {
+        devPortalLink.href = config.devPortalUrl;
+        devPortalLink.textContent = `↗ Otwórz Portal Developers dla ${config.name}`;
+    }
+
+    if (authLinkEl) {
+        authLinkEl.style.background = config.btnBg;
+        if (btnTextEl) btnTextEl.textContent = config.btnText;
+        if (btnIconEl) btnIconEl.innerHTML = config.btnIconSvg;
+
+        // Generate async URL with PKCE if needed
+        const authUrl = await config.buildAuthUrl(currentClientId);
+        authLinkEl.href = authUrl;
+
+        authLinkEl.onclick = (e) => {
+            e.preventDefault();
+            if (typeof showToast === 'function') {
+                showToast(`Otwieranie strony logowania ${config.name}...`);
+            }
+            const popupWidth = 560;
+            const popupHeight = 720;
+            const left = Math.max(0, (window.screen.width - popupWidth) / 2);
+            const top = Math.max(0, (window.screen.height - popupHeight) / 2);
+            window.open(authUrl, 'SoclifyOAuthPopup', `width=${popupWidth},height=${popupHeight},top=${top},left=${left},status=no,toolbar=no,menubar=no,location=yes`);
+            closeSocialConnectModal();
+        };
+    }
 
     modal.style.display = 'flex';
 }
 
 function closeSocialConnectModal() {
-    const modal = document.getElementById('social-connect-modal');
+    const modal = document.getElementById('social-connect-modal') || document.getElementById('twitch-modal');
     if (modal) modal.style.display = 'none';
 }
 
-function handleSocialConnectConfirm() {
+function toggleModalDevConfig() {
+    const body = document.getElementById('dev-config-body');
+    const arrow = document.getElementById('config-arrow');
+    if (!body) return;
+    const isHidden = body.style.display === 'none';
+    body.style.display = isHidden ? 'flex' : 'none';
+    if (arrow) arrow.textContent = isHidden ? '▲' : '▼';
+}
+
+async function handleClientIdInput(val) {
+    const pKey = currentModalPlatformKey || 'tiktok';
+    const config = SOCIAL_OAUTH_CONFIGS[pKey];
+    if (!config) return;
+
+    if (val && val.trim()) {
+        localStorage.setItem(`${pKey}_client_id`, val.trim());
+    } else {
+        localStorage.removeItem(`${pKey}_client_id`);
+    }
+
+    const authLinkEl = document.getElementById('modal-auth-link');
+    if (authLinkEl) {
+        authLinkEl.href = await config.buildAuthUrl(val.trim());
+    }
+}
+
+function copyRedirectUri() {
+    const uri = getAppRedirectUri();
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(uri).then(() => {
+            if (typeof showToast === 'function') {
+                showToast('✓ Skopiowano Redirect URI do schowka: ' + uri);
+            }
+        });
+    } else {
+        prompt('Skopiuj poniższy Redirect URI:', uri);
+    }
+}
+
+function handleManualSimulatedConnect() {
     const pKey = currentModalPlatformKey || 'tiktok';
     const config = SOCIAL_OAUTH_CONFIGS[pKey] || { name: pKey.toUpperCase() };
 
@@ -2403,13 +2731,12 @@ function handleSocialConnectConfirm() {
     }
 
     if (pKey === 'twitch') {
-        localStorage.setItem('twitch_token', 'desktop_auth_token_' + Date.now());
+        localStorage.setItem('twitch_token', 'simulated_oauth_token_' + Date.now());
         if (typeof fetchTwitchChannelStats === 'function') fetchTwitchChannelStats();
     }
 
     renderAnalysisPanels();
     renderConnectedSocialAccounts();
-    renderSocialTrendHubs();
     closeSocialConnectModal();
 
     if (typeof showToast === 'function') {
@@ -2424,6 +2751,43 @@ window.addEventListener('click', (e) => {
         closeSocialConnectModal();
     }
 });
+
+function showOAuthSuccessModal(platformKey) {
+    const modalId = 'oauth-success-connected-modal';
+    const pKey = (platformKey || 'youtube').toLowerCase();
+    const config = (typeof SOCIAL_OAUTH_CONFIGS !== 'undefined' && SOCIAL_OAUTH_CONFIGS[pKey]) ? SOCIAL_OAUTH_CONFIGS[pKey] : { name: pKey.toUpperCase() };
+
+    let targetTab = 'tab-analiza';
+    if (pKey === 'twitch') targetTab = 'tab-twitch';
+    else if (pKey === 'youtube') targetTab = 'tab-youtube';
+    else if (pKey === 'tiktok') targetTab = 'tab-tiktok';
+    else if (pKey === 'instagram') targetTab = 'tab-instagram';
+    else if (pKey === 'facebook') targetTab = 'tab-facebook';
+
+    let modal = document.getElementById(modalId);
+    if (!modal) {
+        modal = document.createElement('div');
+        modal.id = modalId;
+        modal.className = 'custom-modal-overlay';
+        document.body.appendChild(modal);
+    }
+
+    modal.style.display = 'flex';
+    modal.innerHTML = `
+        <div class="custom-modal-box" style="border: 1px solid rgba(34, 197, 94, 0.4); box-shadow: 0 30px 90px rgba(0,0,0,0.8), 0 0 30px rgba(34, 197, 94, 0.2); max-width: 460px;">
+            <div class="modal-header-icon" style="background: rgba(34, 197, 94, 0.15); border: 1px solid rgba(34, 197, 94, 0.4); color: #4ade80; font-size: 32px; font-weight: bold; width: 64px; height: 64px; display: flex; align-items: center; justify-content: center; margin: 0 auto 16px auto; border-radius: 50%;">
+                ✓
+            </div>
+            <h3 class="modal-title" style="color: #4ade80; margin-bottom: 10px; font-size: 20px; text-align: center;">Połączenie zakończone sukcesem!</h3>
+            <p class="modal-desc" style="color: #cbd5e1; font-size: 13.5px; line-height: 1.6; margin-bottom: 24px; text-align: center;">
+                Twoje konto <strong>${config.name}</strong> zostało pomyślnie zweryfikowane i połączone z aplikacją. Wszystkie analizy algorytmu i statystyki są już aktywne!
+            </p>
+            <button class="btn-yellow" onclick="document.getElementById('${modalId}').style.display='none'; if(typeof switchViewTab==='function') switchViewTab('${targetTab}');" style="width: 100%; padding: 14px; font-weight: 700; font-size: 14px; cursor: pointer; border-radius: 12px;">
+                🚀 Przejdź do Analizy ${config.name}
+            </button>
+        </div>
+    `;
+}
 
 // Automatic OAuth Callback parser across all platforms
 function handleGlobalOAuthCallbacks() {
@@ -2455,8 +2819,12 @@ function handleGlobalOAuthCallbacks() {
                 showToast(`🎉 Pomyślnie autoryzowano konto ${platformKey.toUpperCase()}!`);
             }
 
+            showOAuthSuccessModal(platformKey);
+
             if (platformKey === 'twitch' && typeof fetchTwitchChannelStats === 'function') {
                 fetchTwitchChannelStats();
+            } else if (platformKey === 'youtube' && typeof fetchYouTubeChannelStats === 'function') {
+                fetchYouTubeChannelStats();
             }
 
             renderAnalysisPanels();
@@ -2473,24 +2841,88 @@ function handleGlobalOAuthCallbacks() {
     if (code) {
         // Find which platform was in state
         let detectedPlatform = 'tiktok';
-        if (state && state === sessionStorage.getItem('tiktok_oauth_state')) detectedPlatform = 'tiktok';
-        else if (window.location.href.includes('instagram')) detectedPlatform = 'instagram';
-
-        const user = getApliHubUserData();
-        if (!user.connectedAccounts) user.connectedAccounts = {};
-        user.connectedAccounts[detectedPlatform] = true;
-        saveApliHubUserData(user);
-
-        if (window.history && window.history.replaceState) {
-            window.history.replaceState(null, null, window.location.pathname);
+        const ytState = sessionStorage.getItem('youtube_oauth_state');
+        if (state && (state.startsWith('youtube') || (ytState && state === ytState))) {
+            detectedPlatform = 'youtube';
+        } else if (state && state === sessionStorage.getItem('tiktok_oauth_state')) {
+            detectedPlatform = 'tiktok';
+        } else if (window.location.href.includes('instagram')) {
+            detectedPlatform = 'instagram';
         }
 
-        if (typeof showToast === 'function') {
-            showToast(`🎉 Pomyślnie powiązano konto ${detectedPlatform.toUpperCase()}! Kod autoryzacji odebrany.`);
-        }
+        if (detectedPlatform === 'youtube') {
+            const codeVerifier = sessionStorage.getItem('youtube_code_verifier');
+            const cId = localStorage.getItem('youtube_client_id') || (SOCIAL_OAUTH_CONFIGS.youtube && SOCIAL_OAUTH_CONFIGS.youtube.defaultClientId);
+            const redirectUri = getAppRedirectUri();
 
-        renderAnalysisPanels();
-        renderConnectedSocialAccounts();
+            if (codeVerifier && cId) {
+                fetch('https://oauth2.googleapis.com/token', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                    body: new URLSearchParams({
+                        client_id: cId,
+                        code: code,
+                        code_verifier: codeVerifier,
+                        grant_type: 'authorization_code',
+                        redirect_uri: redirectUri
+                    })
+                })
+                .then(res => res.json())
+                .then(tokenData => {
+                    if (tokenData.access_token) {
+                        localStorage.setItem('youtube_token', tokenData.access_token);
+                        localStorage.setItem('youtube_access_token', tokenData.access_token);
+                        if (tokenData.refresh_token) {
+                            localStorage.setItem('youtube_refresh_token', tokenData.refresh_token);
+                        }
+
+                        const user = getApliHubUserData();
+                        if (!user.connectedAccounts) user.connectedAccounts = {};
+                        user.connectedAccounts.youtube = true;
+                        saveApliHubUserData(user);
+
+                        if (window.history && window.history.replaceState) {
+                            window.history.replaceState(null, null, window.location.pathname);
+                        }
+
+                        if (typeof showToast === 'function') {
+                            showToast('🎉 Pomyślnie powiązano konto YouTube z Google API!');
+                        }
+
+                        showOAuthSuccessModal('youtube');
+                        if (typeof fetchYouTubeChannelStats === 'function') {
+                            fetchYouTubeChannelStats();
+                        }
+                        renderAnalysisPanels();
+                        renderConnectedSocialAccounts();
+                    } else {
+                        console.error('Błąd tokenu Google OAuth:', tokenData);
+                        if (typeof showToast === 'function') {
+                            showToast('Błąd Google OAuth: ' + (tokenData.error_description || tokenData.error || 'Błąd autoryzacji'));
+                        }
+                    }
+                })
+                .catch(err => {
+                    console.error('Błąd zapytania o token Google:', err);
+                });
+            }
+        } else {
+            const user = getApliHubUserData();
+            if (!user.connectedAccounts) user.connectedAccounts = {};
+            user.connectedAccounts[detectedPlatform] = true;
+            saveApliHubUserData(user);
+
+            if (window.history && window.history.replaceState) {
+                window.history.replaceState(null, null, window.location.pathname);
+            }
+
+            if (typeof showToast === 'function') {
+                showToast(`🎉 Pomyślnie powiązano konto ${detectedPlatform.toUpperCase()}! Kod autoryzacji odebrany.`);
+            }
+
+            renderAnalysisPanels();
+            renderConnectedSocialAccounts();
+        }
     } else if (connectedPlatform && SOCIAL_OAUTH_CONFIGS[connectedPlatform.toLowerCase()]) {
         const user = getApliHubUserData();
         if (!user.connectedAccounts) user.connectedAccounts = {};
@@ -2506,17 +2938,131 @@ function handleGlobalOAuthCallbacks() {
     }
 }
 
-// Global initialization
-if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', () => {
-        handleGlobalOAuthCallbacks();
+function disconnectAllSocialAccounts() {
+    const user = getApliHubUserData();
+    user.connectedAccounts = {
+        youtube: false,
+        tiktok: false,
+        instagram: false,
+        facebook: false,
+        twitch: false
+    };
+    saveApliHubUserData(user);
+    localStorage.removeItem('twitch_token');
+    localStorage.removeItem('twitch_access_token');
+    localStorage.removeItem('twitch_stats_data');
+    localStorage.removeItem('youtube_token');
+    localStorage.removeItem('youtube_access_token');
+    localStorage.removeItem('youtube_stats_data');
+    localStorage.removeItem('tiktok_token');
+    localStorage.removeItem('instagram_token');
+    localStorage.removeItem('facebook_token');
+    renderAnalysisPanels();
+    renderConnectedSocialAccounts();
+    renderSocialTrendHubs();
+    if (typeof renderTwitchLiveDashboard === 'function') renderTwitchLiveDashboard(null);
+    if (typeof renderYouTubeLiveDashboard === 'function') renderYouTubeLiveDashboard(null);
+    if (typeof showToast === 'function') showToast('🔌 Rozłączono wszystkie konta społecznościowe.');
+}
+window.disconnectAllSocialAccounts = disconnectAllSocialAccounts;
+
+// One-time automatic reset of previously cached connected accounts
+if (!localStorage.getItem('soclify_accounts_reset_v8')) {
+    const user = getApliHubUserData();
+    user.connectedAccounts = {
+        youtube: false,
+        tiktok: false,
+        instagram: false,
+        facebook: false,
+        twitch: false
+    };
+    saveApliHubUserData(user);
+    localStorage.removeItem('twitch_token');
+    localStorage.removeItem('twitch_access_token');
+    localStorage.removeItem('twitch_stats_data');
+    localStorage.removeItem('youtube_token');
+    localStorage.removeItem('youtube_access_token');
+    localStorage.removeItem('youtube_stats_data');
+    localStorage.removeItem('tiktok_token');
+    localStorage.removeItem('instagram_token');
+    localStorage.removeItem('facebook_token');
+    localStorage.setItem('soclify_accounts_reset_v8', 'true');
+}
+
+// Global BroadcastChannel and Storage listener for instant cross-tab/window OAuth sync
+try {
+    const oauthBroadcastChannel = new BroadcastChannel('aplihub_oauth_channel');
+    oauthBroadcastChannel.onmessage = (event) => {
+        if (event.data && event.data.platform) {
+            const platformKey = event.data.platform;
+            const user = getApliHubUserData();
+            if (!user.connectedAccounts) user.connectedAccounts = {};
+            user.connectedAccounts[platformKey] = true;
+            saveApliHubUserData(user);
+
+            if (typeof showOAuthSuccessModal === 'function') {
+                showOAuthSuccessModal(platformKey);
+            }
+            if (platformKey === 'youtube' && typeof fetchYouTubeChannelStats === 'function') {
+                fetchYouTubeChannelStats();
+            } else if (platformKey === 'twitch' && typeof fetchTwitchChannelStats === 'function') {
+                fetchTwitchChannelStats();
+            }
+            renderAnalysisPanels();
+            renderConnectedSocialAccounts();
+        }
+    };
+} catch (e) {}
+
+window.addEventListener('message', (event) => {
+    if (event.data && (event.data.type === 'SOCLIFY_OAUTH_SUCCESS' || event.data.platform)) {
+        const platformKey = event.data.platform;
+        const user = getApliHubUserData();
+        if (!user.connectedAccounts) user.connectedAccounts = {};
+        user.connectedAccounts[platformKey] = true;
+        saveApliHubUserData(user);
+
+        if (typeof showOAuthSuccessModal === 'function') {
+            showOAuthSuccessModal(platformKey);
+        }
+        if (platformKey === 'youtube' && typeof fetchYouTubeChannelStats === 'function') {
+            fetchYouTubeChannelStats();
+        } else if (platformKey === 'twitch' && typeof fetchTwitchChannelStats === 'function') {
+            fetchTwitchChannelStats();
+        }
         renderAnalysisPanels();
         renderConnectedSocialAccounts();
-    });
-} else {
+    }
+});
+
+window.addEventListener('storage', (e) => {
+    if (e.key && (e.key.endsWith('_token') || e.key === 'soclify_user_data' || e.key === 'aplihub_user_data')) {
+        renderAnalysisPanels();
+        renderConnectedSocialAccounts();
+        if (e.key.includes('youtube') && typeof fetchYouTubeChannelStats === 'function') fetchYouTubeChannelStats();
+        if (e.key.includes('twitch') && typeof fetchTwitchChannelStats === 'function') fetchTwitchChannelStats();
+    }
+});
+
+function initAllConnectedDashboards() {
     handleGlobalOAuthCallbacks();
     renderAnalysisPanels();
     renderConnectedSocialAccounts();
+    if (typeof renderTwitchLiveDashboard === 'function') renderTwitchLiveDashboard();
+    if (typeof renderYouTubeLiveDashboard === 'function') renderYouTubeLiveDashboard();
+    if (typeof fetchYouTubeChannelStats === 'function' && (localStorage.getItem('youtube_token') || localStorage.getItem('youtube_access_token'))) {
+        fetchYouTubeChannelStats();
+    }
+    if (typeof fetchTwitchChannelStats === 'function' && (localStorage.getItem('twitch_token') || localStorage.getItem('twitch_access_token'))) {
+        fetchTwitchChannelStats();
+    }
+}
+
+// Global initialization
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initAllConnectedDashboards);
+} else {
+    initAllConnectedDashboards();
 }
 
 // Backwards compatibility and window exports
@@ -2532,4 +3078,4 @@ window.SOCIAL_OAUTH_CONFIGS = SOCIAL_OAUTH_CONFIGS;
 
 
 
-
+
