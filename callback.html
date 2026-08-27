@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>ApliHub — Autoryzacja OAuth</title>
+  <title>ApliHub Soclify — Autoryzacja Konta</title>
   <style>
     body {
       margin: 0;
@@ -18,13 +18,13 @@
       text-align: center;
     }
     .card {
-      background: rgba(24, 24, 27, 0.85);
-      border: 1px solid rgba(255, 255, 255, 0.1);
-      border-radius: 16px;
-      padding: 36px 28px;
-      max-width: 440px;
+      background: rgba(24, 24, 27, 0.9);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      border-radius: 20px;
+      padding: 40px 32px;
+      max-width: 460px;
       width: 90%;
-      box-shadow: 0 20px 50px rgba(0,0,0,0.6), 0 0 30px rgba(245, 158, 11, 0.15);
+      box-shadow: 0 25px 60px rgba(0,0,0,0.7), 0 0 40px rgba(34, 197, 94, 0.15);
     }
     .spinner {
       width: 48px;
@@ -35,45 +35,63 @@
       animation: spin 0.9s linear infinite;
       margin: 0 auto 20px auto;
     }
+    .success-icon {
+      width: 64px;
+      height: 64px;
+      border-radius: 50%;
+      background: rgba(34, 197, 94, 0.15);
+      border: 2px solid #22c55e;
+      color: #22c55e;
+      font-size: 32px;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 20px auto;
+      font-weight: bold;
+    }
     @keyframes spin {
       0% { transform: rotate(0deg); }
       100% { transform: rotate(360deg); }
     }
     h2 {
-      font-size: 20px;
-      margin: 0 0 10px 0;
+      font-size: 22px;
+      margin: 0 0 12px 0;
       color: #fff;
+      font-weight: 800;
     }
     p {
-      font-size: 14px;
-      color: #a1a1aa;
-      line-height: 1.5;
-      margin: 0;
+      font-size: 14.5px;
+      color: #cbd5e1;
+      line-height: 1.6;
+      margin: 0 0 20px 0;
     }
     .btn {
       display: inline-block;
-      margin-top: 22px;
-      background: #f59e0b;
+      background: #22c55e;
       color: #000;
-      font-weight: 700;
+      font-weight: 800;
       font-size: 14px;
-      padding: 12px 24px;
-      border-radius: 8px;
+      padding: 12px 28px;
+      border-radius: 10px;
       text-decoration: none;
+      border: none;
+      cursor: pointer;
       transition: all 0.2s;
     }
     .btn:hover {
-      background: #d97706;
-      transform: translateY(-1px);
+      background: #16a34a;
+      transform: translateY(-2px);
+      box-shadow: 0 8px 20px rgba(34, 197, 94, 0.35);
     }
   </style>
 </head>
 <body>
   <div class="card">
     <div class="spinner" id="spinner"></div>
+    <div class="success-icon" id="success-icon">✓</div>
     <h2 id="status-title">Przetwarzanie autoryzacji...</h2>
-    <p id="status-desc">Trwa bezpieczne łączenie Twojego konta społecznościowego z ApliHub.</p>
-    <a href="index.html" class="btn" id="return-btn" style="display:none;">Wróć do aplikacji</a>
+    <p id="status-desc">Trwa bezpieczne pobieranie danych i łączenie konta z aplikacją Soclify.</p>
+    <button class="btn" id="return-btn" style="display:none;" onclick="window.close()">Zamknij to okno</button>
   </div>
 
   <script>
@@ -91,6 +109,7 @@
       const descEl = document.getElementById('status-desc');
       const btnEl = document.getElementById('return-btn');
       const spinnerEl = document.getElementById('spinner');
+      const successIconEl = document.getElementById('success-icon');
 
       if (error) {
         spinnerEl.style.display = 'none';
@@ -98,11 +117,15 @@
         titleEl.style.color = '#ef4444';
         descEl.textContent = 'Nie udało się połączyć konta: ' + error;
         btnEl.style.display = 'inline-block';
+        btnEl.style.background = '#ef4444';
+        btnEl.textContent = 'Zamknij';
         return;
       }
 
-      let detectedPlatform = 'twitch';
-      if (state.startsWith('youtube') || window.location.href.includes('youtube') || hash.includes('youtube')) {
+      let detectedPlatform = 'youtube';
+      if (state.startsWith('twitch') || window.location.href.includes('twitch') || hash.includes('twitch')) {
+        detectedPlatform = 'twitch';
+      } else if (state.startsWith('youtube') || window.location.href.includes('youtube') || hash.includes('youtube')) {
         detectedPlatform = 'youtube';
       } else if (state.startsWith('tiktok') || sessionStorage.getItem('tiktok_oauth_state') === state) {
         detectedPlatform = 'tiktok';
@@ -112,31 +135,33 @@
         detectedPlatform = 'facebook';
       }
 
-      // Handle Code Exchange (e.g. YouTube PKCE)
+      // 1. Code Exchange (e.g. YouTube PKCE)
+      let finalToken = accessToken;
       if (code) {
         if (detectedPlatform === 'youtube') {
           const codeVerifier = sessionStorage.getItem('youtube_code_verifier') || localStorage.getItem('youtube_code_verifier');
-          const cId = localStorage.getItem('youtube_client_id') || sessionStorage.getItem('youtube_client_id') || '';
+          const cId = localStorage.getItem('youtube_client_id') || sessionStorage.getItem('youtube_client_id') || '127719811655-rtplre9akrqai7tetmdq8do96ksk4nko.apps.googleusercontent.com';
           const redirectUri = window.location.origin + window.location.pathname;
 
           if (codeVerifier && cId) {
             try {
-              const bodyParams = {
-                client_id: cId,
-                code: code,
-                code_verifier: codeVerifier,
-                grant_type: 'authorization_code',
-                redirect_uri: redirectUri
-              };
               const res = await fetch('https://oauth2.googleapis.com/token', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-                body: new URLSearchParams(bodyParams)
+                body: new URLSearchParams({
+                  client_id: cId,
+                  code: code,
+                  code_verifier: codeVerifier,
+                  grant_type: 'authorization_code',
+                  redirect_uri: redirectUri
+                })
               });
               const data = await res.json();
               if (data.access_token) {
+                finalToken = data.access_token;
                 localStorage.setItem('youtube_token', data.access_token);
                 localStorage.setItem('youtube_access_token', data.access_token);
+                if (data.refresh_token) localStorage.setItem('youtube_refresh_token', data.refresh_token);
               }
             } catch (e) {
               console.warn('Code exchange error:', e);
@@ -146,12 +171,12 @@
         localStorage.setItem(detectedPlatform + '_code', code);
       }
 
-      if (accessToken) {
-        localStorage.setItem(detectedPlatform + '_token', accessToken);
-        localStorage.setItem(detectedPlatform + '_access_token', accessToken);
+      if (finalToken) {
+        localStorage.setItem(detectedPlatform + '_token', finalToken);
+        localStorage.setItem(detectedPlatform + '_access_token', finalToken);
       }
 
-      // Mark connected in ApliHub user data
+      // Mark connected in ApliHub user store
       try {
         const userStoreRaw = localStorage.getItem('soclify_user_data') || localStorage.getItem('aplihub_user_data');
         const userStore = userStoreRaw ? JSON.parse(userStoreRaw) : {};
@@ -161,23 +186,43 @@
         localStorage.setItem('aplihub_user_data', JSON.stringify(userStore));
       } catch (e) {}
 
-      // Broadcast channel for desktop/other open tabs
+      // 2. Notify Parent Window (if opened in popup)
+      if (window.opener && !window.opener.closed) {
+        try {
+          window.opener.postMessage({
+            type: 'SOCLIFY_OAUTH_SUCCESS',
+            platform: detectedPlatform,
+            token: finalToken,
+            code: code
+          }, '*');
+        } catch (e) {}
+      }
+
+      // 3. Notify BroadcastChannel (desktop app and open tabs)
       try {
         const bc = new BroadcastChannel('aplihub_oauth_channel');
-        bc.postMessage({ platform: detectedPlatform, success: true, token: accessToken, code: code });
+        bc.postMessage({
+          type: 'SOCLIFY_OAUTH_SUCCESS',
+          platform: detectedPlatform,
+          token: finalToken,
+          code: code
+        });
       } catch (e) {}
 
+      // 4. Update UI
       spinnerEl.style.display = 'none';
-      titleEl.textContent = 'Połączono pomyślnie!';
+      successIconEl.style.display = 'flex';
+      titleEl.textContent = '🎉 Połączono pomyślnie!';
       titleEl.style.color = '#22c55e';
-      descEl.textContent = 'Twoje konto ' + detectedPlatform.toUpperCase() + ' zostało połączone. Za chwilę wrócisz do aplikacji...';
+      descEl.innerHTML = 'Twoje konto <strong>' + detectedPlatform.toUpperCase() + '</strong> zostało pomyślnie powiązane z aplikacją Soclify.<br><br>Możesz teraz zamknąć tę kartę i przejść do aplikacji!';
+      btnEl.style.display = 'inline-block';
 
-      setTimeout(function() {
-        const targetUrl = window.location.href.includes('Algo%20analyzer') 
-          ? 'index.html' 
-          : 'https://vertisek.github.io/ApliHub/';
-        window.location.href = targetUrl;
-      }, 1500);
+      // Auto close popup if opener exists
+      if (window.opener) {
+        setTimeout(function() {
+          window.close();
+        }, 2000);
+      }
     })();
   </script>
 </body>
